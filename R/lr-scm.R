@@ -1,9 +1,16 @@
 
-#' Stepwise covariate modelling for logistic regression
+#' Stepwise covariate modelling for exposure-response models
 #'
 #' @param mod An erlr model object
 #' @param candidates Character vector with list of candidate terms
 #' @param threshold Threshold to test against
+#' @param test Which significance test to use when comparing nested
+#' models. `"auto"` (the default) picks a likelihood-ratio chi-squared
+#' test (`"Chisq"`) for families with known dispersion (binomial,
+#' poisson) and an F-test (`"F"`) for families with an estimated
+#' dispersion parameter (gaussian, Gamma, inverse.gaussian, quasi*),
+#' matching `stats::anova()`'s own `test` argument. Set explicitly to
+#' override.
 #' @param seed Optional seed to control order of term tests
 #'
 #' @returns For `lr_scm_forward()` and `lr_scm_backward()`, the updated erlr model
@@ -23,7 +30,8 @@ NULL
 
 #' @rdname lr_scm
 #' @export
-lr_scm_forward <- function(mod, candidates, threshold = 0.01, seed = NULL) {
+lr_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto", "Chisq", "F"), seed = NULL) {
+  test <- match.arg(test)
   if (is.null(seed)) {
     seed <- .pick_seed()
     rlang::inform(paste("Using seed =", seed))
@@ -34,18 +42,19 @@ lr_scm_forward <- function(mod, candidates, threshold = 0.01, seed = NULL) {
       mod_out <- .lr_scm_forward(
         mod = mod,
         candidates = candidates,
-        threshold = threshold
+        threshold = threshold,
+        test = test
       )
     }
   )
   return(mod_out)
 }
 
-.lr_scm_forward <- function(mod, candidates, threshold) {
+.lr_scm_forward <- function(mod, candidates, threshold, test) {
   history <- lr_scm_history(mod)
   last_iter <- max(history$iteration)
   while (TRUE) {
-    mod_new <- .lr_once_forward(mod, candidates, threshold)
+    mod_new <- .lr_once_forward(mod, candidates, threshold, test)
     history_new <- lr_scm_history(mod_new)
     this_iter <- max(history_new$iteration)
     if (this_iter == last_iter) return(mod)
@@ -61,7 +70,8 @@ lr_scm_forward <- function(mod, candidates, threshold = 0.01, seed = NULL) {
 
 #' @rdname lr_scm
 #' @export
-lr_scm_backward <- function(mod, candidates, threshold = 0.001, seed = NULL) {
+lr_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("auto", "Chisq", "F"), seed = NULL) {
+  test <- match.arg(test)
   if (is.null(seed)) {
     seed <- .pick_seed()
     rlang::inform(paste("Using seed =", seed))
@@ -72,18 +82,19 @@ lr_scm_backward <- function(mod, candidates, threshold = 0.001, seed = NULL) {
       mod_out <- .lr_scm_backward(
         mod = mod,
         candidates = candidates,
-        threshold = threshold
+        threshold = threshold,
+        test = test
       )
     }
   )
   return(mod_out)
 }
 
-.lr_scm_backward <- function(mod, candidates, threshold) {
+.lr_scm_backward <- function(mod, candidates, threshold, test) {
   history <- lr_scm_history(mod)
   last_iter <- max(history$iteration)
   while (TRUE) {
-    mod_new <- .lr_once_backward(mod, candidates, threshold)
+    mod_new <- .lr_once_backward(mod, candidates, threshold, test)
     history_new <- lr_scm_history(mod_new)
     this_iter <- max(history_new$iteration)
     if (this_iter == last_iter) return(mod)
@@ -118,7 +129,7 @@ lr_scm_history <- function(mod) {
   return(history_row)
 }
 
-.lr_once_forward <- function(mod, candidates, threshold) {
+.lr_once_forward <- function(mod, candidates, threshold, test) {
   candidates <- sample(candidates)
   history <- lr_scm_history(mod)
   iter <- max(history$iteration) + 1L
@@ -131,7 +142,7 @@ lr_scm_history <- function(mod) {
     attm <- attm + 1L
     if (!.term_in_model(mod, add)) {
       mod_new <- .lr_add_term(mod, add, quiet = TRUE)
-      p_val <- .lr_anova_p(mod, mod_new)
+      p_val <- .lr_anova_p(mod, mod_new, test)
       history_row <- tibble::tibble(
         iteration = iter,
         attempt = attm,
@@ -165,7 +176,7 @@ lr_scm_history <- function(mod) {
   return(best_mod)
 }
 
-.lr_once_backward <- function(mod, candidates, threshold) {
+.lr_once_backward <- function(mod, candidates, threshold, test) {
   trm_mod <- stats::terms(mod)
   trm_lab <- attr(trm_mod, "term.labels")
   candidates <- intersect(trm_lab, candidates)
@@ -182,7 +193,7 @@ lr_scm_history <- function(mod) {
     attm <- attm + 1L
     if (.term_in_model(mod, del)) {
       mod_new <- .lr_remove_term(mod, del, quiet = TRUE)
-      p_val <- .lr_anova_p(mod, mod_new)
+      p_val <- .lr_anova_p(mod, mod_new, test)
       history_row <- tibble::tibble(
         iteration = iter,
         attempt = attm,
@@ -216,9 +227,12 @@ lr_scm_history <- function(mod) {
   return(best_mod)
 }
 
-.lr_anova_p <- function(mod1, mod2) {
-  smm <- stats::anova(mod1, mod2) 
-  return(smm$`Pr(>Chi)`[2])
+.lr_anova_p <- function(mod1, mod2, test) {
+  family_name <- stats::family(mod1)$family
+  test <- .lr_resolve_test(test, family_name)
+  smm <- stats::anova(mod1, mod2, test = test)
+  p_col <- grep("^Pr\\(", colnames(smm))[1]
+  return(smm[[p_col]][2])
 }
 
 .term_in_model <- function(mod, term) {
@@ -250,7 +264,7 @@ lr_scm_history <- function(mod) {
   fml <- stats::as.formula(
     paste(deparse(mod$formula), deparse(add[[2]]), sep = " + ")
   )
-  lr_model(formula = fml, data = dat)
+  lr_model(formula = fml, data = dat, family = stats::family(mod))
 }
 
 .lr_remove_term <- function(mod, remove, quiet = FALSE) {
@@ -265,7 +279,7 @@ lr_scm_history <- function(mod) {
   }
   dat <- mod$data
   trm_new <- stats::drop.terms(trm_mod, ind, keep.response = TRUE)
-  lr_model(formula = trm_new, data = dat)
+  lr_model(formula = trm_new, data = dat, family = stats::family(mod))
 }
 
 

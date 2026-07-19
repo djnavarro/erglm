@@ -2,12 +2,12 @@
 % Please edit documentation in R/lr-core.R
 \name{lr_predict}
 \alias{lr_predict}
-\title{Predictions and confidence intervals for logistic regression}
+\title{Predictions and confidence intervals for exposure-response models}
 \usage{
 lr_predict(object, newdata = NULL, conf_level = 0.95)
 }
 \arguments{
-\item{object}{A logistic regression model}
+\item{object}{An erlr model, as returned by \code{\link[=lr_model]{lr_model()}}}
 
 \item{newdata}{Data frame containing cases to be predicted}
 
@@ -17,11 +17,19 @@ lr_predict(object, newdata = NULL, conf_level = 0.95)
 A tibble
 }
 \description{
-Predictions and confidence intervals for logistic regression
+Predictions and confidence intervals for exposure-response models
+}
+\details{
+Computes intervals on the link scale and back-transforms with
+\code{stats::family(object)$linkinv}, so this works for any \code{glm()} family,
+not just binomial/logistic models.
 }
 \examples{
 mod <- lr_model(ae1 ~ aucss, lr_data)
 prd <- lr_predict(mod, lr_data)
 prd
+
+mod_gauss <- lr_model(biomarker_change ~ aucss, lr_data, family = gaussian())
+lr_predict(mod_gauss, lr_data)
 
 }

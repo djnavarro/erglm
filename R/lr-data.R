@@ -35,6 +35,21 @@
             round(digits = 3),
           ae1 = as.numeric(logit(stats::runif(n)) < aucss/200 - 2 + 1 * as.numeric(sex=="Female")),
           ae2 = as.numeric(logit(stats::runif(n)) < aucss/500 - 2.0),
+        ) |>
+        # additional non-binary responses, for demonstrating/testing
+        # poisson, gaussian, and Gamma families -- appended after the
+        # existing columns so their random draws don't perturb ae1/ae2
+        # under the same seed.
+        dplyr::mutate(
+          ae_count = stats::rpois(
+            n,
+            lambda = exp(-1 + aucss / 1000 + 0.3 * as.numeric(sex == "Female"))
+          ),
+          biomarker_change = stats::rnorm(n, mean = -2 + aucss / 500, sd = 1.5),
+          ae_duration = {
+            mean_duration <- 5 + dose / 50 + aucss / 500
+            stats::rgamma(n, shape = 2, rate = 2 / mean_duration)
+          }
         )
     }
   )
@@ -48,13 +63,16 @@
   attr(lr_data$cmaxss, "label") <- "Cmax,ss"
   attr(lr_data$ae1, "label") <- "Response 1"
   attr(lr_data$ae2, "label") <- "Response 2"
+  attr(lr_data$ae_count, "label") <- "AE count"
+  attr(lr_data$biomarker_change, "label") <- "Biomarker change from baseline"
+  attr(lr_data$ae_duration, "label") <- "AE duration"
   return(lr_data)
 }
 
 #lr_data <- .make_lr_data(seed = 2407L)
 #usethis::use_data(lr_data, overwrite = TRUE)
 
-#' Sample simulated data for logistic regression exposure-response models with covariates
+#' Sample simulated data for exposure-response models with covariates
 #'
 #' @name lr_data
 #' @format A data frame with columns:
@@ -67,8 +85,13 @@
 #' \item{treatment}{Treatment}
 #' \item{aucss}{AUCss}
 #' \item{cmaxss}{Cmax,ss}
-#' \item{ae1}{Binary response 1 value}
-#' \item{ae2}{Binary response 2 value}
+#' \item{ae1}{Binary response 1 value (for binomial models)}
+#' \item{ae2}{Binary response 2 value (for binomial models)}
+#' \item{ae_count}{Count response (for poisson models)}
+#' \item{biomarker_change}{Continuous response, can be negative (for
+#' gaussian models)}
+#' \item{ae_duration}{Continuous, strictly positive, right-skewed
+#' response (for Gamma models)}
 #' }
 #' @details
 #'

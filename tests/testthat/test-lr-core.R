@@ -69,3 +69,36 @@ test_that("lr_predict can adjust confidence level", {
   expect_equal(prd0$ci_upper, prd0$fit_resp)
 })
 
+test_that("lr_model supports non-binomial glm families", {
+  mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
+  expect_s3_class(mod_pois, "glm")
+  expect_equal(family(mod_pois)$family, "poisson")
+
+  mod_gauss <- lr_model(biomarker_change ~ aucss, lr_data, family = gaussian())
+  expect_equal(family(mod_gauss)$family, "gaussian")
+
+  mod_gamma <- lr_model(ae_duration ~ aucss + dose, lr_data, family = Gamma(link = "log"))
+  expect_equal(family(mod_gamma)$family, "Gamma")
+})
+
+test_that("lr_predict is family-generic", {
+  mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
+  prd <- lr_predict(mod_pois)
+  pr_resp <- predict(mod_pois, type = "response", se.fit = TRUE)
+  expect_equal(prd$fit_resp, pr_resp$fit)
+
+  mod_gauss <- lr_model(biomarker_change ~ aucss, lr_data, family = gaussian())
+  prd_gauss <- lr_predict(mod_gauss)
+  pr_resp_gauss <- predict(mod_gauss, type = "response", se.fit = TRUE)
+  expect_equal(prd_gauss$fit_resp, pr_resp_gauss$fit)
+})
+
+test_that("lr_simulator is family-generic", {
+  mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
+  par1 <- coef(mod_pois)
+  sim_fn <- lr_simulator(mod_pois)
+  p1 <- sim_fn(param = par1, data = lr_data)
+  p2 <- unname(predict(mod_pois, type = "response"))
+  expect_equal(p1, p2)
+})
+

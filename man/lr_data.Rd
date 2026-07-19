@@ -3,7 +3,7 @@
 \docType{data}
 \name{lr_data}
 \alias{lr_data}
-\title{Sample simulated data for logistic regression exposure-response models with covariates}
+\title{Sample simulated data for exposure-response models with covariates}
 \format{
 A data frame with columns:
 \describe{
@@ -15,15 +15,20 @@ A data frame with columns:
 \item{treatment}{Treatment}
 \item{aucss}{AUCss}
 \item{cmaxss}{Cmax,ss}
-\item{ae1}{Binary response 1 value}
-\item{ae2}{Binary response 2 value}
+\item{ae1}{Binary response 1 value (for binomial models)}
+\item{ae2}{Binary response 2 value (for binomial models)}
+\item{ae_count}{Count response (for poisson models)}
+\item{biomarker_change}{Continuous response, can be negative (for
+gaussian models)}
+\item{ae_duration}{Continuous, strictly positive, right-skewed
+response (for Gamma models)}
 }
 }
 \usage{
 lr_data
 }
 \description{
-Sample simulated data for logistic regression exposure-response models with covariates
+Sample simulated data for exposure-response models with covariates
 }
 \details{
 This simulated dataset is entirely synthetic

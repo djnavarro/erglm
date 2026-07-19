@@ -14,3 +14,23 @@ This is the simulation article
 ```{r setup}
 library(erlr)
 ```
+
+## Visual predictive checks
+
+`lr_vpc_sim()` draws simulated response values that reflect both parameter uncertainty (by resampling coefficients from the model's asymptotic sampling distribution) and, family-appropriately, residual noise around the resulting expectation:
+
+```{r vpc-1}
+mod <- lr_model(ae2 ~ aucss + sex, lr_data)
+sim <- lr_vpc_sim(mod, nsim = 20, seed = 1234)
+sim
+```
+
+The noise model is family-specific: Bernoulli draws for `binomial`, Poisson draws for `poisson`, normal draws for `gaussian`, and gamma draws for `Gamma`. For example, with a Poisson response:
+
+```{r vpc-2}
+mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
+sim_pois <- lr_vpc_sim(mod_pois, nsim = 20, seed = 1234)
+sim_pois
+```
+
+Other `glm()` families aren't currently supported by `lr_vpc_sim()` and will raise an informative error rather than silently falling back to an expectation-only draw.

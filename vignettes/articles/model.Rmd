@@ -18,7 +18,7 @@ library(tibble)
 
 
 
-The core function is `lr_model()`, a very thin wrapper around `glm()` that specifies the family and link function to create a logistic regression. The package comes with a synthetic data set called `lr_data` that we can use:
+The core function is `lr_model()`, a very thin wrapper around `glm()`. By default it fits a logistic regression (`family = binomial(link = "logit")`), but any `glm()` family can be supplied explicitly -- `poisson`, `gaussian`, and `Gamma` are tested and supported alongside `binomial`. The package comes with a synthetic data set called `lr_data` that we can use:
 
 ```{r data-1}
 lr_data
@@ -76,3 +76,21 @@ To extract the log, use `lr_scm_history()`:
 ```{r}
 lr_scm_history(final_mod)
 ```
+
+## Other `glm()` families
+
+`lr_data` also includes a count response (`ae_count`), a continuous response (`biomarker_change`), and a right-skewed positive continuous response (`ae_duration`), for demonstrating `poisson`, `gaussian`, and `Gamma` models respectively:
+
+```{r model-2}
+mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
+mod_pois
+```
+
+`lr_predict()` and `lr_simulator()` work unchanged, since both operate on the link scale generically via `stats::family(object)$linkinv`:
+
+```{r predict-3}
+mod_pois |> 
+  lr_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
+```
+
+Stepwise covariate modelling also generalises: by default `lr_scm_forward()`/`lr_scm_backward()` pick a likelihood-ratio chi-squared test for `poisson` (as here) and `binomial` models, and an F-test for `gaussian`/`Gamma` models, matching `stats::anova()`'s own `test` argument. This can be overridden with the `test` argument if needed.

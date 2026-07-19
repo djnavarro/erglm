@@ -5,11 +5,23 @@
 \alias{lr_scm_forward}
 \alias{lr_scm_backward}
 \alias{lr_scm_history}
-\title{Stepwise covariate modelling for logistic regression}
+\title{Stepwise covariate modelling for exposure-response models}
 \usage{
-lr_scm_forward(mod, candidates, threshold = 0.01, seed = NULL)
+lr_scm_forward(
+  mod,
+  candidates,
+  threshold = 0.01,
+  test = c("auto", "Chisq", "F"),
+  seed = NULL
+)
 
-lr_scm_backward(mod, candidates, threshold = 0.001, seed = NULL)
+lr_scm_backward(
+  mod,
+  candidates,
+  threshold = 0.001,
+  test = c("auto", "Chisq", "F"),
+  seed = NULL
+)
 
 lr_scm_history(mod)
 }
@@ -20,6 +32,14 @@ lr_scm_history(mod)
 
 \item{threshold}{Threshold to test against}
 
+\item{test}{Which significance test to use when comparing nested
+models. \code{"auto"} (the default) picks a likelihood-ratio chi-squared
+test (\code{"Chisq"}) for families with known dispersion (binomial,
+poisson) and an F-test (\code{"F"}) for families with an estimated
+dispersion parameter (gaussian, Gamma, inverse.gaussian, quasi*),
+matching \code{stats::anova()}'s own \code{test} argument. Set explicitly to
+override.}
+
 \item{seed}{Optional seed to control order of term tests}
 }
 \value{
@@ -28,7 +48,7 @@ is returned, with the SCM history log updated internally. For \code{lr_scm_histo
 a data frame is returned containing the SCM history log
 }
 \description{
-Stepwise covariate modelling for logistic regression
+Stepwise covariate modelling for exposure-response models
 }
 \examples{
 mod0 <- lr_model(ae1 ~ aucss, lr_data)

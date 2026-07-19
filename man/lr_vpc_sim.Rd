@@ -2,12 +2,12 @@
 % Please edit documentation in R/lr-vpc.R
 \name{lr_vpc_sim}
 \alias{lr_vpc_sim}
-\title{VPC simulations for logistic regression models}
+\title{VPC simulations for exposure-response models}
 \usage{
 lr_vpc_sim(object, nsim = 100, seed = NULL)
 }
 \arguments{
-\item{object}{Logistic regression model}
+\item{object}{An erlr model, as returned by \code{\link[=lr_model]{lr_model()}}}
 
 \item{nsim}{Number of replicates}
 
@@ -20,15 +20,28 @@ response variable replaced by its simulated value under parameter
 uncertainty.
 }
 \description{
-VPC simulations for logistic regression models
+VPC simulations for exposure-response models
 }
 \details{
-To visualise the result (e.g. as a VPC-style plot comparing
+For each replicate, parameter uncertainty is reflected by
+sampling coefficients from the model's asymptotic sampling
+distribution and computing the expected response at those
+coefficients; family-appropriate residual noise is then added on top
+of that expectation to produce a full predictive draw (Bernoulli
+draws for \code{binomial}, Poisson draws for \code{poisson}, normal draws for
+\code{gaussian}, gamma draws for \code{Gamma}). The dispersion parameter used
+for that noise is a single point estimate
+(\code{summary(object)$dispersion}), not resampled per replicate. Other
+\code{glm()} families are not currently supported and will raise an
+error. To visualise the result (e.g. as a VPC-style plot comparing
 observed and simulated response rates), see \code{erplots::er_vpc_plot()}.
 }
 \examples{
 mod <- lr_model(ae2 ~ aucss + sex, lr_data)
 sim <- lr_vpc_sim(mod)
 sim
+
+mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
+lr_vpc_sim(mod_pois)
 
 }

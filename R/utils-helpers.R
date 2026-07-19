@@ -8,7 +8,7 @@
 
 .as_erlr <- function(mod) {
   class(mod) <- c("erlr_glm", class(mod)) # append class in case new methods are required
-  mod$erlr <- list(type = "logistic") # internal "erlr" list to store erlr-specific info
+  mod$erlr <- list(type = stats::family(mod)$family) # internal "erlr" list to store erlr-specific info
   mod
 }
 

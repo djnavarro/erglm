@@ -23,7 +23,12 @@ er_simulate.erlr_glm <- function(model, newdata, nsim = 100, seed = NULL, ...) {
 er_summary.erlr_glm <- function(model, ...) {
   coefs <- summary(model)$coefficients
   if (nrow(coefs) < 2) return(NULL)
-  list(p_value = unname(coefs[2, "Pr(>|z|)"]))
+  # column is "Pr(>|z|)" for families with known dispersion (binomial,
+  # poisson) but "Pr(>|t|)" for families with an estimated dispersion
+  # parameter (gaussian, Gamma, inverse.gaussian, quasi*) -- match by
+  # pattern rather than exact name.
+  p_col <- grep("^Pr\\(", colnames(coefs))[1]
+  list(p_value = unname(coefs[2, p_col]))
 }
 
 .onLoad <- function(libname, pkgname) {

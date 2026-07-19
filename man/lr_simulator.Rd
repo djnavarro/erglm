@@ -2,12 +2,12 @@
 % Please edit documentation in R/lr-core.R
 \name{lr_simulator}
 \alias{lr_simulator}
-\title{Simulate from a logistic regression model}
+\title{Simulate from an exposure-response model}
 \usage{
 lr_simulator(object)
 }
 \arguments{
-\item{object}{A logistic regression model}
+\item{object}{An erlr model, as returned by \code{\link[=lr_model]{lr_model()}}}
 }
 \value{
 A function with arguments \code{param}, \code{data}, and \code{type}.
@@ -21,13 +21,13 @@ of prediction to generate (defaults to \code{"response"})
 Takes a fitted glm object as input and returns a function
 that will evaluate the underlying structural model with
 user-specified parameters or data (e.g., for VPCs or
-other counterfactual simulation scenarios). In principle
-this should work for glms more generally, not merely
-logistic regressions, but has not been tested except for
-logistic regression models
+other counterfactual simulation scenarios). Uses
+\code{stats::family(object)$linkinv}, so this works for any \code{glm()}
+family, not just binomial/logistic models; tested for
+binomial, poisson, gaussian, and Gamma families.
 }
 \description{
-Simulate from a logistic regression model
+Simulate from an exposure-response model
 }
 \examples{
 mod1 <- lr_model(ae2 ~ aucss + sex, lr_data)

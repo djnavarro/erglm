@@ -1,18 +1,28 @@
 
 
-#' Fit a logistic regression function
+#' Fit an exposure-response model based on `glm()`
 #'
 #' @param formula Model formula
 #' @param data Data set
+#' @param family The error distribution and link function to use, as for
+#' `stats::glm()`. Defaults to `stats::binomial(link = "logit")` for
+#' backward compatibility. Tested and officially supported for
+#' `binomial()`, `poisson()`, `gaussian()`, and `Gamma()`; other `glm()`
+#' families should work through the same generic mechanisms but are
+#' untested.
 #' @param ... Other arguments passed to `glm()`
 #' @returns A glm object
 #' @export
 #' @examples
 #' mod <- lr_model(ae1 ~ aucss, lr_data)
 #' mod
-#' 
-lr_model <- function(formula, data, ...) {
-  mod <- stats::glm(formula = formula, data = data, family = stats::binomial(link = "logit"), ...)
+#'
+#' # other glm() families are also supported
+#' mod_pois <- lr_model(ae_count ~ aucss, lr_data, family = poisson())
+#' mod_pois
+#'
+lr_model <- function(formula, data, family = stats::binomial(link = "logit"), ...) {
+  mod <- stats::glm(formula = formula, data = data, family = family, ...)
   .as_erlr(mod)
 }
 
@@ -20,18 +30,25 @@ lr_model <- function(formula, data, ...) {
 # should work for any glm, not just logistic. adapted from:
 # https://fromthebottomoftheheap.net/2018/12/10/confidence-intervals-for-glms/
 
-#' Predictions and confidence intervals for logistic regression
+#' Predictions and confidence intervals for exposure-response models
 #'
-#' @param object A logistic regression model
+#' @param object An erlr model, as returned by [lr_model()]
 #' @param newdata Data frame containing cases to be predicted
 #' @param conf_level Confidence level for the intervals
 #' @returns A tibble
+#'
+#' @details Computes intervals on the link scale and back-transforms with
+#' `stats::family(object)$linkinv`, so this works for any `glm()` family,
+#' not just binomial/logistic models.
 #'
 #' @export
 #' @examples
 #' mod <- lr_model(ae1 ~ aucss, lr_data)
 #' prd <- lr_predict(mod, lr_data)
 #' prd
+#'
+#' mod_gauss <- lr_model(biomarker_change ~ aucss, lr_data, family = gaussian())
+#' lr_predict(mod_gauss, lr_data)
 #' 
 lr_predict <- function(object, newdata = NULL, conf_level = .95) {
   if (is.null(newdata)) newdata <- object$data
@@ -52,9 +69,9 @@ lr_predict <- function(object, newdata = NULL, conf_level = .95) {
   return(out)
 }
 
-#' Simulate from a logistic regression model
+#' Simulate from an exposure-response model
 #'
-#' @param object A logistic regression model
+#' @param object An erlr model, as returned by [lr_model()]
 #'
 #' @returns A function with arguments `param`, `data`, and `type`.
 #' - The `param` argument should be a vector of coefficients
@@ -65,10 +82,10 @@ lr_predict <- function(object, newdata = NULL, conf_level = .95) {
 #' Takes a fitted glm object as input and returns a function
 #' that will evaluate the underlying structural model with
 #' user-specified parameters or data (e.g., for VPCs or
-#' other counterfactual simulation scenarios). In principle
-#' this should work for glms more generally, not merely 
-#' logistic regressions, but has not been tested except for
-#' logistic regression models
+#' other counterfactual simulation scenarios). Uses
+#' `stats::family(object)$linkinv`, so this works for any `glm()`
+#' family, not just binomial/logistic models; tested for
+#' binomial, poisson, gaussian, and Gamma families.
 #'  
 #' @examples
 #' mod1 <- lr_model(ae2 ~ aucss + sex, lr_data)

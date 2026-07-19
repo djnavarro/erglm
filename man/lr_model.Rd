@@ -2,14 +2,21 @@
 % Please edit documentation in R/lr-core.R
 \name{lr_model}
 \alias{lr_model}
-\title{Fit a logistic regression function}
+\title{Fit an exposure-response model based on \code{glm()}}
 \usage{
-lr_model(formula, data, ...)
+lr_model(formula, data, family = stats::binomial(link = "logit"), ...)
 }
 \arguments{
 \item{formula}{Model formula}
 
 \item{data}{Data set}
+
+\item{family}{The error distribution and link function to use, as for
+\code{stats::glm()}. Defaults to \code{stats::binomial(link = "logit")} for
+backward compatibility. Tested and officially supported for
+\code{binomial()}, \code{poisson()}, \code{gaussian()}, and \code{Gamma()}; other \code{glm()}
+families should work through the same generic mechanisms but are
+untested.}
 
 \item{...}{Other arguments passed to \code{glm()}}
 }
@@ -17,10 +24,14 @@ lr_model(formula, data, ...)
 A glm object
 }
 \description{
-Fit a logistic regression function
+Fit an exposure-response model based on \code{glm()}
 }
 \examples{
 mod <- lr_model(ae1 ~ aucss, lr_data)
 mod
+
+# other glm() families are also supported
+mod_pois <- lr_model(ae_count ~ aucss, lr_data, family = poisson())
+mod_pois
 
 }
