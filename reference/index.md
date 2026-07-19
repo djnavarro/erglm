@@ -13,27 +13,6 @@ Build logistic regression models for exposure-response
   [`lr_scm_history()`](https://erlr.djnavarro.net/reference/lr_scm.md) :
   Stepwise covariate modelling for logistic regression
 
-## Plot
-
-Exposure-response plots for logistic regression models
-
-- [`lr_plot()`](https://erlr.djnavarro.net/reference/lr_plot.md)
-  [`lr_plot_style()`](https://erlr.djnavarro.net/reference/lr_plot.md)
-  [`lr_plot_show_model()`](https://erlr.djnavarro.net/reference/lr_plot.md)
-  [`lr_plot_show_quantiles()`](https://erlr.djnavarro.net/reference/lr_plot.md)
-  [`lr_plot_show_datastrip()`](https://erlr.djnavarro.net/reference/lr_plot.md)
-  [`lr_plot_show_groups()`](https://erlr.djnavarro.net/reference/lr_plot.md)
-  [`lr_plot_build()`](https://erlr.djnavarro.net/reference/lr_plot.md) :
-  Builds an exposure-response plot for a logistic regression model
-- [`build_datastrip_jitter()`](https://erlr.djnavarro.net/reference/lr_partial.md)
-  [`build_group_boxplot()`](https://erlr.djnavarro.net/reference/lr_partial.md)
-  [`build_group_violin()`](https://erlr.djnavarro.net/reference/lr_partial.md)
-  [`build_model_ribbonline()`](https://erlr.djnavarro.net/reference/lr_partial.md)
-  [`build_model_spaghetti()`](https://erlr.djnavarro.net/reference/lr_partial.md)
-  [`build_quantile_errorbar()`](https://erlr.djnavarro.net/reference/lr_partial.md)
-  [`build_summary_pvalue()`](https://erlr.djnavarro.net/reference/lr_partial.md)
-  : Partial builders for logistic regression plots
-
 ## Simulate
 
 Simulation tools for exposure-response logistic regressions
@@ -42,8 +21,6 @@ Simulation tools for exposure-response logistic regressions
   : Simulate from a logistic regression model
 - [`lr_vpc_sim()`](https://erlr.djnavarro.net/reference/lr_vpc_sim.md) :
   VPC simulations for logistic regression models
-- [`lr_vpc_plot()`](https://erlr.djnavarro.net/reference/lr_vpc_plot.md)
-  : Plot VPC simulations for logistic regression models
 
 ## Other
 
@@ -55,8 +32,3 @@ Other functions and objects
 - [`logit()`](https://erlr.djnavarro.net/reference/logit.md)
   [`invlogit()`](https://erlr.djnavarro.net/reference/logit.md) : Logit
   and inverse logit functions
-- [`clopper_pearson()`](https://erlr.djnavarro.net/reference/clopper_pearson.md)
-  : Clopper-Pearson confidence interval for binary data
-- [`cut_exposure_quantile()`](https://erlr.djnavarro.net/reference/cut_quantile.md)
-  [`cut_quantile()`](https://erlr.djnavarro.net/reference/cut_quantile.md)
-  : Cut a continuous variable into quantiles

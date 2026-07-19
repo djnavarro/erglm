@@ -3,6 +3,7 @@
 This is the modelling article
 
 ``` r
+
 library(erlr)
 library(tibble)
 ```
@@ -15,6 +16,7 @@ The package comes with a synthetic data set called `lr_data` that we can
 use:
 
 ``` r
+
 lr_data
 #> # A tibble: 300 × 10
 #>       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2
@@ -37,6 +39,7 @@ lr_data
 Creating a model:
 
 ``` r
+
 mod <- lr_model(formula = ae1 ~ aucss, data = lr_data)
 mod
 #> 
@@ -58,6 +61,7 @@ The [`lr_predict()`](https://erlr.djnavarro.net/reference/lr_predict.md)
 function produces model predictions:
 
 ``` r
+
 pred <- mod |> 
   lr_predict(newdata = tibble(
     aucss = seq(from = 0, to = 1500, by = 100)
@@ -87,6 +91,7 @@ pred
 The confidence level can be adjusted using the `conf_level` argument
 
 ``` r
+
 pred <- mod |> 
   lr_predict(
     newdata = tibble(aucss = seq(from = 0, to = 1500, by = 100)), 
@@ -121,6 +126,7 @@ There are two functions that control SCM regression,
 [`lr_scm_backward()`](https://erlr.djnavarro.net/reference/lr_scm.md):
 
 ``` r
+
 base_mod <- lr_model(formula = ae1 ~ aucss, data = lr_data)
 candidates <- c("sex", "dose", "weight", "age")
 
@@ -146,6 +152,7 @@ To extract the log, use
 [`lr_scm_history()`](https://erlr.djnavarro.net/reference/lr_scm.md):
 
 ``` r
+
 lr_scm_history(final_mod)
 #> # A tibble: 5 × 11
 #>   iteration attempt step       action term_tested model_tested   model_converged

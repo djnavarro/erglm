@@ -11,13 +11,13 @@ Source:
 [`DESCRIPTION`](https://github.com/djnavarro/erlr/blob/main/DESCRIPTION)
 
 Navarro D (2026). *erlr: Exposure-Response Tools for Logistic Regression
-Models*. R package version 0.0.9.9000,
+Models*. R package version 0.1.0.9000,
 <https://github.com/djnavarro/erlr>.
 
     @Manual{,
       title = {erlr: Exposure-Response Tools for Logistic Regression Models},
       author = {Danielle Navarro},
       year = {2026},
-      note = {R package version 0.0.9.9000},
+      note = {R package version 0.1.0.9000},
       url = {https://github.com/djnavarro/erlr},
     }
