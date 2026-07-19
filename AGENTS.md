@@ -39,11 +39,11 @@ published, or its `erlr`-dependent tests/vignette will break.
 ## Planned work
 
 See [PLAN.md](PLAN.md) for the history of this generalisation/rename
-project. Both the family generalisation (steps 1-5) and the `erglm`
-rename (step 6) described there are now done. Renaming the actual
-GitHub repo (`djnavarro/erlr` -> `djnavarro/erglm`) and repointing the
-`erglm.djnavarro.net` pkgdown domain are manual follow-ups, not done by
-editing files in this repo.
+project. The family generalisation (steps 1-5), the `erglm` rename
+(step 6), and its manual infrastructure follow-ups (renaming the
+GitHub repo `djnavarro/erlr` -> `djnavarro/erglm`, and repointing the
+`erglm.djnavarro.net` pkgdown domain/DNS) are all now done. The only
+remaining item is the companion `erplots` repo update noted above.
 
 ## Structure
 

@@ -179,17 +179,16 @@ debate if new information changes the calculus.
    helpers → `.erglm_*`. Clean break, no deprecated `lr_*` aliases.
    Version bumped to `0.2.0.9000`.
 
-   **Not done as part of this pass** (tracked separately, per the
-   erlr→erglm rename plan's stated scope):
-   - Actually renaming the GitHub repo (`djnavarro/erlr` →
-     `djnavarro/erglm`) and repointing the `erglm.djnavarro.net`
-     pkgdown custom domain -- manual/infrastructure steps, not a file
-     change in this repo. `DESCRIPTION`/`README.Rmd`/`_pkgdown.yml`
-     already reference the new URLs, so they won't resolve until this
-     happens.
-   - Updating the companion `erplots` repo, which still references
-     `erlr::lr_model()`/`erlr::lr_data` in its `DESCRIPTION` (`Suggests:
-     erlr`), `tests/testthat/helper-data.R`, and
-     `vignettes/articles/plot.Rmd`. This will break once erglm is
-     published under the new name; needs a follow-up PR against that
-     repo.
+   The GitHub repo (`djnavarro/erlr` → `djnavarro/erglm`) has since
+   been renamed, and the `erglm.djnavarro.net` pkgdown custom domain/DNS
+   is live (HTTPS certificate approved) -- both manual/infrastructure
+   follow-ups from the original rename plan are complete. The local
+   clone directory was also renamed from `erlr` to `erglm` for
+   consistency (filesystem-level, outside git).
+
+   **Still not done** (tracked separately): updating the companion
+   `erplots` repo, which still references `erlr::lr_model()`/
+   `erlr::lr_data` in its `DESCRIPTION` (`Suggests: erlr`),
+   `tests/testthat/helper-data.R`, and `vignettes/articles/plot.Rmd`.
+   This will break once erglm is published under the new name; needs a
+   follow-up PR against that repo.
