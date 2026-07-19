@@ -27,6 +27,8 @@ Suggests:
     testthat (>= 3.0.0)
 URL: https://github.com/djnavarro/erlr, https://erlr.djnavarro.net/
 BugReports: https://github.com/djnavarro/erlr/issues
+Remotes:
+    djnavarro/erplots
 Depends: 
     R (>= 4.1.0)
 LazyData: true
