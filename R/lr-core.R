@@ -93,7 +93,7 @@ lr_predict <- function(object, newdata = NULL, conf_level = .95) {
 #' @export
 #' 
 lr_simulator <- function(object) {
-  ff <- object$formula
+  ff <- stats::delete.response(stats::terms(object$formula))
   force(ff)
   function(param, data, type = "response") {
     mm <- stats::model.matrix(ff, data)
@@ -101,5 +101,35 @@ lr_simulator <- function(object) {
     if (type == "response") pred <- stats::family(object)$linkinv(pred)
     return(pred)
   }
+}
+
+# shared helper: draws `nsim` sets of coefficients from the sampling
+# distribution implied by the model's variance-covariance matrix, and
+# evaluates the linear predictor at each draw for the supplied `newdata`.
+# Used both by `lr_vpc_sim()` and by the `er_simulate.erlr_glm()` method
+# (used by erplots, if installed, for spaghetti-style uncertainty bands).
+.lr_simulate_draws <- function(object, newdata, nsim = 100, seed = NULL) {
+  if (is.null(seed)) {
+    seed <- .pick_seed()
+    rlang::inform(paste("Using seed =", seed))
+  }
+  fn <- lr_simulator(object)
+  withr::with_seed(
+    seed = seed,
+    code = {
+      par <- mvtnorm::rmvnorm(
+        n = nsim,
+        mean = stats::coef(object),
+        sigma = stats::vcov(object)
+      )
+    }
+  )
+  sim <- list()
+  for (ii in seq_len(nsim)) {
+    dd_sim <- newdata |> dplyr::mutate(row_id = dplyr::row_number(), sim_id = ii)
+    dd_sim$fit_resp <- fn(param = par[ii, ], dd_sim)
+    sim[[ii]] <- dd_sim
+  }
+  dplyr::bind_rows(sim)
 }
 

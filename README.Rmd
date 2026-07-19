@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-Provides estimation and plotting tools for exposure-response models that use logistic regression for binary responses. It is mostly intended as a convenience package: the core tools are wrappers around `glm()`, and the plotting tools use ggplot2 and patchwork to build typical plots used in exposure-response modelling.
+Provides estimation tools for exposure-response models that use logistic regression for binary responses. It is mostly intended as a convenience package: the core tools are wrappers around `glm()`. For plotting exposure-response models (including those fitted with erlr), see the companion package [erplots](https://github.com/djnavarro/erplots), which supplies a model-agnostic mini-language for building exposure-response plots.
 
 ## Installation
 
@@ -45,30 +45,6 @@ mod <- lr_model(ae1 ~ aucss, lr_data)
 mod
 ```
 
-## Plots
-
-```{r}
-#| fig-height: 8
-#| label: lr-plot
-
-lr_data |> 
-  lr_plot(aucss, ae1) |> 
-  lr_plot_show_model() |> 
-  lr_plot_show_quantiles() |> 
-  lr_plot_show_groups(aucss) |> 
-  plot()
-
-plt <- lr_data |> 
-   lr_plot(aucss, ae2, stratify_by = sex) |> 
-   lr_plot_show_model(keep_strata = FALSE) |> 
-   lr_plot_show_quantiles(bins = 3) |> 
-   lr_plot_show_datastrip() |> 
-   lr_plot_show_groups(group_by = c(aucss, treatment), keep_strata = FALSE)
-
-print(plt)
-plot(plt)
-```
-
 ## Stepwise covariate modelling
 
 ```{r}
@@ -84,8 +60,8 @@ lr_scm_history(mod2)
 mod <- lr_model(ae1 ~ aucss + sex, lr_data)
 sim <- lr_vpc_sim(mod, seed = 1234)
 sim
-
-lr_vpc_plot(mod, sim, group_by = aucss)
-lr_vpc_plot(mod, sim, group_by = sex)
 ```
+
+To visualise the simulations against the observed data (e.g. as a VPC-style
+plot), see `erplots::er_vpc_plot()`.
 

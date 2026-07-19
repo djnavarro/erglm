@@ -12,11 +12,13 @@ coverage](https://codecov.io/gh/djnavarro/erlr/graph/badge.svg)](https://app.cod
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-Provides estimation and plotting tools for exposure-response models that
-use logistic regression for binary responses. It is mostly intended as a
-convenience package: the core tools are wrappers around `glm()`, and the
-plotting tools use ggplot2 and patchwork to build typical plots used in
-exposure-response modelling.
+Provides estimation tools for exposure-response models that use logistic
+regression for binary responses. It is mostly intended as a convenience
+package: the core tools are wrappers around `glm()`. For plotting
+exposure-response models (including those fitted with erlr), see the
+companion package [erplots](https://github.com/djnavarro/erplots), which
+supplies a model-agnostic mini-language for building exposure-response
+plots.
 
 ## Installation
 
@@ -63,59 +65,19 @@ mod
 #> Residual Deviance: 193.4     AIC: 197.4
 ```
 
-## Plots
-
-``` r
-lr_data |> 
-  lr_plot(aucss, ae1) |> 
-  lr_plot_show_model() |> 
-  lr_plot_show_quantiles() |> 
-  lr_plot_show_groups(aucss) |> 
-  plot()
-```
-
-<img src="man/figures/README-lr-plot-1.png" width="100%" />
-
-``` r
-
-plt <- lr_data |> 
-   lr_plot(aucss, ae2, stratify_by = sex) |> 
-   lr_plot_show_model(keep_strata = FALSE) |> 
-   lr_plot_show_quantiles(bins = 3) |> 
-   lr_plot_show_datastrip() |> 
-   lr_plot_show_groups(group_by = c(aucss, treatment), keep_strata = FALSE)
-
-print(plt)
-#> <erlr_plot>
-#>   plot variables:
-#>     - exposure:        aucss
-#>     - response:        ae2
-#>     - stratification:  sex
-#>   plot components:
-#>     - model:           ae2 ~ aucss
-#>     - quantile:        3 bins
-#>     - strip:           jitter both
-#>     - group:           .aucss_quantile, treatment
-#>   plots built: <none>
-#>   output built: no
-plot(plt)
-```
-
-<img src="man/figures/README-lr-plot-2.png" width="100%" />
-
 ## Stepwise covariate modelling
 
 ``` r
 mod1 <- lr_model(ae1 ~ aucss + sex + dose, lr_data)
 mod2 <- lr_scm_backward(mod1, candidates = c("sex", "dose"))
-#> Using seed = 7932
+#> Using seed = 4292
 lr_scm_history(mod2)
 #> # A tibble: 4 × 11
 #>   iteration attempt step       action term_tested model_tested   model_converged
 #>       <int>   <int> <chr>      <chr>  <chr>       <chr>          <lgl>          
 #> 1         0       0 base model <NA>   <NA>        ae1 ~ aucss +… TRUE           
-#> 2         1       1 backward   remove ~dose       ae1 ~ aucss +… TRUE           
-#> 3         1       2 backward   remove ~sex        ae1 ~ aucss +… TRUE           
+#> 2         1       1 backward   remove ~sex        ae1 ~ aucss +… TRUE           
+#> 3         1       2 backward   remove ~dose       ae1 ~ aucss +… TRUE           
 #> 4         2       3 backward   remove ~sex        ae1 ~ aucss    TRUE           
 #> # ℹ 4 more variables: term_p_value <dbl>, model_aic <dbl>, model_bic <dbl>,
 #> #   model_updated <int>
@@ -131,7 +93,7 @@ sim
 #>      ae1 aucss sex    row_id sim_id
 #>    <dbl> <dbl> <fct>   <int>  <int>
 #>  1 0.894  673. Male        1      1
-#>  2 1.00  2806. Female      2      1
+#>  2 1.000 2806. Female      2      1
 #>  3 0.110    0  Female      3      1
 #>  4 0.993 1169. Female      4      1
 #>  5 0.588  377. Male        5      1
@@ -141,14 +103,7 @@ sim
 #>  9 0.129    0  Male        9      1
 #> 10 0.362  254. Female     10      1
 #> # ℹ 29,990 more rows
-
-lr_vpc_plot(mod, sim, group_by = aucss)
 ```
 
-<img src="man/figures/README-lr-vpc-1.png" width="100%" />
-
-``` r
-lr_vpc_plot(mod, sim, group_by = sex)
-```
-
-<img src="man/figures/README-lr-vpc-2.png" width="100%" />
+To visualise the simulations against the observed data (e.g. as a
+VPC-style plot), see `erplots::er_vpc_plot()`.

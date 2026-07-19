@@ -9,29 +9,20 @@ reference:
   - lr_model
   - lr_predict
   - lr_scm
-- title: Plot 
-  desc: Exposure-response plots for logistic regression models
-- contents:
-  - lr_plot
-  - lr_partial
 - title: Simulate
   desc: Simulation tools for exposure-response logistic regressions
 - contents:
   - lr_simulator
   - lr_vpc_sim
-  - lr_vpc_plot
 - title: Other
   desc: Other functions and objects
 - contents:
   - lr_data
   - logit
-  - clopper_pearson
-  - cut_quantile
 
 articles:
   - title:
     navbar:
     contents: 
       - articles/model
-      - articles/plot
       - articles/simulate

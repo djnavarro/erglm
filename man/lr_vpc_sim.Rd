@@ -14,10 +14,17 @@ lr_vpc_sim(object, nsim = 100, seed = NULL)
 \item{seed}{RNG state}
 }
 \value{
-A data frame or tibble
+A data frame or tibble. Contains one row per observation per
+simulated replicate (identified by the \code{sim_id} column), with the
+response variable replaced by its simulated value under parameter
+uncertainty.
 }
 \description{
 VPC simulations for logistic regression models
+}
+\details{
+To visualise the result (e.g. as a VPC-style plot comparing
+observed and simulated response rates), see \code{erplots::er_vpc_plot()}.
 }
 \examples{
 mod <- lr_model(ae2 ~ aucss + sex, lr_data)
