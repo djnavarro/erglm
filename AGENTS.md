@@ -83,7 +83,14 @@ fleshing out the `erglm.Rmd` "Getting Started" stub (see PLAN.md).
   (`erglm_scm_forward()`/`erglm_scm_backward()`/`erglm_scm_history()`),
   and the single-term `erglm_add_term()`/`erglm_remove_term()` helpers
   they're built on (also exported, matching `emaxnls`'s
-  `emax_add_term()`/`emax_remove_term()`).
+  `emax_add_term()`/`emax_remove_term()`). SCM's `seed` argument only
+  controls the `sample()`-shuffled order candidates are tested in
+  within a step (via `withr::with_seed()`); model fitting itself
+  (`stats::glm()`) is deterministic, so `seed` is redundant for the
+  *result* except in the (essentially measure-zero) case of an exact
+  p-value tie between competing candidates -- documented in the
+  `@details` of `erglm_scm`'s shared roxygen block, with a seed-
+  invariance regression test in `tests/testthat/test-erglm-scm.R`.
 - `R/erglm-simulate.R` -- `simulate.erglm_model()`, the `stats::simulate()`
   S3 method (and its `.erglm_resample()` helper), modelled on emaxnls's
   `simulate()` output shape: one row per observation per replicate, with

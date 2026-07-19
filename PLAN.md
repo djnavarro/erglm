@@ -147,6 +147,33 @@ functions (`stats::family(mod)$linkfun`/`$linkinv`), so:
 - `AGENTS.md` updated to document the rename under the
   `R/utils-helpers.R` structure bullet.
 
+## Done: audit SCM's `seed` argument for genuine RNG-dependence
+
+Completed in one session, prompted by a request to check whether
+`erglm_scm_forward()`/`erglm_scm_backward()`'s `seed` argument (added
+as a safety measure against (a) candidate-testing order mattering and
+(b) some part of model fitting secretly depending on `.Random.seed`)
+is actually load-bearing.
+
+- Traced the seed's only consumer: `withr::with_seed()` wraps a
+  `sample(candidates)` shuffle in `.erglm_once_forward()`/
+  `.erglm_once_backward()`. Everything downstream --
+  `erglm_model()`/`stats::glm()` (IRLS, no random starting values) and
+  `stats::anova()` for p-values -- is deterministic, so (b) doesn't
+  currently hold. (a) is real in principle but only changes the
+  *selected* candidate in the case of an exact p-value tie within a
+  step, since ties are broken by strict `<`/`>` comparisons against
+  encounter order.
+- Documented this in a new `@details` section of `erglm_scm`'s shared
+  roxygen block (`R/erglm-scm.R`), regenerated via
+  `devtools::document()`.
+- Added a regression test (`tests/testthat/test-erglm-scm.R`) asserting
+  both SCM functions select the same formula/AIC across five distinct
+  seeds on `erglm_data` (non-tied data).
+- `seed` itself was left in place (not removed) -- it's retained as a
+  guard against future refactors reintroducing genuine
+  seed-sensitivity, per the documented rationale.
+
 ## Next initiative: document `glm`/`lm` method inheritance
 
 ### Motivation

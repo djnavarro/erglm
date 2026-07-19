@@ -118,6 +118,30 @@ test_that("erglm_scm_forward respects an explicit test override", {
   expect_equal(deparse(mod_auto$formula), deparse(mod_chisq$formula))
 })
 
+test_that("erglm_scm_forward is seed-invariant on non-tied data", {
+  mod1 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
+  seeds <- c(101L, 2202L, 33033L, 4004L, 55055L)
+  mods <- lapply(seeds, function(s) {
+    erglm_scm_forward(mod1, candidates = c("sex", "dose"), threshold = .01, seed = s)
+  })
+  formulas <- vapply(mods, function(m) deparse(m$formula), character(1))
+  expect_length(unique(formulas), 1L)
+  aics <- vapply(mods, stats::AIC, numeric(1))
+  expect_equal(aics, rep(aics[1], length(aics)))
+})
+
+test_that("erglm_scm_backward is seed-invariant on non-tied data", {
+  mod1 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
+  seeds <- c(101L, 2202L, 33033L, 4004L, 55055L)
+  mods <- lapply(seeds, function(s) {
+    erglm_scm_backward(mod1, candidates = c("sex", "dose"), threshold = .001, seed = s)
+  })
+  formulas <- vapply(mods, function(m) deparse(m$formula), character(1))
+  expect_length(unique(formulas), 1L)
+  aics <- vapply(mods, stats::AIC, numeric(1))
+  expect_equal(aics, rep(aics[1], length(aics)))
+})
+
 test_that("erglm_add_term and erglm_remove_term preserve the model's family", {
   mod1 <- erglm_model(ae_count ~ aucss, erglm_data, family = poisson())
   mod2 <- erglm_add_term(mod1, ~sex, quiet = TRUE)

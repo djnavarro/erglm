@@ -51,6 +51,32 @@ containing the SCM history log
 \description{
 Stepwise covariate modelling for exposure-response models
 }
+\details{
+\code{seed} exists as a safety measure against two hypothetical
+sources of run-to-run variation: (a) the order in which candidate
+terms are tested within a step, and (b) some part of the model-fitting
+machinery secretly depending on \code{.Random.seed}. As currently
+implemented, only (a) is real, and even then its effect is usually
+invisible. Concretely: each step of \code{erglm_scm_forward()}/
+\code{erglm_scm_backward()} shuffles the candidate terms (\code{sample()})
+before testing them one at a time, and the shuffled order is the
+\emph{only} thing \code{seed} (via \code{withr::with_seed()}) controls. Term p-values
+come from \code{stats::anova()} on models fitted with \code{stats::glm()}, which
+is a deterministic algorithm (iteratively reweighted least squares,
+no random starting values) -- so which candidate is \emph{found} to be
+best does not depend on the seed. The seed can only change which
+candidate is \emph{selected} in the (rare, essentially measure-zero for
+continuous predictors) case of an exact tie in p-values within a
+step, since ties are broken by encounter order (\code{p_val < lowest_p}/
+\code{p_val > highest_p} are strict inequalities in the internal
+\code{.erglm_once_forward()}/\code{.erglm_once_backward()} helpers). In short:
+for typical data, \code{seed} is redundant for reproducibility of the
+\emph{result} (though it still affects the row order of the intermediate
+attempts recorded in \code{\link[=erglm_scm_history]{erglm_scm_history()}}) -- it's retained mainly
+as a guard against future refactors reintroducing genuine
+seed-sensitivity (e.g. if candidate order were ever used as an
+early-stopping rule rather than exhaustively tested every step).
+}
 \examples{
 mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 mod1 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"))
