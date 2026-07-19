@@ -30,9 +30,8 @@ package would be renamed `erglm` at that point.
 ### What needs to change
 
 - **`lr_model()`**: currently hardcodes
-  `family = stats::binomial(link = "logit")`. Needs a `family` argument
-  (defaulting to `binomial(link = "logit")` for backward compatibility,
-  or with no default once renamed).
+  `family = stats::binomial(link = "logit")`. Needs a `family` argument;
+  see decision (2) below on what it should default to once renamed.
 - **`.as_erlr()`**: hardcodes `mod$erlr$type <- "logistic"`. Should record
   the actual family (`stats::family(mod)$family`) instead.
 - **`er_summary.erlr_glm()`** (in `R/er-methods.R`): extracts a p-value
@@ -71,21 +70,59 @@ package would be renamed `erglm` at that point.
   a continuous and/or count response column (also useful for erplots'
   continuous-response work, see its PLAN.md).
 
-### Open questions to resolve before implementation
+### Design decisions (reviewed)
 
-1. Should the rename to `erglm` happen in the same PR as the family
-   generalisation, or as a separate, purely mechanical rename afterwards?
-2. Default `family` for `glm_model()` once renamed -- require it
-   explicitly, or keep binomial-logit as a default for continuity?
-3. Scope of family support for v1: full generality (any `family` object,
-   including quasi-families), or an initially-supported subset
-   (binomial, poisson, gaussian, Gamma) with others left as "should work,
-   untested"?
-4. Whether SCM's test-selection-by-family should be automatic or a
-   user-facing argument (e.g. `test = c("auto", "Chisq", "F")`).
-5. How much of the VPC noise-model dispatch belongs in this package vs.
-   left as a documented limitation (e.g. only supporting the
-   "expectation only" shortcut, at least for v1).
+The questions below were originally left open; each now has a working
+recommendation so implementation isn't blocked, but all are still up for
+debate if new information changes the calculus.
+
+1. **Rename timing.** Do the family generalisation and the `erglm` rename
+   as two separate steps, not one PR: generalise behaviour first (under
+   the existing `erlr` name), get it reviewed and tested, then do the
+   rename as a final, purely mechanical pass right before CRAN
+   submission. Rationale: this keeps behavioural review separate from a
+   large, low-risk find-and-replace diff, and means a generalisation
+   decision can be revisited without re-doing a rename. (This matches
+   the existing step ordering below, where the rename is last.)
+
+2. **Default `family`.** Once renamed, `glm_model()` should default to
+   `family = stats::gaussian()` -- i.e. match `stats::glm()`'s own
+   default -- rather than keeping the binomial-logit default. A package
+   that's no longer logistic-regression-specific shouldn't quietly
+   special-case binary responses; users fitting logistic models pass
+   `family = binomial()` explicitly, same as they would with base
+   `glm()`. This is the more predictable choice for anyone coming from
+   base R, at the cost of a breaking change for existing `lr_model()`
+   callers -- acceptable given the rename already breaks call sites.
+
+3. **v1 family scope.** Explicitly support and test four families that
+   cover the common exposure-response use cases: `binomial` (binary
+   AE), `poisson` (count AE), `gaussian` (continuous biomarker), and
+   `Gamma` (skewed continuous/time-based endpoints). Other families
+   (inverse.gaussian, quasi-families, etc.) should work through the same
+   generic mechanisms but are "untested, not officially supported" until
+   someone actually needs one -- don't build a speculative test matrix
+   for families with no current use case.
+
+4. **SCM test selection.** Automatic by default, with an escape hatch:
+   pick the test from the family's dispersion behaviour (`"Chisq"` for
+   binomial/poisson, which have known dispersion; `"F"` for
+   gaussian/Gamma/inverse.gaussian/quasi*, which have estimated
+   dispersion), but expose `test = c("auto", "Chisq", "F")` on the
+   forward/backward SCM functions so users can override it. This follows
+   the same convention `car::Anova()` and similar tools use, and avoids
+   silently giving wrong-flavoured p-values for less common families.
+
+5. **VPC noise-model dispatch.** Implement it, rather than punting to a
+   documented limitation -- VPCs are a core diagnostic in this domain,
+   and an "expectation only" VPC is materially weaker for continuous/count
+   responses (it understates predictive uncertainty by ignoring residual
+   noise entirely). Scope the initial implementation to the same four
+   families as (3): Bernoulli/probability draws for binomial, `rpois()`
+   for poisson, `rnorm()` (using the estimated residual SD) for gaussian,
+   `rgamma()` (using the estimated shape/dispersion) for Gamma. Families
+   outside that set should raise an informative error rather than
+   silently falling back to the expectation-only shortcut.
 
 ### Suggested step ordering
 
