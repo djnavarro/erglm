@@ -6,8 +6,8 @@ Authors@R:
 Description:
     Provides estimation tools for exposure-response models based on
     glm(): model fitting and prediction, stepwise covariate modelling,
-    and simulation-based visual predictive checks. Officially tested
-    and supported for binomial, poisson, gaussian, and Gamma families.
+    and simulation-based visual predictive checks. Tested
+    and supported for binomial, poisson, gaussian, and gamma families.
     For a model-agnostic mini-language to visualise exposure-response
     models (including those fitted with erglm), see the companion
     package 'erplots'.

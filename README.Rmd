@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-Provides estimation tools for exposure-response models based on `glm()`. It is mostly intended as a convenience package: the core tools are wrappers around `glm()`, officially tested and supported for binomial, poisson, gaussian, and Gamma families. For plotting exposure-response models (including those fitted with erglm), see the companion package [erplots](https://github.com/djnavarro/erplots), which supplies a model-agnostic mini-language for building exposure-response plots.
+Provides estimation tools for exposure-response models based on `glm()`. It is mostly intended as a convenience package: the core tools are wrappers around `glm()`, tested and supported for binomial, poisson, gaussian, and gamma families. For plotting exposure-response models (including those fitted with erglm), see the companion package [erplots](https://github.com/djnavarro/erplots), which supplies a model-agnostic mini-language for building exposure-response plots.
 
 ## Installation
 
