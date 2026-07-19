@@ -20,6 +20,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/model.html">Modelling</a></li>
+    <li><a class="dropdown-item" href="../articles/methods.html">Using base R model methods</a></li>
     <li><a class="dropdown-item" href="../articles/simulate.html">Simulation</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -78,6 +79,14 @@
     <p>Computes intervals on the link scale and back-transforms with
 <code>stats::family(object)$linkinv</code>, so this works for any <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> family,
 not just binomial/logistic models.</p>
+<p>This is a tidy, opinionated alternative to calling base R's
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> directly on <code>object</code> – since <code>object</code> is a genuine
+<code>glm</code> object, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> (and <code>predict(object, se.fit = TRUE)</code>, on
+which this function is based) work unchanged and remain useful for
+quick point estimates or when a tidy data frame isn't needed. See
+<code>vignette("methods", package = "erglm")</code> for a side-by-side
+comparison and other inherited <code>glm</code>/<code>lm</code> methods (<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>,
+<code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>, <code><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC()</a></code>, etc.).</p>
     </div>
 
     <div class="section level2">

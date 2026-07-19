@@ -41,6 +41,29 @@ erglm_model(formula, data, family = stats::gaussian(), ...)
 
 A glm object
 
+## Details
+
+The returned object has class `c("erglm_model", "glm", "lm")`: it *is* a
+`glm` object, with a little extra metadata attached. This means all of
+the usual `glm`/`lm` methods work unchanged, without needing an
+erglm-specific equivalent – e.g.
+[`summary()`](https://rdrr.io/r/base/summary.html),
+[`coef()`](https://rdrr.io/r/stats/coef.html),
+[`vcov()`](https://rdrr.io/r/stats/vcov.html),
+[`confint()`](https://rdrr.io/r/stats/confint.html),
+[`predict()`](https://rdrr.io/r/stats/predict.html),
+[`AIC()`](https://rdrr.io/r/stats/AIC.html),
+[`BIC()`](https://rdrr.io/r/stats/AIC.html),
+[`logLik()`](https://rdrr.io/r/stats/logLik.html), and
+[`anova()`](https://rdrr.io/r/stats/anova.html) for comparing nested
+models. See `vignette("methods", package = "erglm")` for worked examples
+of these.
+[`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md)
+is a separate, erglm-specific alternative to
+[`predict()`](https://rdrr.io/r/stats/predict.html) that returns
+confidence intervals on the response scale in a tidy data frame; the two
+are complementary, not competing.
+
 ## Examples
 
 ``` r

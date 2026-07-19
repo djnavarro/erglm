@@ -101,4 +101,4 @@ sim
 
 To visualise the simulations against the observed data (e.g. as a
 VPC-style plot), see
-[`erplots::er_vpc_plot()`](https://rdrr.io/pkg/erplots/man/er_vpc_plot.html).
+[`erplots::er_vpc_plot()`](https://erplots.djnavarro.net/reference/er_vpc_plot.html).

@@ -20,6 +20,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/model.html">Modelling</a></li>
+    <li><a class="dropdown-item" href="../articles/methods.html">Using base R model methods</a></li>
     <li><a class="dropdown-item" href="../articles/simulate.html">Simulation</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -80,6 +81,18 @@ work through the same generic mechanisms but are untested.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A glm object</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The returned object has class <code>c("erglm_model", "glm", "lm")</code>:
+it <em>is</em> a <code>glm</code> object, with a little extra metadata attached. This
+means all of the usual <code>glm</code>/<code>lm</code> methods work unchanged, without
+needing an erglm-specific equivalent – e.g. <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code>,
+<code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>, <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code>, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, <code><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC()</a></code>, <code><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">BIC()</a></code>, <code><a href="https://rdrr.io/r/stats/logLik.html" class="external-link">logLik()</a></code>, and
+<code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code> for comparing nested models. See <code>vignette("methods", package = "erglm")</code> for worked examples of these. <code><a href="erglm_predict.html">erglm_predict()</a></code>
+is a separate, erglm-specific alternative to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> that
+returns confidence intervals on the response scale in a tidy data
+frame; the two are complementary, not competing.</p>
     </div>
 
     <div class="section level2">

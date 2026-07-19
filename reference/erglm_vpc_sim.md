@@ -43,7 +43,7 @@ per replicate. Other [`glm()`](https://rdrr.io/r/stats/glm.html)
 families are not currently supported and will raise an error. To
 visualise the result (e.g. as a VPC-style plot comparing observed and
 simulated response rates), see
-[`erplots::er_vpc_plot()`](https://rdrr.io/pkg/erplots/man/er_vpc_plot.html).
+[`erplots::er_vpc_plot()`](https://erplots.djnavarro.net/reference/er_vpc_plot.html).
 
 ## Examples
 

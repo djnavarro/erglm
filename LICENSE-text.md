@@ -1,4 +1,4 @@
 # License
 
     YEAR: 2026
-    COPYRIGHT HOLDER: erglm authors
+    COPYRIGHT HOLDER: Danielle Navarro

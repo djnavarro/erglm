@@ -34,6 +34,18 @@ Computes intervals on the link scale and back-transforms with
 [`glm()`](https://rdrr.io/r/stats/glm.html) family, not just
 binomial/logistic models.
 
+This is a tidy, opinionated alternative to calling base R's
+[`predict()`](https://rdrr.io/r/stats/predict.html) directly on `object`
+– since `object` is a genuine `glm` object,
+[`predict()`](https://rdrr.io/r/stats/predict.html) (and
+`predict(object, se.fit = TRUE)`, on which this function is based) work
+unchanged and remain useful for quick point estimates or when a tidy
+data frame isn't needed. See `vignette("methods", package = "erglm")`
+for a side-by-side comparison and other inherited `glm`/`lm` methods
+([`summary()`](https://rdrr.io/r/base/summary.html),
+[`vcov()`](https://rdrr.io/r/stats/vcov.html),
+[`AIC()`](https://rdrr.io/r/stats/AIC.html), etc.).
+
 ## Examples
 
 ``` r
