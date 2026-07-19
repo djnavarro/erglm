@@ -1,0 +1,111 @@
+---
+title: "Using base R model methods"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(erglm)
+```
+
+An object returned by `erglm_model()` is a genuine `glm` object -- it has
+class `c("erglm_model", "glm", "lm")`, and the `erglm_model` class only adds
+a little extra metadata on top. This means none of the standard R methods
+for working with fitted models are erglm-specific: they're the same ones
+you'd use for a plain `glm()` fit, and they work here without any
+modification. This article is a short reference for the ones that come up
+most often when working with exposure-response models.
+
+```{r model}
+mod <- erglm_model(ae1 ~ aucss + dose + sex, erglm_data, family = binomial())
+```
+
+## Model summary
+
+`summary()` gives the usual coefficient table, standard errors, and
+dispersion information:
+
+```{r summary}
+summary(mod)
+```
+
+## Coefficients and the variance-covariance matrix
+
+The fitted coefficients and their variance-covariance matrix are available
+via `coef()` and `vcov()`, exactly as for any `glm`:
+
+```{r coef}
+coef(mod)
+```
+
+```{r vcov}
+vcov(mod)
+```
+
+Confidence intervals for individual coefficients can be obtained from
+`confint()` (profile-likelihood based, so slightly slower but generally
+preferred over a Wald interval for `glm` models):
+
+```{r confint}
+confint(mod)
+```
+
+## Predictions
+
+Base R's `predict()` works directly on an erglm model. By default it
+returns predictions on the link scale; use `type = "response"` for the
+response scale:
+
+```{r predict}
+predict(mod, newdata = erglm_data[1:5, ], type = "response")
+```
+
+`predict()` can also return standard errors (`se.fit = TRUE`), which is
+the basis for erglm's own [erglm_predict()] -- that function is a thin,
+opinionated wrapper that back-transforms the link-scale standard errors
+into a confidence interval on the response scale and returns everything as
+a tidy data frame bound to `newdata`:
+
+```{r erglm_predict}
+erglm_predict(mod, newdata = erglm_data[1:5, ])
+```
+
+Use whichever is more convenient: `predict()` for a quick point estimate,
+or `erglm_predict()` when you want interval bounds without computing them
+by hand.
+
+## Model comparison
+
+`AIC()`, `BIC()`, and `logLik()` all work as usual, which is convenient for
+comparing candidate models outside of erglm's own stepwise covariate
+modelling (`erglm_scm_forward()`/`erglm_scm_backward()`):
+
+```{r aic-bic}
+mod_no_sex <- erglm_model(ae1 ~ aucss + dose, erglm_data, family = binomial())
+
+AIC(mod, mod_no_sex)
+BIC(mod, mod_no_sex)
+```
+
+For nested models, `anova()` gives a likelihood-ratio (or F, for families
+with estimated dispersion) test directly -- this is exactly the machinery
+`erglm_scm_forward()`/`erglm_scm_backward()` use internally, exposed here
+for one-off comparisons:
+
+```{r anova}
+anova(mod_no_sex, mod, test = "Chisq")
+```
+
+## A note on diagnostic plots
+
+Base R's `plot.lm()` diagnostic plots (`plot(mod, which = 1:4)`) also work,
+though some panels (e.g. leverage) are more informative for continuous
+responses than for binary ones. erglm deliberately doesn't provide its own
+diagnostic plotting -- see the companion
+[erplots](https://github.com/djnavarro/erplots) package for
+exposure-response-specific visualisations.

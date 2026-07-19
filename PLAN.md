@@ -1,194 +1,183 @@
 # erglm development plan
 
-This document tracks scoped-out future development for erglm (formerly
-`erlr`, renamed per step 6 below). It is not a changelog; see NEWS.md
-for that once one exists. Items here are proposals to be reviewed
-before implementation, not committed designs; the sections below are
-kept as a historical record of the generalisation/rename project even
-though the package has since moved on from the `erlr`/`lr_*` names they
-describe.
+This document tracks scoped-out future development for erglm. It is not
+a changelog; see NEWS.md for that once one exists. Items here are
+proposals to be reviewed before implementation, not committed designs.
 
-## Generalise from logistic regression to arbitrary `glm()` families (→ `erglm`)
+## Done: generalise from logistic regression to arbitrary `glm()` families
+
+Completed (see git history for the full diff; `4c663e7`, `c31a4ef`,
+`90f88d1`). Summary:
+
+- The package was originally `erlr`, a thin wrapper around
+  `glm(family = binomial(link = "logit"))` with `lr_*`-prefixed
+  functions. It has been generalised to support arbitrary `glm()`
+  families and renamed `erglm`.
+- `erglm_model()` takes a `family` argument, defaulting to
+  `stats::gaussian()` (matching `glm()`'s own default). Binomial,
+  poisson, gaussian, and Gamma are tested and officially supported
+  end to end (fitting, prediction, SCM significance testing, VPC
+  simulation); other `glm()` families work through the same generic
+  mechanisms but aren't covered by SCM's test selection or VPC's noise
+  draws.
+- SCM (`erglm_scm_forward()`/`erglm_scm_backward()`) picks
+  `anova(..., test = "Chisq")` vs. `test = "F"` automatically from the
+  family's dispersion behaviour, with a `test = c("auto", "Chisq",
+  "F")` override.
+- VPC (`erglm_vpc_sim()`) draws family-appropriate residual noise
+  (Bernoulli/`rpois()`/`rnorm()`/`rgamma()`) rather than only the
+  expectation, for the four supported families; other families error
+  informatively rather than silently falling back to expectation-only.
+- The example dataset (`erglm_data`, formerly `lr_data`) gained count
+  (`ae_count`), continuous (`biomarker_change`), and right-skewed
+  continuous (`ae_duration`) response columns alongside the original
+  binary ones, to exercise poisson/gaussian/Gamma.
+- All exported names, the model class, internal helpers, and package
+  name were renamed (`lr_*` → `erglm_*`, class `erlr_glm` →
+  `erglm_model`). This was a clean break with no deprecated aliases,
+  since the package predates any CRAN release or external users.
+  Version is currently `0.2.0.9000`.
+- Infrastructure: the GitHub repo (`djnavarro/erlr` →
+  `djnavarro/erglm`) has been renamed and the `erglm.djnavarro.net`
+  pkgdown domain/DNS is live.
+
+**Still outstanding, but out of scope for this repo:** the companion
+[erplots](https://github.com/djnavarro/erplots) repo still references
+`erlr::lr_model()`/`erlr::lr_data` in its `DESCRIPTION` (`Suggests:
+erlr`), test helpers, and a vignette article. This needs a follow-up
+PR *in that repo*; it will break once `erglm` is published under its
+new name, since `erlr` will no longer be findable. Tracked here only
+as a reminder — no erglm-side action needed.
+
+## Next initiative: document `glm`/`lm` method inheritance
 
 ### Motivation
 
-Since the plotting mini-language moved out to
-[erplots](https://github.com/djnavarro/erplots), erlr is a fairly thin
-wrapper around `glm(family = binomial(link = "logit"))`. Most of the
-underlying machinery (prediction with CIs, parameter-uncertainty
-simulation, stepwise covariate modelling) is not actually specific to
-logistic regression -- it would work, with minor changes, for any `glm()`
-family. Generalising is a natural next step, and should happen *before* an
-initial CRAN release (to avoid a disruptive rename afterwards). The
-package would be renamed `erglm` at that point.
+`erglm_model()` returns an object of class `c("erglm_model", "glm",
+"lm")` -- it *is* a `glm` fit, not a wrapper that hides one. All of the
+standard `glm`/`lm` methods (`summary()`, `coef()`, `vcov()`,
+`confint()`, `predict()`, `AIC()`, `BIC()`, `logLik()`, `anova()`, even
+`plot.lm()`'s diagnostic panels) already work on erglm models with no
+extra code needed on erglm's part. This is currently undocumented,
+which matters more than it might for a typically programmer-facing
+package: the primary userbase is pharmacometricians, who are likely to
+know these `glm`/`lm` methods well from other contexts but may not
+think to try them on an "erglm" object, or may not realise
+`erglm_predict()` is additive rather than a replacement for
+`predict()`.
 
-### What already generalises for free
+### Status
 
-- `lr_predict()` already computes CIs on the link scale using
-  `stats::family(object)$linkinv`, not a hardcoded logit/inverse-logit.
-  It should work unchanged for any `glm` family.
-- `lr_simulator()` builds a model matrix from the (response-stripped)
-  formula and applies `stats::family(object)$linkinv` -- also already
-  family-agnostic.
+- Added a `@details` note to `erglm_model()`'s documentation
+  (`R/erglm-core.R`) stating the class vector explicitly and listing
+  the key inherited methods, with a pointer to a new vignette.
+- Added `vignettes/articles/methods.Rmd`, a worked-example article
+  covering `summary()`, `coef()`/`vcov()`, `confint()`, `predict()`
+  (contrasted with `erglm_predict()`), `AIC()`/`BIC()`/`anova()` for
+  model comparison, and a note on `plot.lm()` diagnostics (pointing to
+  erplots for exposure-response-specific visualisation instead).
+  Registered in `_pkgdown.yml`'s articles list, after `model.Rmd` and
+  before `simulate.Rmd`.
 
-### What needs to change
+### Still to do
 
-- **`lr_model()`**: currently hardcodes
-  `family = stats::binomial(link = "logit")`. Needs a `family` argument;
-  see decision (2) below on what it should default to once renamed.
-- **`.as_erlr()`**: hardcodes `mod$erlr$type <- "logistic"`. Should record
-  the actual family (`stats::family(mod)$family`) instead.
-- **`er_summary.erlr_glm()`** (in `R/er-methods.R`): extracts a p-value
-  from column `"Pr(>|z|)"` of `summary(model)$coefficients`. That column
-  is `"Pr(>|t|)"` for families with an estimated dispersion parameter
-  (gaussian, Gamma, inverse.gaussian, quasi*). Needs to match the `"Pr("`
-  column by pattern rather than by exact name.
-- **`.lr_anova_p()`** (stepwise covariate modelling): uses
-  `stats::anova(mod1, mod2)` and reads off `Pr(>Chi)`. A likelihood-ratio
-  chi-squared test is appropriate for families with known dispersion
-  (binomial, Poisson) but not for families with an estimated dispersion
-  parameter (gaussian, Gamma), where an F-test is the standard choice
-  (`stats::anova(mod1, mod2, test = "F")`). SCM needs to pick the test
-  based on family, or expose it as an argument, and read the resulting
-  column name generically (`"Pr(>Chi)"` vs `"Pr(>F)"`).
-- **`lr_vpc_sim()` / `.lr_simulate_draws()`**: currently returns the
-  *expected* response under sampled parameters (`fit_resp`) as the
-  "simulated" value -- a reasonable shortcut for a 0/1 response (it's the
-  simulated probability), but for a continuous or count response a proper
-  VPC typically needs a full draw including residual/dispersion noise
-  (e.g. `rnorm(n, mean = fit, sd = sigma)` for gaussian,
-  `rpois(n, lambda = fit)` for Poisson), not just the conditional mean.
-  This needs a family-dispatched noise-generation step, most likely via an
-  internal generic keyed on `family(model)$family`.
-- **Naming**: functions are all prefixed `lr_` (logistic regression
-  specific). Proposed rename scheme (open for discussion):
-  `lr_model()` → `glm_model()`, `lr_predict()` → `glm_predict()`,
-  `lr_simulator()` → `glm_simulator()`, `lr_scm_*()` → `glm_scm_*()`,
-  `lr_vpc_sim()` → `glm_vpc_sim()`. Class `erlr_glm` → `erglm_model` (or
-  similar). Because erplots dispatches purely on the generic name plus
-  whatever class erlr/erglm chooses to register, this rename is entirely
-  internal to this package -- no coordination needed with erplots beyond
-  updating the `registerS3method()` calls in `R/er-methods.R`.
-- **Example data**: `lr_data` only has binary (`ae1`/`ae2`) responses.
-  Demonstrating gaussian/Poisson families well would benefit from adding
-  a continuous and/or count response column (also useful for erplots'
-  continuous-response work, see its PLAN.md).
+- ~~Run `devtools::document()` to regenerate `man/erglm_model.Rd` from
+  the updated roxygen comment, and render `methods.Rmd` end-to-end to
+  confirm the code chunks all evaluate cleanly.~~ Done -- both
+  `man/erglm_model.Rd` and `man/erglm_predict.Rd` are regenerated, and
+  `methods.Rmd` renders cleanly with `rmarkdown::render()`.
+- Consider whether the `erglm.Rmd` "Getting Started" stub (currently
+  near-empty) should also mention the `glm`/`lm` inheritance up front,
+  or just link to the new `methods.Rmd` article, so a first-time reader
+  finds it without already knowing to look.
+- ~~Cross-link from `erglm_predict()`'s own roxygen docs back to
+  `predict()`/the new vignette.~~ Done -- `erglm_predict()`'s
+  `@details` now notes it's an opinionated alternative to calling
+  `predict()` directly, and points to `vignette("methods", package =
+  "erglm")` for a side-by-side comparison.
 
-### Design decisions (reviewed)
+The one remaining open item (the `erglm.Rmd` stub) is small enough that
+this initiative is otherwise ready to close out once that's decided.
 
-The questions below were originally left open; each now has a working
-recommendation so implementation isn't blocked, but all are still up for
-debate if new information changes the calculus.
+## Next initiative: CRAN submission prep
 
-1. **Rename timing.** Do the family generalisation and the `erglm` rename
-   as two separate steps, not one PR: generalise behaviour first (under
-   the existing `erlr` name), get it reviewed and tested, then do the
-   rename as a final, purely mechanical pass right before CRAN
-   submission. Rationale: this keeps behavioural review separate from a
-   large, low-risk find-and-replace diff, and means a generalisation
-   decision can be revisited without re-doing a rename. (This matches
-   the existing step ordering below, where the rename is last.)
+### Motivation
 
-2. **Default `family`.** Once renamed, `glm_model()` should default to
-   `family = stats::gaussian()` -- i.e. match `stats::glm()`'s own
-   default -- rather than keeping the binomial-logit default. A package
-   that's no longer logistic-regression-specific shouldn't quietly
-   special-case binary responses; users fitting logistic models pass
-   `family = binomial()` explicitly, same as they would with base
-   `glm()`. This is the more predictable choice for anyone coming from
-   base R, at the cost of a breaking change for existing `lr_model()`
-   callers -- acceptable given the rename already breaks call sites.
+The rename/generalisation was explicitly sequenced to happen *before*
+a first CRAN release (see the old rationale, preserved in git history
+at `PLAN.md@c31a4ef`), to avoid a disruptive post-release rename. That
+work is done, the package checks cleanly, and there are no other
+planned breaking changes on the horizon — this is a reasonable point
+to prepare for a first CRAN submission.
 
-3. **v1 family scope.** Explicitly support and test four families that
-   cover the common exposure-response use cases: `binomial` (binary
-   AE), `poisson` (count AE), `gaussian` (continuous biomarker), and
-   `Gamma` (skewed continuous/time-based endpoints). Other families
-   (inverse.gaussian, quasi-families, etc.) should work through the same
-   generic mechanisms but are "untested, not officially supported" until
-   someone actually needs one -- don't build a speculative test matrix
-   for families with no current use case.
+### What's already in reasonable shape
 
-4. **SCM test selection.** Automatic by default, with an escape hatch:
-   pick the test from the family's dispersion behaviour (`"Chisq"` for
-   binomial/poisson, which have known dispersion; `"F"` for
-   gaussian/Gamma/inverse.gaussian/quasi*, which have estimated
-   dispersion), but expose `test = c("auto", "Chisq", "F")` on the
-   forward/backward SCM functions so users can override it. This follows
-   the same convention `car::Anova()` and similar tools use, and avoids
-   silently giving wrong-flavoured p-values for less common families.
+- `R-CMD-check.yaml`, `test-coverage.yaml`, and `pkgdown.yaml` GitHub
+  Actions are set up and green.
+- `Config/testthat/edition: 3`; tests exist per source file and cover
+  all four supported families.
+- MIT license with a `LICENSE`/`LICENSE.md` pair in the standard
+  `usethis::use_mit_license()` format.
+- `URL`/`BugReports` fields point at the renamed repo and pkgdown site.
 
-5. **VPC noise-model dispatch.** Implement it, rather than punting to a
-   documented limitation -- VPCs are a core diagnostic in this domain,
-   and an "expectation only" VPC is materially weaker for continuous/count
-   responses (it understates predictive uncertainty by ignoring residual
-   noise entirely). Scope the initial implementation to the same four
-   families as (3): Bernoulli/probability draws for binomial, `rpois()`
-   for poisson, `rnorm()` (using the estimated residual SD) for gaussian,
-   `rgamma()` (using the estimated shape/dispersion) for Gamma. Families
-   outside that set should raise an informative error rather than
-   silently falling back to the expectation-only shortcut.
+### Gaps to close before submitting
+
+1. **No `NEWS.md`.** CRAN doesn't require one, but reviewers and users
+   benefit from a top-level entry documenting the `erlr` → `erglm`
+   rename and family generalisation, since anyone who used `erlr`
+   needs a migration note. Should be added regardless of submission
+   timing.
+2. ~~**`LICENSE.md` copyright holder doesn't match `DESCRIPTION`.**~~
+   Done -- `LICENSE`/`LICENSE.md` now read "Danielle Navarro", matching
+   the `cph` role in `Authors@R`.
+3. **`Suggests: erplots` + `Remotes: djnavarro/erplots`.** `erplots`
+   isn't on CRAN. `Remotes` is ignored by CRAN's own build (it's a
+   `remotes`/`pak`-only convenience field), so it isn't itself a
+   blocker, but every use of `erplots` in tests/vignettes must be
+   properly gated (`requireNamespace("erplots", quietly = TRUE)` /
+   `testthat::skip_if_not_installed("erplots")`) so the package builds
+   and checks cleanly with `erplots` absent, which AGENTS.md says is
+   already the case for tests. Worth a final `R CMD check --as-cran`
+   run with `erplots` *not* installed to confirm the vignette article
+   build and examples don't implicitly depend on it too (articles
+   aren't shipped, so this mainly matters for `R/er-methods.R`'s
+   lazy-registration path and any `\dontrun`/example code).
+4. **Roxygen/Rd completeness for CRAN.** Every exported function needs
+   a `@return`/`\value` tag (CRAN now enforces this) and a runnable
+   `@examples` block without gratuitous `\dontrun{}`. Needs an audit
+   pass across `R/erglm-core.R`, `R/erglm-scm.R`, `R/erglm-vpc.R`.
+5. **Pre-submission checks.** Run and resolve findings from:
+   `devtools::check(remote = TRUE, manual = TRUE)`,
+   `devtools::spell_check()`, `urlchecker::url_check()`, and ideally
+   `R CMD check --as-cran` on both win-builder and R-hub, since none of
+   that is currently run locally or in CI (the CI workflow checks on
+   its own runner matrix, but a manual as-cran pass before submission
+   is still standard practice).
+6. **`cran-comments.md`.** Standard practice for a first submission:
+   note this is a new package, summarise `R CMD check` results (0
+   errors/warnings, any NOTEs explained), and flag the `erplots`
+   Suggests relationship.
+7. **Version number for release.** Decide whether the first CRAN
+   release ships as `0.2.0` (dropping the `.9000` dev suffix, keeping
+   the version that reflects "second design," post-rename) or `1.0.0`
+   (signalling API stability now that the family generalisation and
+   rename are both behind it). Open question — no strong convention
+   either way for a first release; flagging for a decision rather than
+   picking one.
 
 ### Suggested step ordering
 
-1. ~~Add `family` argument to `lr_model()`; generalise `.as_erlr()`.~~
-   Done. `lr_model()` gained a `family` argument (still defaulting to
-   `binomial(link = "logit")` for backward compatibility, per decision
-   2 -- the switch to a `gaussian()` default happens at rename time).
-   `.as_erlr()` now records `stats::family(mod)$family` instead of a
-   hardcoded `"logistic"`.
-2. ~~Generalise `er_summary.erlr_glm()`'s p-value column lookup.~~ Done,
-   now matches `^Pr\(` in the coefficient table's column names.
-3. ~~Generalise SCM's test statistic selection.~~ Done. `lr_scm_forward()`
-   / `lr_scm_backward()` gained a `test = c("auto", "Chisq", "F")`
-   argument (see decision 4); `.lr_anova_p()` picks the test
-   automatically from the family's dispersion behaviour
-   (`R/lr-family.R::.lr_default_test()`) and reads the p-value column
-   generically. Also fixed a latent bug in `.lr_add_term()`/
-   `.lr_remove_term()`, which previously refit via `lr_model()` without
-   passing through the original model's `family` (so SCM on a
-   non-default family would silently refit as binomial-logit).
-4. ~~Design and implement family-dispatched VPC noise generation.~~
-   Done, per decision 5, scoped to binomial/poisson/gaussian/Gamma
-   (`R/lr-family.R::.lr_draw_response()`); other families raise an
-   informative error from `lr_vpc_sim()` rather than silently falling
-   back to expectation-only draws. `.lr_simulate_draws()` itself is
-   unchanged (still expectation-only, since it's shared with
-   `er_simulate.erlr_glm()`/spaghetti plots, which want smooth
-   expectation curves) -- the noise draw is applied only in
-   `lr_vpc_sim()`, on top of `.lr_simulate_draws()`'s output.
-5. ~~Expand `lr_data` (or add a second example dataset) with
-   continuous/count responses; expand tests across families.~~ Done.
-   Added `ae_count` (poisson), `biomarker_change` (gaussian), and
-   `ae_duration` (Gamma) columns to `lr_data`, generated by appending
-   new draws after the existing generator code so `id`/`sex`/.../`ae1`/
-   `ae2` are unchanged bit-for-bit under the same seed. Tests extended
-   across all four families in `test-lr-core.R`, `test-lr-scm.R`,
-   `test-lr-vpc.R`, `test-er-methods.R`; vignette articles `model.Rmd`
-   and `simulate.Rmd` gained non-binomial worked examples.
-6. ~~Execute the `erglm` rename (package name, exported function names,
-   class names, DESCRIPTION/NAMESPACE/pkgdown/README/vignettes, GitHub
-   repo).~~ Done (in-repo changes). Final naming scheme used: package
-   `erlr` → `erglm`; `lr_model()` → `erglm_model()` (default `family`
-   now `stats::gaussian()`, per decision 2); `lr_predict()` →
-   `erglm_predict()`; `lr_simulator()` → `erglm_simulator()`;
-   `lr_scm_forward()`/`lr_scm_backward()`/`lr_scm_history()` →
-   `erglm_scm_forward()`/`erglm_scm_backward()`/`erglm_scm_history()`;
-   `lr_vpc_sim()` → `erglm_vpc_sim()`; dataset `lr_data` → `erglm_data`;
-   class `erlr_glm` → `erglm_model` (same name as the constructor
-   function, matching the `lm()`/`"lm"` base-R idiom); internal `.lr_*`
-   helpers → `.erglm_*`. Clean break, no deprecated `lr_*` aliases.
-   Version bumped to `0.2.0.9000`.
+1. ~~Fix the `LICENSE.md` copyright holder mismatch (item 2).~~ Done.
+2. Write `NEWS.md` covering the `erlr` → `erglm` history (item 1).
+3. Audit roxygen `@return`/`@examples` coverage across all exported
+   functions (item 4).
+4. Decide the release version number (item 7) — needs user input.
+5. Run the full pre-submission check suite (item 5), including a
+   check with `erplots` uninstalled (item 3), and fix anything it
+   surfaces.
+6. Draft `cran-comments.md` (item 6) and do a final review pass before
+   `devtools::release()`.
 
-   The GitHub repo (`djnavarro/erlr` → `djnavarro/erglm`) has since
-   been renamed, and the `erglm.djnavarro.net` pkgdown custom domain/DNS
-   is live (HTTPS certificate approved) -- both manual/infrastructure
-   follow-ups from the original rename plan are complete. The local
-   clone directory was also renamed from `erlr` to `erglm` for
-   consistency (filesystem-level, outside git).
-
-   **Still not done** (tracked separately): updating the companion
-   `erplots` repo, which still references `erlr::lr_model()`/
-   `erlr::lr_data` in its `DESCRIPTION` (`Suggests: erlr`),
-   `tests/testthat/helper-data.R`, and `vignettes/articles/plot.Rmd`.
-   This will break once erglm is published under the new name; needs a
-   follow-up PR against that repo.
+This ordering isn't committed — steps 2–3 have no open design
+questions and could be done in any order or in parallel; step 4 blocks
+tagging a release but not the mechanical cleanup in 2–3.

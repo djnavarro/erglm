@@ -25,6 +25,17 @@ A glm object
 \description{
 Fit an exposure-response model based on \code{glm()}
 }
+\details{
+The returned object has class \code{c("erglm_model", "glm", "lm")}:
+it \emph{is} a \code{glm} object, with a little extra metadata attached. This
+means all of the usual \code{glm}/\code{lm} methods work unchanged, without
+needing an erglm-specific equivalent -- e.g. \code{summary()}, \code{coef()},
+\code{vcov()}, \code{confint()}, \code{predict()}, \code{AIC()}, \code{BIC()}, \code{logLik()}, and
+\code{anova()} for comparing nested models. See \code{vignette("methods", package = "erglm")} for worked examples of these. \code{erglm_predict()}
+is a separate, erglm-specific alternative to \code{predict()} that
+returns confidence intervals on the response scale in a tidy data
+frame; the two are complementary, not competing.
+}
 \examples{
 mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 mod

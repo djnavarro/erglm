@@ -25,4 +25,5 @@ articles:
     navbar:
     contents: 
       - articles/model
+      - articles/methods
       - articles/simulate

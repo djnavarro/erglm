@@ -23,6 +23,15 @@ Predictions and confidence intervals for exposure-response models
 Computes intervals on the link scale and back-transforms with
 \code{stats::family(object)$linkinv}, so this works for any \code{glm()} family,
 not just binomial/logistic models.
+
+This is a tidy, opinionated alternative to calling base R's
+\code{predict()} directly on \code{object} -- since \code{object} is a genuine
+\code{glm} object, \code{predict()} (and \code{predict(object, se.fit = TRUE)}, on
+which this function is based) work unchanged and remain useful for
+quick point estimates or when a tidy data frame isn't needed. See
+\code{vignette("methods", package = "erglm")} for a side-by-side
+comparison and other inherited \code{glm}/\code{lm} methods (\code{summary()},
+\code{vcov()}, \code{AIC()}, etc.).
 }
 \examples{
 mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())

@@ -11,6 +11,17 @@
 #' work through the same generic mechanisms but are untested.
 #' @param ... Other arguments passed to `glm()`
 #' @returns A glm object
+#'
+#' @details The returned object has class `c("erglm_model", "glm", "lm")`:
+#' it *is* a `glm` object, with a little extra metadata attached. This
+#' means all of the usual `glm`/`lm` methods work unchanged, without
+#' needing an erglm-specific equivalent -- e.g. `summary()`, `coef()`,
+#' `vcov()`, `confint()`, `predict()`, `AIC()`, `BIC()`, `logLik()`, and
+#' `anova()` for comparing nested models. See `vignette("methods",
+#' package = "erglm")` for worked examples of these. `erglm_predict()`
+#' is a separate, erglm-specific alternative to `predict()` that
+#' returns confidence intervals on the response scale in a tidy data
+#' frame; the two are complementary, not competing.
 #' @export
 #' @examples
 #' mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
@@ -39,6 +50,15 @@ erglm_model <- function(formula, data, family = stats::gaussian(), ...) {
 #' @details Computes intervals on the link scale and back-transforms with
 #' `stats::family(object)$linkinv`, so this works for any `glm()` family,
 #' not just binomial/logistic models.
+#'
+#' This is a tidy, opinionated alternative to calling base R's
+#' `predict()` directly on `object` -- since `object` is a genuine
+#' `glm` object, `predict()` (and `predict(object, se.fit = TRUE)`, on
+#' which this function is based) work unchanged and remain useful for
+#' quick point estimates or when a tidy data frame isn't needed. See
+#' `vignette("methods", package = "erglm")` for a side-by-side
+#' comparison and other inherited `glm`/`lm` methods (`summary()`,
+#' `vcov()`, `AIC()`, etc.).
 #'
 #' @export
 #' @examples
