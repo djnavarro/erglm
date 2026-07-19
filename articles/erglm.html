@@ -35,7 +35,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/model.html">Modelling</a></li>
+<li><a class="dropdown-item" href="../articles/erglm.html">Getting Started</a></li>
+    <li><a class="dropdown-item" href="../articles/model.html">Modelling</a></li>
     <li><a class="dropdown-item" href="../articles/scm.html">Stepwise covariate modelling</a></li>
     <li><a class="dropdown-item" href="../articles/methods.html">Using base R model methods</a></li>
     <li><a class="dropdown-item" href="../articles/simulate.html">Simulation</a></li>
@@ -77,10 +78,169 @@
 
     
     
-<p>This is the getting started article</p>
+<p>erglm provides estimation tools for exposure-response models based on
+<code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>. It’s mostly a convenience package: the core tools
+are thin wrappers around <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> and its usual machinery,
+tested and supported for binomial, poisson, gaussian, and Gamma
+families. This article is a quick tour of the main pieces; the other
+articles go into more depth on each.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span></code></pre></div>
-  </main>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
+</h2>
+<p>The package ships with a synthetic dataset, <code>erglm_data</code>,
+used throughout the documentation. It has an exposure metric
+(<code>aucss</code>), several covariates (<code>sex</code>,
+<code>age</code>, <code>weight</code>, <code>dose</code>, …), and
+response columns for each supported family: binary (<code>ae1</code>,
+<code>ae2</code>), count (<code>ae_count</code>), continuous
+(<code>biomarker_change</code>), and positive right-skewed continuous
+(<code>ae_duration</code>):</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">erglm_data</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 300 × 13</span></span></span>
+<span><span class="co">#&gt;       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2 ae_count</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1 Male      35     79   200 Drug       673.   97.3     0     1        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2 Female    22     58   200 Drug      <span style="text-decoration: underline;">2</span>806.  301.      1     1        6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3 Female    28     58     0 Placebo      0     0       0     0        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4 Female    18     57   100 Drug      <span style="text-decoration: underline;">1</span>169.  198.      1     1        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5 Male      28     77   100 Drug       377.   51.4     0     0        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6 Female    19     76   200 Drug       327.   25.4     1     0        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7 Male      30     70     0 Placebo      0     0       0     0        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8 Female    34     60   100 Drug      <span style="text-decoration: underline;">1</span>208.  133.      1     1        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9 Male      21     89     0 Placebo      0     0       0     0        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10 Female    34     56   200 Drug       254.   31.0     0     0        1</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 290 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: biomarker_change &lt;dbl&gt;, ae_duration &lt;dbl&gt;</span></span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="fitting-a-model">Fitting a model<a class="anchor" aria-label="anchor" href="#fitting-a-model"></a>
+</h2>
+<p><code><a href="../reference/erglm_model.html">erglm_model()</a></code> fits the model – it takes the same
+<code>formula</code>/<code>data</code> arguments as <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>,
+plus a <code>family</code> argument (defaulting to
+<code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code>, matching <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>’s own default):</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">mod</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  stats::glm(formula = formula, family = family, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt; (Intercept)        aucss      sexMale  </span></span>
+<span><span class="co">#&gt;   -1.648112     0.005508    -0.312232  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 299 Total (i.e. Null);  297 Residual</span></span>
+<span><span class="co">#&gt; Null Deviance:       402.1 </span></span>
+<span><span class="co">#&gt; Residual Deviance: 192.7     AIC: 198.7</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="prediction">Prediction<a class="anchor" aria-label="anchor" href="#prediction"></a>
+</h2>
+<p><code><a href="../reference/erglm_predict.html">erglm_predict()</a></code> produces predictions with confidence
+intervals, on both the link and response scales, as a tidy data
+frame:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3000</span>, by <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, sex <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 7</span></span></span>
+<span><span class="co">#&gt;   aucss sex    fit_link se_link fit_resp ci_lower ci_upper</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     0 Female    -<span style="color: #BB0000;">1.65</span>   0.301    0.161   0.096<span style="text-decoration: underline;">4</span>    0.258</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   500 Female     1.11   0.297    0.751   0.628     0.844</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">1</span>000 Female     3.86   0.558    0.979   0.941     0.993</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">1</span>500 Female     6.61   0.871    0.999   0.993     1.000</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>000 Female     9.37   1.20     1.000   0.999     1.000</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>500 Female    12.1    1.53     1.000   1.000     1.000</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>  <span style="text-decoration: underline;">3</span>000 Female    14.9    1.86     1.000   1.000     1.000</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="choosing-covariates">Choosing covariates<a class="anchor" aria-label="anchor" href="#choosing-covariates"></a>
+</h2>
+<p>When there are several candidate covariates,
+<code><a href="../reference/erglm_scm.html">erglm_scm_forward()</a></code> and <code><a href="../reference/erglm_scm.html">erglm_scm_backward()</a></code>
+automate the process of deciding which belong in the model, via stepwise
+addition/elimination based on significance testing:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">mod</span>, candidates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dose"</span>, <span class="st">"weight"</span>, <span class="st">"age"</span><span class="op">)</span>, seed <span class="op">=</span> <span class="fl">1024</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  stats::glm(formula = formula, family = family, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt; (Intercept)        aucss      sexMale  </span></span>
+<span><span class="co">#&gt;   -1.648112     0.005508    -0.312232  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 299 Total (i.e. Null);  297 Residual</span></span>
+<span><span class="co">#&gt; Null Deviance:       402.1 </span></span>
+<span><span class="co">#&gt; Residual Deviance: 192.7     AIC: 198.7</span></span></code></pre></div>
+<p>See the <a href="scm.html">“Stepwise covariate modelling”</a> article
+for a full treatment, including the forward/backward workflow and the
+audit log (<code><a href="../reference/erglm_scm.html">erglm_scm_history()</a></code>).</p>
+</div>
+<div class="section level2">
+<h2 id="simulation">Simulation<a class="anchor" aria-label="anchor" href="#simulation"></a>
+</h2>
+<p><code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> generates replicate datasets from a fitted
+model, and <code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> reshapes those replicates into a
+data set ready for a visual predictive check:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">2048</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,500 × 5</span></span></span>
+<span><span class="co">#&gt;      ae1 aucss sex    row_id sim_id</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0  673. Male        1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1 <span style="text-decoration: underline;">2</span>806. Female      2      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     0    0  Female      3      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1 <span style="text-decoration: underline;">1</span>169. Female      4      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1  377. Male        5      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1  327. Female      6      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     0    0  Male        7      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1 <span style="text-decoration: underline;">1</span>208. Female      8      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     0    0  Male        9      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1  254. Female     10      1</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,490 more rows</span></span></span></code></pre></div>
+<p>See the <a href="simulate.html">“Simulation”</a> article for details,
+including the lower-level <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> building block.</p>
+</div>
+<div class="section level2">
+<h2 id="working-with-fitted-models">Working with fitted models<a class="anchor" aria-label="anchor" href="#working-with-fitted-models"></a>
+</h2>
+<p>An object returned by <code><a href="../reference/erglm_model.html">erglm_model()</a></code> is a genuine
+<code>glm</code> object – it has class
+<code>c("erglm_model", "glm", "lm")</code> – so all of the standard
+<code>glm</code>/<code>lm</code> methods (<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>,
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code>, <code><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC()</a></code>,
+<code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code>, and so on) work on it directly, with no
+erglm-specific replacement needed. See the <a href="methods.html">“Using
+base R model methods”</a> article for a worked-through tour of
+these.</p>
+</div>
+<div class="section level2">
+<h2 id="where-to-next">Where to next<a class="anchor" aria-label="anchor" href="#where-to-next"></a>
+</h2>
+<ul>
+<li>
+<a href="model.html">“Modelling”</a> – more on fitting and
+prediction, including the other <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> families erglm
+supports.</li>
+<li>
+<a href="scm.html">“Stepwise covariate modelling”</a> – the
+forward/backward SCM workflow in full.</li>
+<li>
+<a href="methods.html">“Using base R model methods”</a> – the
+<code>glm</code>/<code>lm</code> methods that come for free.</li>
+<li>
+<a href="simulate.html">“Simulation”</a> – <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code>,
+<code><a href="../reference/erglm_fun.html">erglm_fun()</a></code>, and <code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code>.</li>
+<li>the companion <a href="https://github.com/djnavarro/erplots" class="external-link">erplots</a> package, for
+visualising exposure-response models fitted with erglm.</li>
+</ul>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
