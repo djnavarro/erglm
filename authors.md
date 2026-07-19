@@ -8,16 +8,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/djnavarro/erlr/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/djnavarro/erglm/blob/main/DESCRIPTION)
 
-Navarro D (2026). *erlr: Exposure-Response Tools for Logistic Regression
-Models*. R package version 0.1.0.9000,
-<https://github.com/djnavarro/erlr>.
+Navarro D (2026). *erglm: Exposure-Response Tools for GLM-Based Models*.
+R package version 0.2.0.9000, <https://github.com/djnavarro/erglm>.
 
     @Manual{,
-      title = {erlr: Exposure-Response Tools for Logistic Regression Models},
+      title = {erglm: Exposure-Response Tools for GLM-Based Models},
       author = {Danielle Navarro},
       year = {2026},
-      note = {R package version 0.1.0.9000},
-      url = {https://github.com/djnavarro/erlr},
+      note = {R package version 0.2.0.9000},
+      url = {https://github.com/djnavarro/erglm},
     }

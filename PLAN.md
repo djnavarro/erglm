@@ -1,8 +1,11 @@
-# erlr development plan
+# erglm development plan
 
-This document tracks scoped-out future development for erlr. It is not a
-changelog; see NEWS.md for that once one exists. Items here are
-proposals to be reviewed before implementation, not committed designs.
+This document tracks scoped-out future development for erglm (formerly
+`erlr`, renamed per step 6 below). It is not a changelog; see NEWS.md
+for that once one exists. Items here are proposals to be reviewed before
+implementation, not committed designs; the sections below are kept as a
+historical record of the generalisation/rename project even though the
+package has since moved on from the `erlr`/`lr_*` names they describe.
 
 ## Generalise from logistic regression to arbitrary `glm()` families (→ `erglm`)
 
@@ -21,20 +24,18 @@ natural next step, and should happen *before* an initial CRAN release
 
 ### What already generalises for free
 
-- [`lr_predict()`](https://erlr.djnavarro.net/reference/lr_predict.md)
-  already computes CIs on the link scale using
+- `lr_predict()` already computes CIs on the link scale using
   `stats::family(object)$linkinv`, not a hardcoded logit/inverse-logit.
   It should work unchanged for any `glm` family.
-- [`lr_simulator()`](https://erlr.djnavarro.net/reference/lr_simulator.md)
-  builds a model matrix from the (response-stripped) formula and applies
-  `stats::family(object)$linkinv` – also already family-agnostic.
+- `lr_simulator()` builds a model matrix from the (response-stripped)
+  formula and applies `stats::family(object)$linkinv` – also already
+  family-agnostic.
 
 ### What needs to change
 
-- **[`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md)**:
-  currently hardcodes `family = stats::binomial(link = "logit")`. Needs
-  a `family` argument; see decision (2) below on what it should default
-  to once renamed.
+- **`lr_model()`**: currently hardcodes
+  `family = stats::binomial(link = "logit")`. Needs a `family` argument;
+  see decision (2) below on what it should default to once renamed.
 - **`.as_erlr()`**: hardcodes `mod$erlr$type <- "logistic"`. Should
   record the actual family (`stats::family(mod)$family`) instead.
 - **`er_summary.erlr_glm()`** (in `R/er-methods.R`): extracts a p-value
@@ -51,25 +52,19 @@ natural next step, and should happen *before* an initial CRAN release
   needs to pick the test based on family, or expose it as an argument,
   and read the resulting column name generically (`"Pr(>Chi)"` vs
   `"Pr(>F)"`).
-- **[`lr_vpc_sim()`](https://erlr.djnavarro.net/reference/lr_vpc_sim.md)
-  / `.lr_simulate_draws()`**: currently returns the *expected* response
-  under sampled parameters (`fit_resp`) as the “simulated” value – a
-  reasonable shortcut for a 0/1 response (it’s the simulated
-  probability), but for a continuous or count response a proper VPC
-  typically needs a full draw including residual/dispersion noise
-  (e.g. `rnorm(n, mean = fit, sd = sigma)` for gaussian,
+- **`lr_vpc_sim()` / `.lr_simulate_draws()`**: currently returns the
+  *expected* response under sampled parameters (`fit_resp`) as the
+  “simulated” value – a reasonable shortcut for a 0/1 response (it’s the
+  simulated probability), but for a continuous or count response a
+  proper VPC typically needs a full draw including residual/dispersion
+  noise (e.g. `rnorm(n, mean = fit, sd = sigma)` for gaussian,
   `rpois(n, lambda = fit)` for Poisson), not just the conditional mean.
   This needs a family-dispatched noise-generation step, most likely via
   an internal generic keyed on `family(model)$family`.
 - **Naming**: functions are all prefixed `lr_` (logistic regression
-  specific). Proposed rename scheme (open for discussion):
-  [`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md) →
-  `glm_model()`,
-  [`lr_predict()`](https://erlr.djnavarro.net/reference/lr_predict.md) →
-  `glm_predict()`,
-  [`lr_simulator()`](https://erlr.djnavarro.net/reference/lr_simulator.md)
-  → `glm_simulator()`, `lr_scm_*()` → `glm_scm_*()`,
-  [`lr_vpc_sim()`](https://erlr.djnavarro.net/reference/lr_vpc_sim.md) →
+  specific). Proposed rename scheme (open for discussion): `lr_model()`
+  → `glm_model()`, `lr_predict()` → `glm_predict()`, `lr_simulator()` →
+  `glm_simulator()`, `lr_scm_*()` → `glm_scm_*()`, `lr_vpc_sim()` →
   `glm_vpc_sim()`. Class `erlr_glm` → `erglm_model` (or similar).
   Because erplots dispatches purely on the generic name plus whatever
   class erlr/erglm chooses to register, this rename is entirely internal
@@ -105,9 +100,8 @@ debate if new information changes the calculus.
     `family = binomial()` explicitly, same as they would with base
     [`glm()`](https://rdrr.io/r/stats/glm.html). This is the more
     predictable choice for anyone coming from base R, at the cost of a
-    breaking change for existing
-    [`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md)
-    callers – acceptable given the rename already breaks call sites.
+    breaking change for existing `lr_model()` callers – acceptable given
+    the rename already breaks call sites.
 
 3.  **v1 family scope.** Explicitly support and test four families that
     cover the common exposure-response use cases: `binomial` (binary
@@ -144,42 +138,38 @@ debate if new information changes the calculus.
 
 ### Suggested step ordering
 
-1.  ~~Add `family` argument to
-    [`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md);
-    generalise `.as_erlr()`.~~ Done.
-    [`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md)
-    gained a `family` argument (still defaulting to
+1.  ~~Add `family` argument to `lr_model()`; generalise `.as_erlr()`.~~
+    Done. `lr_model()` gained a `family` argument (still defaulting to
     `binomial(link = "logit")` for backward compatibility, per decision
     2 – the switch to a
     [`gaussian()`](https://rdrr.io/r/stats/family.html) default happens
     at rename time). `.as_erlr()` now records
     `stats::family(mod)$family` instead of a hardcoded `"logistic"`.
+
 2.  ~~Generalise `er_summary.erlr_glm()`’s p-value column lookup.~~
     Done, now matches `^Pr\(` in the coefficient table’s column names.
+
 3.  ~~Generalise SCM’s test statistic selection.~~ Done.
-    [`lr_scm_forward()`](https://erlr.djnavarro.net/reference/lr_scm.md)
-    /
-    [`lr_scm_backward()`](https://erlr.djnavarro.net/reference/lr_scm.md)
-    gained a `test = c("auto", "Chisq", "F")` argument (see decision 4);
+    `lr_scm_forward()` / `lr_scm_backward()` gained a
+    `test = c("auto", "Chisq", "F")` argument (see decision 4);
     `.lr_anova_p()` picks the test automatically from the family’s
     dispersion behaviour (`R/lr-family.R::.lr_default_test()`) and reads
     the p-value column generically. Also fixed a latent bug in
     `.lr_add_term()`/ `.lr_remove_term()`, which previously refit via
-    [`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md)
-    without passing through the original model’s `family` (so SCM on a
-    non-default family would silently refit as binomial-logit).
+    `lr_model()` without passing through the original model’s `family`
+    (so SCM on a non-default family would silently refit as
+    binomial-logit).
+
 4.  ~~Design and implement family-dispatched VPC noise generation.~~
     Done, per decision 5, scoped to binomial/poisson/gaussian/Gamma
     (`R/lr-family.R::.lr_draw_response()`); other families raise an
-    informative error from
-    [`lr_vpc_sim()`](https://erlr.djnavarro.net/reference/lr_vpc_sim.md)
-    rather than silently falling back to expectation-only draws.
-    `.lr_simulate_draws()` itself is unchanged (still expectation-only,
-    since it’s shared with `er_simulate.erlr_glm()`/spaghetti plots,
-    which want smooth expectation curves) – the noise draw is applied
-    only in
-    [`lr_vpc_sim()`](https://erlr.djnavarro.net/reference/lr_vpc_sim.md),
-    on top of `.lr_simulate_draws()`’s output.
+    informative error from `lr_vpc_sim()` rather than silently falling
+    back to expectation-only draws. `.lr_simulate_draws()` itself is
+    unchanged (still expectation-only, since it’s shared with
+    `er_simulate.erlr_glm()`/spaghetti plots, which want smooth
+    expectation curves) – the noise draw is applied only in
+    `lr_vpc_sim()`, on top of `.lr_simulate_draws()`’s output.
+
 5.  ~~Expand `lr_data` (or add a second example dataset) with
     continuous/count responses; expand tests across families.~~ Done.
     Added `ae_count` (poisson), `biomarker_change` (gaussian), and
@@ -189,6 +179,40 @@ debate if new information changes the calculus.
     across all four families in `test-lr-core.R`, `test-lr-scm.R`,
     `test-lr-vpc.R`, `test-er-methods.R`; vignette articles `model.Rmd`
     and `simulate.Rmd` gained non-binomial worked examples.
-6.  Execute the `erglm` rename (package name, exported function names,
+
+6.  ~~Execute the `erglm` rename (package name, exported function names,
     class names, DESCRIPTION/NAMESPACE/pkgdown/README/vignettes, GitHub
-    repo). **Remaining** – not done in this pass; see decision 1.
+    repo).~~ Done (in-repo changes). Final naming scheme used: package
+    `erlr` → `erglm`; `lr_model()` →
+    [`erglm_model()`](https://erglm.djnavarro.net/reference/erglm_model.md)
+    (default `family` now
+    [`stats::gaussian()`](https://rdrr.io/r/stats/family.html), per
+    decision 2); `lr_predict()` →
+    [`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md);
+    `lr_simulator()` →
+    [`erglm_simulator()`](https://erglm.djnavarro.net/reference/erglm_simulator.md);
+    `lr_scm_forward()`/`lr_scm_backward()`/`lr_scm_history()` →
+    [`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_history()`](https://erglm.djnavarro.net/reference/erglm_scm.md);
+    `lr_vpc_sim()` →
+    [`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md);
+    dataset `lr_data` → `erglm_data`; class `erlr_glm` → `erglm_model`
+    (same name as the constructor function, matching the
+    [`lm()`](https://rdrr.io/r/stats/lm.html)/`"lm"` base-R idiom);
+    internal `.lr_*` helpers → `.erglm_*`. Clean break, no deprecated
+    `lr_*` aliases. Version bumped to `0.2.0.9000`.
+
+    **Not done as part of this pass** (tracked separately, per the
+    erlr→erglm rename plan’s stated scope):
+
+    - Actually renaming the GitHub repo (`djnavarro/erlr` →
+      `djnavarro/erglm`) and repointing the `erglm.djnavarro.net`
+      pkgdown custom domain – manual/infrastructure steps, not a file
+      change in this repo. `DESCRIPTION`/`README.Rmd`/`_pkgdown.yml`
+      already reference the new URLs, so they won’t resolve until this
+      happens.
+    - Updating the companion `erplots` repo, which still references
+      [`erlr::lr_model()`](https://erlr.djnavarro.net/reference/lr_model.html)/[`erlr::lr_data`](https://erlr.djnavarro.net/reference/lr_data.html)
+      in its `DESCRIPTION` (`Suggests: erlr`),
+      `tests/testthat/helper-data.R`, and `vignettes/articles/plot.Rmd`.
+      This will break once erglm is published under the new name; needs
+      a follow-up PR against that repo.

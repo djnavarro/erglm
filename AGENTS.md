@@ -2,59 +2,99 @@
 
 ## What this package is
 
-erlr provides estimation tools for exposure-response models based on
-logistic regression (`glm(family = binomial(link = "logit"))`): model
-fitting
-([`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md)),
+erglm provides estimation tools for exposure-response models based on
+[`glm()`](https://rdrr.io/r/stats/glm.html): model fitting
+([`erglm_model()`](https://erglm.djnavarro.net/reference/erglm_model.md)),
 prediction with confidence intervals
-([`lr_predict()`](https://erlr.djnavarro.net/reference/lr_predict.md)),
+([`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md)),
 stepwise covariate modelling
-([`lr_scm_forward()`](https://erlr.djnavarro.net/reference/lr_scm.md) /
-[`lr_scm_backward()`](https://erlr.djnavarro.net/reference/lr_scm.md) /
-[`lr_scm_history()`](https://erlr.djnavarro.net/reference/lr_scm.md)),
+([`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
+/
+[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
+/
+[`erglm_scm_history()`](https://erglm.djnavarro.net/reference/erglm_scm.md)),
 and simulation
-([`lr_simulator()`](https://erlr.djnavarro.net/reference/lr_simulator.md),
-[`lr_vpc_sim()`](https://erlr.djnavarro.net/reference/lr_vpc_sim.md)).
+([`erglm_simulator()`](https://erglm.djnavarro.net/reference/erglm_simulator.md),
+[`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)).
+[`erglm_model()`](https://erglm.djnavarro.net/reference/erglm_model.md)
+takes a `family` argument, defaulting to
+[`stats::gaussian()`](https://rdrr.io/r/stats/family.html) (matching
+[`glm()`](https://rdrr.io/r/stats/glm.html)’s own default); binomial,
+poisson, gaussian, and Gamma are tested and officially supported end to
+end (fitting, prediction, SCM significance testing, and VPC simulation).
+Other [`glm()`](https://rdrr.io/r/stats/glm.html) families work through
+the same generic mechanisms in
+[`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md)/[`erglm_simulator()`](https://erglm.djnavarro.net/reference/erglm_simulator.md)
+but aren’t covered by SCM’s test selection or VPC’s noise draws.
+
+This package was previously called `erlr` (logistic-regression-only,
+`lr_*`-prefixed functions); it was renamed to `erglm` and generalised to
+arbitrary [`glm()`](https://rdrr.io/r/stats/glm.html) families, per
+[PLAN.md](https://erglm.djnavarro.net/PLAN.md) step 6. There are no
+`lr_*` deprecated aliases – this was a clean-break rename, since the
+package predates any CRAN release or external users.
 
 It deliberately contains **no plotting code**. For a model-agnostic
 mini-language to visualise exposure-response models (including those
 fitted here), see the companion package
-[erplots](https://github.com/djnavarro/erplots). erlr interoperates with
-erplots by implementing the `er_predict()` / `er_simulate()` /
+[erplots](https://github.com/djnavarro/erplots). erglm interoperates
+with erplots by implementing the `er_predict()` / `er_simulate()` /
 `er_summary()` generics erplots defines, registered lazily at load time
-(see `R/er-methods.R`) – erlr has no hard dependency on erplots or on
+(see `R/er-methods.R`) – erglm has no hard dependency on erplots or on
 plotting packages (ggplot2, patchwork).
+
+**Known follow-up (not yet done):** the companion `erplots` repo still
+references the old package/function names
+([`erlr::lr_model()`](https://erlr.djnavarro.net/reference/lr_model.html),
+[`erlr::lr_data`](https://erlr.djnavarro.net/reference/lr_data.html)) in
+its `DESCRIPTION` `Suggests`, test helpers, and a vignette article – it
+needs a corresponding update once this rename is published, or its
+`erlr`-dependent tests/vignette will break.
 
 ## Planned work
 
-See [PLAN.md](https://erlr.djnavarro.net/PLAN.md) for scoped-out future
-development. The main item is generalising this package from
-logistic-regression-specific to arbitrary
-[`glm()`](https://rdrr.io/r/stats/glm.html) families, with an
-accompanying rename to `erglm` before an initial CRAN release.
+See [PLAN.md](https://erglm.djnavarro.net/PLAN.md) for the history of
+this generalisation/rename project. Both the family generalisation
+(steps 1-5) and the `erglm` rename (step 6) described there are now
+done. Renaming the actual GitHub repo (`djnavarro/erlr` -\>
+`djnavarro/erglm`) and repointing the `erglm.djnavarro.net` pkgdown
+domain are manual follow-ups, not done by editing files in this repo.
 
 ## Structure
 
-- `R/lr-core.R` –
-  [`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md),
-  [`lr_predict()`](https://erlr.djnavarro.net/reference/lr_predict.md),
+- `R/erglm-core.R` –
+  [`erglm_model()`](https://erglm.djnavarro.net/reference/erglm_model.md),
+  [`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md),
   the
-  [`lr_simulator()`](https://erlr.djnavarro.net/reference/lr_simulator.md)
-  closure factory, and the shared `.lr_simulate_draws()` helper (used by
-  both
-  [`lr_vpc_sim()`](https://erlr.djnavarro.net/reference/lr_vpc_sim.md)
+  [`erglm_simulator()`](https://erglm.djnavarro.net/reference/erglm_simulator.md)
+  closure factory, and the shared `.erglm_simulate_draws()` helper (used
+  by both
+  [`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
   and, via erplots, spaghetti-style plots).
-- `R/lr-scm.R` – forward/backward stepwise covariate modelling.
-- `R/lr-vpc.R` –
-  [`lr_vpc_sim()`](https://erlr.djnavarro.net/reference/lr_vpc_sim.md).
-- `R/lr-data.R` – the synthetic `lr_data` example dataset.
+- `R/erglm-scm.R` – forward/backward stepwise covariate modelling.
+- `R/erglm-vpc.R` –
+  [`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md).
+- `R/erglm-family.R` – shared family-dispatch helpers used by SCM and
+  VPC: `.erglm_default_test()` (picks `"Chisq"` vs `"F"` for
+  [`stats::anova()`](https://rdrr.io/r/stats/anova.html) based on the
+  family’s dispersion behaviour) and `.erglm_draw_response()`
+  (family-specific residual noise draws for VPC simulation;
+  binomial/poisson/gaussian/Gamma only, errors informatively otherwise).
+- `R/erglm-data.R` – the synthetic `erglm_data` example dataset. Has
+  binary (`ae1`, `ae2`), count (`ae_count`), continuous
+  (`biomarker_change`), and positive/right-skewed continuous
+  (`ae_duration`) response columns, for demonstrating
+  binomial/poisson/gaussian/Gamma models respectively.
 - `R/er-methods.R` – erplots interoperability: S3 methods for
   `er_predict()`/`er_simulate()`/`er_summary()`, plus lazy registration
   via `.onLoad()` (vendored `s3_register()` – the standard pattern for
-  optional cross-package S3 methods).
+  optional cross-package S3 methods). `er_summary.erglm_model()`’s
+  p-value extraction is family-generic (matches `Pr(>|z|)` or `Pr(>|t|)`
+  by pattern).
 - `R/utils-helpers.R`, `R/utils-global.R` – small internal helpers and
   [`globalVariables()`](https://rdrr.io/r/utils/globalVariables.html)
-  declarations for NSE.
+  declarations for NSE. `.as_erglm()` records the fitted model’s actual
+  family (`stats::family(mod)$family`) in `mod$erglm$type`.
 
 ## Development workflow
 
@@ -74,9 +114,14 @@ accompanying rename to `erglm` before an initial CRAN release.
 - Use the base R pipe (`|>`), not the magrittr pipe.
 - Follow the existing tidyverse-style conventions (dplyr/tibble/rlang)
   already used throughout.
-- Public functions are prefixed `lr_`; internal helpers are prefixed
-  with `.`.
-- Model objects are plain `glm` objects with an extra `erlr_glm` class
-  and an internal `$erlr` list for package-specific metadata (e.g. SCM
-  history) – see `.as_erlr()`.
+- Public functions are prefixed `erglm_`; internal helpers are prefixed
+  with `.erglm_` (or, for a couple of package-wide utilities like
+  `.pick_seed()`, no prefix at all).
+- Model objects are plain `glm` objects with an extra `erglm_model`
+  class (same name as the constructor function
+  [`erglm_model()`](https://erglm.djnavarro.net/reference/erglm_model.md),
+  matching the base-R idiom of
+  [`lm()`](https://rdrr.io/r/stats/lm.html)/class `"lm"`) and an
+  internal `$erglm` list for package-specific metadata (e.g. SCM
+  history) – see `.as_erglm()`.
 - Don’t add plotting code here – that belongs in erplots.

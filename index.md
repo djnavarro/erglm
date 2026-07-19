@@ -1,51 +1,52 @@
-# erlr
+# erglm
 
-Provides estimation tools for exposure-response models that use logistic
-regression for binary responses. It is mostly intended as a convenience
-package: the core tools are wrappers around
-[`glm()`](https://rdrr.io/r/stats/glm.html). For plotting
-exposure-response models (including those fitted with erlr), see the
-companion package [erplots](https://github.com/djnavarro/erplots), which
-supplies a model-agnostic mini-language for building exposure-response
-plots.
+Provides estimation tools for exposure-response models based on
+[`glm()`](https://rdrr.io/r/stats/glm.html). It is mostly intended as a
+convenience package: the core tools are wrappers around
+[`glm()`](https://rdrr.io/r/stats/glm.html), officially tested and
+supported for binomial, poisson, gaussian, and Gamma families. For
+plotting exposure-response models (including those fitted with erglm),
+see the companion package
+[erplots](https://github.com/djnavarro/erplots), which supplies a
+model-agnostic mini-language for building exposure-response plots.
 
 ## Installation
 
-You can install the development version of erlr like so:
+You can install the development version of erglm like so:
 
 ``` r
 
-pak::pak("djnavarro/erlr")
+pak::pak("djnavarro/erglm")
 ```
 
 ## Models
 
 ``` r
 
-library(erlr)
+library(erglm)
 library(tibble)
 
-lr_data
-#> # A tibble: 300 × 10
-#>       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2
-#>    <int> <fct>  <int>  <dbl> <dbl> <fct>     <dbl>  <dbl> <dbl> <dbl>
-#>  1     1 Male      35     79   200 Drug       673.   97.3     0     1
-#>  2     2 Female    22     58   200 Drug      2806.  301.      1     1
-#>  3     3 Female    28     58     0 Placebo      0     0       0     0
-#>  4     4 Female    18     57   100 Drug      1169.  198.      1     1
-#>  5     5 Male      28     77   100 Drug       377.   51.4     0     0
-#>  6     6 Female    19     76   200 Drug       327.   25.4     1     0
-#>  7     7 Male      30     70     0 Placebo      0     0       0     0
-#>  8     8 Female    34     60   100 Drug      1208.  133.      1     1
-#>  9     9 Male      21     89     0 Placebo      0     0       0     0
-#> 10    10 Female    34     56   200 Drug       254.   31.0     0     0
+erglm_data
+#> # A tibble: 300 × 13
+#>       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2 ae_count
+#>    <int> <fct>  <int>  <dbl> <dbl> <fct>     <dbl>  <dbl> <dbl> <dbl>    <int>
+#>  1     1 Male      35     79   200 Drug       673.   97.3     0     1        1
+#>  2     2 Female    22     58   200 Drug      2806.  301.      1     1        6
+#>  3     3 Female    28     58     0 Placebo      0     0       0     0        1
+#>  4     4 Female    18     57   100 Drug      1169.  198.      1     1        0
+#>  5     5 Male      28     77   100 Drug       377.   51.4     0     0        0
+#>  6     6 Female    19     76   200 Drug       327.   25.4     1     0        0
+#>  7     7 Male      30     70     0 Placebo      0     0       0     0        0
+#>  8     8 Female    34     60   100 Drug      1208.  133.      1     1        1
+#>  9     9 Male      21     89     0 Placebo      0     0       0     0        0
+#> 10    10 Female    34     56   200 Drug       254.   31.0     0     0        1
 #> # ℹ 290 more rows
+#> # ℹ 2 more variables: biomarker_change <dbl>, ae_duration <dbl>
 
-mod <- lr_model(ae1 ~ aucss, lr_data)
+mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 mod
 #> 
-#> Call:  stats::glm(formula = formula, family = stats::binomial(link = "logit"), 
-#>     data = data)
+#> Call:  stats::glm(formula = formula, family = family, data = data)
 #> 
 #> Coefficients:
 #> (Intercept)        aucss  
@@ -60,10 +61,10 @@ mod
 
 ``` r
 
-mod1 <- lr_model(ae1 ~ aucss + sex + dose, lr_data)
-mod2 <- lr_scm_backward(mod1, candidates = c("sex", "dose"))
-#> Using seed = 4292
-lr_scm_history(mod2)
+mod1 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
+mod2 <- erglm_scm_backward(mod1, candidates = c("sex", "dose"))
+#> Using seed = 7116
+erglm_scm_history(mod2)
 #> # A tibble: 4 × 11
 #>   iteration attempt step       action term_tested model_tested   model_converged
 #>       <int>   <int> <chr>      <chr>  <chr>       <chr>          <lgl>          
@@ -79,22 +80,22 @@ lr_scm_history(mod2)
 
 ``` r
 
-mod <- lr_model(ae1 ~ aucss + sex, lr_data)
-sim <- lr_vpc_sim(mod, seed = 1234)
+mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+sim <- erglm_vpc_sim(mod, seed = 1234)
 sim
 #> # A tibble: 30,000 × 5
 #>      ae1 aucss sex    row_id sim_id
-#>    <dbl> <dbl> <fct>   <int>  <int>
-#>  1 0.894  673. Male        1      1
-#>  2 1.000 2806. Female      2      1
-#>  3 0.110    0  Female      3      1
-#>  4 0.993 1169. Female      4      1
-#>  5 0.588  377. Male        5      1
-#>  6 0.468  327. Female      6      1
-#>  7 0.129    0  Male        7      1
-#>  8 0.994 1208. Female      8      1
-#>  9 0.129    0  Male        9      1
-#> 10 0.362  254. Female     10      1
+#>    <int> <dbl> <fct>   <int>  <int>
+#>  1     1  673. Male        1      1
+#>  2     1 2806. Female      2      1
+#>  3     0    0  Female      3      1
+#>  4     1 1169. Female      4      1
+#>  5     0  377. Male        5      1
+#>  6     1  327. Female      6      1
+#>  7     0    0  Male        7      1
+#>  8     1 1208. Female      8      1
+#>  9     0    0  Male        9      1
+#> 10     1  254. Female     10      1
 #> # ℹ 29,990 more rows
 ```
 

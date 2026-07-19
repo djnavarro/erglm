@@ -4,23 +4,23 @@ This is the modelling article
 
 ``` r
 
-library(erlr)
+library(erglm)
 library(tibble)
 ```
 
 The core function is
-[`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md), a very
-thin wrapper around [`glm()`](https://rdrr.io/r/stats/glm.html). By
-default it fits a logistic regression
-(`family = binomial(link = "logit")`), but any
+[`erglm_model()`](https://erglm.djnavarro.net/reference/erglm_model.md),
+a very thin wrapper around [`glm()`](https://rdrr.io/r/stats/glm.html).
+By default it fits a gaussian model (`family = gaussian()`, matching
+[`glm()`](https://rdrr.io/r/stats/glm.html)’s own default), but any
 [`glm()`](https://rdrr.io/r/stats/glm.html) family can be supplied
-explicitly – `poisson`, `gaussian`, and `Gamma` are tested and supported
-alongside `binomial`. The package comes with a synthetic data set called
-`lr_data` that we can use:
+explicitly – `binomial`, `poisson`, and `Gamma` are also tested and
+supported. The package comes with a synthetic data set called
+`erglm_data` that we can use:
 
 ``` r
 
-lr_data
+erglm_data
 #> # A tibble: 300 × 13
 #>       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2 ae_count
 #>    <int> <fct>  <int>  <dbl> <dbl> <fct>     <dbl>  <dbl> <dbl> <dbl>    <int>
@@ -44,7 +44,7 @@ Creating a model:
 
 ``` r
 
-mod <- lr_model(formula = ae1 ~ aucss, data = lr_data)
+mod <- erglm_model(formula = ae1 ~ aucss, data = erglm_data, family = binomial())
 mod
 #> 
 #> Call:  stats::glm(formula = formula, family = family, data = data)
@@ -60,13 +60,14 @@ mod
 
 ## Prediction
 
-The [`lr_predict()`](https://erlr.djnavarro.net/reference/lr_predict.md)
+The
+[`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md)
 function produces model predictions:
 
 ``` r
 
 pred <- mod |> 
-  lr_predict(newdata = tibble(
+  erglm_predict(newdata = tibble(
     aucss = seq(from = 0, to = 1500, by = 100)
   ))
 pred
@@ -96,7 +97,7 @@ The confidence level can be adjusted using the `conf_level` argument
 ``` r
 
 pred <- mod |> 
-  lr_predict(
+  erglm_predict(
     newdata = tibble(aucss = seq(from = 0, to = 1500, by = 100)), 
     conf_level = 0.8 
   )
@@ -125,17 +126,18 @@ pred
 ## Stepwise covariate modelling
 
 There are two functions that control SCM regression,
-[`lr_scm_forward()`](https://erlr.djnavarro.net/reference/lr_scm.md) and
-[`lr_scm_backward()`](https://erlr.djnavarro.net/reference/lr_scm.md):
+[`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
+and
+[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md):
 
 ``` r
 
-base_mod <- lr_model(formula = ae1 ~ aucss, data = lr_data)
+base_mod <- erglm_model(formula = ae1 ~ aucss, data = erglm_data, family = binomial())
 candidates <- c("sex", "dose", "weight", "age")
 
 final_mod <- base_mod |> 
-  lr_scm_forward(candidates, threshold = 0.01, seed = 3425) |> 
-  lr_scm_backward(candidates, threshold = 0.001, seed = 9821)
+  erglm_scm_forward(candidates, threshold = 0.01, seed = 3425) |> 
+  erglm_scm_backward(candidates, threshold = 0.001, seed = 9821)
 
 final_mod
 #> 
@@ -151,11 +153,11 @@ final_mod
 ```
 
 To extract the log, use
-[`lr_scm_history()`](https://erlr.djnavarro.net/reference/lr_scm.md):
+[`erglm_scm_history()`](https://erglm.djnavarro.net/reference/erglm_scm.md):
 
 ``` r
 
-lr_scm_history(final_mod)
+erglm_scm_history(final_mod)
 #> # A tibble: 5 × 11
 #>   iteration attempt step       action term_tested model_tested   model_converged
 #>       <int>   <int> <chr>      <chr>  <chr>       <chr>          <lgl>          
@@ -170,14 +172,14 @@ lr_scm_history(final_mod)
 
 ## Other `glm()` families
 
-`lr_data` also includes a count response (`ae_count`), a continuous
+`erglm_data` also includes a count response (`ae_count`), a continuous
 response (`biomarker_change`), and a right-skewed positive continuous
 response (`ae_duration`), for demonstrating `poisson`, `gaussian`, and
 `Gamma` models respectively:
 
 ``` r
 
-mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
+mod_pois <- erglm_model(ae_count ~ aucss + sex, erglm_data, family = poisson())
 mod_pois
 #> 
 #> Call:  stats::glm(formula = formula, family = family, data = data)
@@ -191,15 +193,16 @@ mod_pois
 #> Residual Deviance: 272.4     AIC: 712.6
 ```
 
-[`lr_predict()`](https://erlr.djnavarro.net/reference/lr_predict.md) and
-[`lr_simulator()`](https://erlr.djnavarro.net/reference/lr_simulator.md)
+[`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md)
+and
+[`erglm_simulator()`](https://erglm.djnavarro.net/reference/erglm_simulator.md)
 work unchanged, since both operate on the link scale generically via
 `stats::family(object)$linkinv`:
 
 ``` r
 
 mod_pois |> 
-  lr_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
+  erglm_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
 #> # A tibble: 7 × 7
 #>   aucss sex    fit_link se_link fit_resp ci_lower ci_upper
 #>   <dbl> <chr>     <dbl>   <dbl>    <dbl>    <dbl>    <dbl>
@@ -213,7 +216,7 @@ mod_pois |>
 ```
 
 Stepwise covariate modelling also generalises: by default
-[`lr_scm_forward()`](https://erlr.djnavarro.net/reference/lr_scm.md)/[`lr_scm_backward()`](https://erlr.djnavarro.net/reference/lr_scm.md)
+[`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
 pick a likelihood-ratio chi-squared test for `poisson` (as here) and
 `binomial` models, and an F-test for `gaussian`/`Gamma` models, matching
 [`stats::anova()`](https://rdrr.io/r/stats/anova.html)’s own `test`
