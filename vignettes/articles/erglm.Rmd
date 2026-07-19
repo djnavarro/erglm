@@ -9,8 +9,96 @@ knitr::opts_chunk$set(
 )
 ```
 
-This is the getting started article
+erglm provides estimation tools for exposure-response models based on
+`glm()`. It's mostly a convenience package: the core tools are thin
+wrappers around `glm()` and its usual machinery, tested and supported for
+binomial, poisson, gaussian, and Gamma families. This article is a quick
+tour of the main pieces; the other articles go into more depth on each.
 
 ```{r setup}
 library(erglm)
+library(tibble)
 ```
+
+## Example data
+
+The package ships with a synthetic dataset, `erglm_data`, used throughout
+the documentation. It has an exposure metric (`aucss`), several covariates
+(`sex`, `age`, `weight`, `dose`, ...), and response columns for each
+supported family: binary (`ae1`, `ae2`), count (`ae_count`), continuous
+(`biomarker_change`), and positive right-skewed continuous (`ae_duration`):
+
+```{r data}
+erglm_data
+```
+
+## Fitting a model
+
+`erglm_model()` fits the model -- it takes the same `formula`/`data`
+arguments as `glm()`, plus a `family` argument (defaulting to
+`gaussian()`, matching `glm()`'s own default):
+
+```{r model}
+mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+mod
+```
+
+## Prediction
+
+`erglm_predict()` produces predictions with confidence intervals, on both
+the link and response scales, as a tidy data frame:
+
+```{r predict}
+mod |>
+  erglm_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
+```
+
+## Choosing covariates
+
+When there are several candidate covariates, `erglm_scm_forward()` and
+`erglm_scm_backward()` automate the process of deciding which belong in
+the model, via stepwise addition/elimination based on significance
+testing:
+
+```{r scm}
+erglm_scm_forward(mod, candidates = c("dose", "weight", "age"), seed = 1024)
+```
+
+See the ["Stepwise covariate modelling"](scm.html) article for a full
+treatment, including the forward/backward workflow and the audit log
+(`erglm_scm_history()`).
+
+## Simulation
+
+`simulate()` generates replicate datasets from a fitted model, and
+`erglm_vpc_sim()` reshapes those replicates into a data set ready for a
+visual predictive check:
+
+```{r simulate}
+erglm_vpc_sim(mod, nsim = 5, seed = 2048)
+```
+
+See the ["Simulation"](simulate.html) article for details, including the
+lower-level `erglm_fun()` building block.
+
+## Working with fitted models
+
+An object returned by `erglm_model()` is a genuine `glm` object -- it has
+class `c("erglm_model", "glm", "lm")` -- so all of the standard `glm`/`lm`
+methods (`summary()`, `predict()`, `confint()`, `AIC()`, `anova()`, and so
+on) work on it directly, with no erglm-specific replacement needed. See the
+["Using base R model methods"](methods.html) article for a worked-through
+tour of these.
+
+## Where to next
+
+- ["Modelling"](model.html) -- more on fitting and prediction, including
+  the other `glm()` families erglm supports.
+- ["Stepwise covariate modelling"](scm.html) -- the forward/backward SCM
+  workflow in full.
+- ["Using base R model methods"](methods.html) -- the `glm`/`lm` methods
+  that come for free.
+- ["Simulation"](simulate.html) -- `simulate()`, `erglm_fun()`, and
+  `erglm_vpc_sim()`.
+- the companion [erplots](https://github.com/djnavarro/erplots) package,
+  for visualising exposure-response models fitted with erglm.

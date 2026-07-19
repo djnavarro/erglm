@@ -30,6 +30,7 @@ articles:
   - title:
     navbar:
     contents: 
+      - articles/erglm
       - articles/model
       - articles/scm
       - articles/methods

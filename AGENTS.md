@@ -68,10 +68,11 @@ project. The family generalisation (steps 1-5), the `erglm` rename
 repo `djnavarro/erlr` -> `djnavarro/erglm`, and repointing the
 `erglm.djnavarro.net` pkgdown domain/DNS), the emaxnls-harmonisation
 work (`simulate.erglm_model()`, `erglm_fun()`, exporting
-`erglm_add_term()`/`erglm_remove_term()`), and the pkgdown
-site/vignette restructuring that followed it are all now done. Two
-items remain: the companion `erplots` repo update noted above, and
-fleshing out the `erglm.Rmd` "Getting Started" stub (see PLAN.md).
+`erglm_add_term()`/`erglm_remove_term()`), the pkgdown site/vignette
+restructuring that followed it, the `glm`/`lm` method-inheritance
+documentation (`methods.Rmd`), and fleshing out the `erglm.Rmd` "Getting
+Started" stub are all now done. One item remains: the companion
+`erplots` repo update noted above (see PLAN.md).
 
 ## Structure
 
@@ -139,15 +140,17 @@ fleshing out the `erglm.Rmd` "Getting Started" stub (see PLAN.md).
   skipped if erplots isn't installed.
 - Vignettes/articles live in `vignettes/articles/` and are built for the
   pkgdown site, not shipped with the package (see `.Rbuildignore`):
-  `erglm.Rmd` ("Getting Started", currently a near-empty stub -- see
-  [PLAN.md](PLAN.md)), `model.Rmd` (fitting, prediction, other `glm()`
-  families), `scm.Rmd` (stepwise covariate modelling, modelled on
-  emaxnls's `stepwise-covariate-modelling.Rmd`), `methods.Rmd` (base
-  `glm`/`lm` method inheritance), and `simulate.Rmd` (`simulate()`,
-  `erglm_fun()`, and `erglm_vpc_sim()`, modelled on emaxnls's
-  `simulating-from-emax-models.Rmd`; needs `ggplot2`, see above).
-  `_pkgdown.yml`'s `reference:` index and `articles:` list must be kept
-  in sync by hand when exports or articles are added/renamed --
+  `erglm.Rmd` ("Getting Started" -- a short tour covering `erglm_data`,
+  `erglm_model()`/`erglm_predict()`, a one-example teaser of SCM and
+  simulation, the `glm`/`lm` method inheritance, and pointers to the
+  other, more detailed articles), `model.Rmd` (fitting, prediction,
+  other `glm()` families), `scm.Rmd` (stepwise covariate modelling,
+  modelled on emaxnls's `stepwise-covariate-modelling.Rmd`),
+  `methods.Rmd` (base `glm`/`lm` method inheritance), and `simulate.Rmd`
+  (`simulate()`, `erglm_fun()`, and `erglm_vpc_sim()`, modelled on
+  emaxnls's `simulating-from-emax-models.Rmd`; needs `ggplot2`, see
+  above). `_pkgdown.yml`'s `reference:` index and `articles:` list must
+  be kept in sync by hand when exports or articles are added/renamed --
   `pkgdown::check_pkgdown()` catches drift (e.g. a reference to a
   renamed/removed topic) without needing a full site build.
 - If `pkgdown::build_articles()`/`build_site()` fails with "lazy-load

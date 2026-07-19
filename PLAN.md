@@ -174,7 +174,7 @@ is actually load-bearing.
   guard against future refactors reintroducing genuine
   seed-sensitivity, per the documented rationale.
 
-## Next initiative: document `glm`/`lm` method inheritance
+## Done: document `glm`/`lm` method inheritance
 
 ### Motivation
 
@@ -204,25 +204,50 @@ think to try them on an "erglm" object, or may not realise
   Registered in `_pkgdown.yml`'s articles list, after `model.Rmd` and
   before `simulate.Rmd`.
 
-### Still to do
+### Status (completed)
 
-- ~~Run `devtools::document()` to regenerate `man/erglm_model.Rd` from
-  the updated roxygen comment, and render `methods.Rmd` end-to-end to
-  confirm the code chunks all evaluate cleanly.~~ Done -- both
-  `man/erglm_model.Rd` and `man/erglm_predict.Rd` are regenerated, and
-  `methods.Rmd` renders cleanly with `rmarkdown::render()`.
-- Consider whether the `erglm.Rmd` "Getting Started" stub (currently
-  near-empty) should also mention the `glm`/`lm` inheritance up front,
-  or just link to the new `methods.Rmd` article, so a first-time reader
-  finds it without already knowing to look.
-- ~~Cross-link from `erglm_predict()`'s own roxygen docs back to
-  `predict()`/the new vignette.~~ Done -- `erglm_predict()`'s
-  `@details` now notes it's an opinionated alternative to calling
-  `predict()` directly, and points to `vignette("methods", package =
-  "erglm")` for a side-by-side comparison.
+- Ran `devtools::document()` to regenerate `man/erglm_model.Rd` from the
+  updated roxygen comment, and rendered `methods.Rmd` end-to-end to
+  confirm the code chunks all evaluate cleanly (both
+  `man/erglm_model.Rd` and `man/erglm_predict.Rd` regenerated).
+- Cross-linked from `erglm_predict()`'s own roxygen docs back to
+  `predict()`/the new vignette -- `erglm_predict()`'s `@details` now
+  notes it's an opinionated alternative to calling `predict()`
+  directly, and points to `vignette("methods", package = "erglm")` for
+  a side-by-side comparison.
+- Resolved the last open question -- the `erglm.Rmd` "Getting Started"
+  stub gained a couple of sentences on the `glm`/`lm` class inheritance
+  (`c("erglm_model", "glm", "lm")`), with a link to the full
+  `methods.Rmd` article for a worked-through tour. (The stub was then
+  fleshed out fully into a complete article -- see the next section.)
 
-The one remaining open item (the `erglm.Rmd` stub) is small enough that
-this initiative is otherwise ready to close out once that's decided.
+## Done: flesh out the `erglm.Rmd` "Getting Started" stub
+
+Completed in one session. `erglm.Rmd` was a ~15-line placeholder (just
+`library(erglm)` and a one-line comment); it's now a short tour of the
+package intended as the first thing a new user reads, linking out to the
+other, more detailed articles rather than duplicating them:
+
+- Package description (borrowed from `DESCRIPTION`/`README.md`), a look
+  at `erglm_data`, fitting a model with `erglm_model()`, and prediction
+  with `erglm_predict()`.
+- A one-example teaser each for stepwise covariate modelling
+  (`erglm_scm_forward()`) and simulation (`erglm_vpc_sim()`), each
+  pointing to `scm.Rmd`/`simulate.Rmd` for the full treatment rather than
+  re-explaining the mechanics.
+- The `glm`/`lm` method-inheritance note added in the previous initiative
+  (pointing to `methods.Rmd`).
+- A closing "Where to next" list linking every other article plus
+  erplots.
+- Registered `articles/erglm` at the top of `_pkgdown.yml`'s `articles:`
+  list (it had been omitted entirely, even as a stub); verified with
+  `pkgdown::check_pkgdown()`.
+- Rendered end-to-end with `rmarkdown::render()` to confirm all code
+  chunks evaluate cleanly.
+- `AGENTS.md`'s vignette listing and "still outstanding" notes updated
+  accordingly -- the only remaining item from that history is the
+  companion `erplots` repo's own `erlr`-reference cleanup, which is out
+  of scope for this repo.
 
 ## Next initiative: CRAN submission prep
 
