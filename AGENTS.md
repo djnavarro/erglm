@@ -144,6 +144,17 @@ fleshing out the `erglm.Rmd` "Getting Started" stub (see PLAN.md).
   session (`unloadNamespace("erglm")`), reinstall from a clean shell
   (`R CMD INSTALL .`, not `devtools::install()`, which hit the same
   issue when the package was already loaded), then retry.
+- pkgdown renders every `*.md` file at the package root (and in
+  `.github/`) into its own `docs/*.html` page -- hard-coded in
+  `pkgdown:::package_mds()` and not configurable via `_pkgdown.yml`, so
+  `.Rbuildignore`-ing `AGENTS.md`/`PLAN.md` (needed to keep them out of
+  the built *package*) has no effect on the *pkgdown site*: unhandled,
+  they'd get published as `docs/AGENTS.html`/`docs/PLAN.html` and
+  indexed in `docs/search.json`/`docs/sitemap.xml`. `tools/pkgdown-postbuild.R`
+  strips these pages (and their search/sitemap entries) back out;
+  `.github/workflows/pkgdown.yaml` runs it right after
+  `build_site_github_pages()`. Run it manually after any local
+  `pkgdown::build_site()` too.
 
 ## Conventions
 
