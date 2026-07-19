@@ -6,9 +6,9 @@
 
 .pick_seed <- function() {999 + sample.int(9000, size = 1L)}
 
-.as_erlr <- function(mod) {
-  class(mod) <- c("erlr_glm", class(mod)) # append class in case new methods are required
-  mod$erlr <- list(type = stats::family(mod)$family) # internal "erlr" list to store erlr-specific info
+.as_erglm <- function(mod) {
+  class(mod) <- c("erglm_model", class(mod)) # append class in case new methods are required
+  mod$erglm <- list(type = stats::family(mod)$family) # internal "erglm" list to store erglm-specific info
   mod
 }
 

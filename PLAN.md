@@ -1,8 +1,12 @@
-# erlr development plan
+# erglm development plan
 
-This document tracks scoped-out future development for erlr. It is not a
-changelog; see NEWS.md for that once one exists. Items here are proposals
-to be reviewed before implementation, not committed designs.
+This document tracks scoped-out future development for erglm (formerly
+`erlr`, renamed per step 6 below). It is not a changelog; see NEWS.md
+for that once one exists. Items here are proposals to be reviewed
+before implementation, not committed designs; the sections below are
+kept as a historical record of the generalisation/rename project even
+though the package has since moved on from the `erlr`/`lr_*` names they
+describe.
 
 ## Generalise from logistic regression to arbitrary `glm()` families (→ `erglm`)
 
@@ -161,6 +165,31 @@ debate if new information changes the calculus.
    across all four families in `test-lr-core.R`, `test-lr-scm.R`,
    `test-lr-vpc.R`, `test-er-methods.R`; vignette articles `model.Rmd`
    and `simulate.Rmd` gained non-binomial worked examples.
-6. Execute the `erglm` rename (package name, exported function names,
+6. ~~Execute the `erglm` rename (package name, exported function names,
    class names, DESCRIPTION/NAMESPACE/pkgdown/README/vignettes, GitHub
-   repo). **Remaining** -- not done in this pass; see decision 1.
+   repo).~~ Done (in-repo changes). Final naming scheme used: package
+   `erlr` → `erglm`; `lr_model()` → `erglm_model()` (default `family`
+   now `stats::gaussian()`, per decision 2); `lr_predict()` →
+   `erglm_predict()`; `lr_simulator()` → `erglm_simulator()`;
+   `lr_scm_forward()`/`lr_scm_backward()`/`lr_scm_history()` →
+   `erglm_scm_forward()`/`erglm_scm_backward()`/`erglm_scm_history()`;
+   `lr_vpc_sim()` → `erglm_vpc_sim()`; dataset `lr_data` → `erglm_data`;
+   class `erlr_glm` → `erglm_model` (same name as the constructor
+   function, matching the `lm()`/`"lm"` base-R idiom); internal `.lr_*`
+   helpers → `.erglm_*`. Clean break, no deprecated `lr_*` aliases.
+   Version bumped to `0.2.0.9000`.
+
+   **Not done as part of this pass** (tracked separately, per the
+   erlr→erglm rename plan's stated scope):
+   - Actually renaming the GitHub repo (`djnavarro/erlr` →
+     `djnavarro/erglm`) and repointing the `erglm.djnavarro.net`
+     pkgdown custom domain -- manual/infrastructure steps, not a file
+     change in this repo. `DESCRIPTION`/`README.Rmd`/`_pkgdown.yml`
+     already reference the new URLs, so they won't resolve until this
+     happens.
+   - Updating the companion `erplots` repo, which still references
+     `erlr::lr_model()`/`erlr::lr_data` in its `DESCRIPTION` (`Suggests:
+     erlr`), `tests/testthat/helper-data.R`, and
+     `vignettes/articles/plot.Rmd`. This will break once erglm is
+     published under the new name; needs a follow-up PR against that
+     repo.

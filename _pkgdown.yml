@@ -1,23 +1,23 @@
-url: https://erlr.djnavarro.net/
+url: https://erglm.djnavarro.net/
 template:
   package: waeponwifestre
 
 reference:
 - title: Build 
-  desc: Build logistic regression models for exposure-response
+  desc: Build exposure-response models based on glm()
 - contents:
-  - lr_model
-  - lr_predict
-  - lr_scm
+  - erglm_model
+  - erglm_predict
+  - erglm_scm
 - title: Simulate
-  desc: Simulation tools for exposure-response logistic regressions
+  desc: Simulation tools for exposure-response glm() models
 - contents:
-  - lr_simulator
-  - lr_vpc_sim
+  - erglm_simulator
+  - erglm_vpc_sim
 - title: Other
   desc: Other functions and objects
 - contents:
-  - lr_data
+  - erglm_data
   - logit
 
 articles:

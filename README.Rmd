@@ -13,55 +13,54 @@ knitr::opts_chunk$set(
 )
 ```
 
-# erlr
+# erglm
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/djnavarro/erlr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/djnavarro/erlr/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/djnavarro/erlr/graph/badge.svg)](https://app.codecov.io/gh/djnavarro/erlr)
+[![R-CMD-check](https://github.com/djnavarro/erglm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/djnavarro/erglm/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/djnavarro/erglm/graph/badge.svg)](https://app.codecov.io/gh/djnavarro/erglm)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-Provides estimation tools for exposure-response models that use logistic regression for binary responses. It is mostly intended as a convenience package: the core tools are wrappers around `glm()`. For plotting exposure-response models (including those fitted with erlr), see the companion package [erplots](https://github.com/djnavarro/erplots), which supplies a model-agnostic mini-language for building exposure-response plots.
+Provides estimation tools for exposure-response models based on `glm()`. It is mostly intended as a convenience package: the core tools are wrappers around `glm()`, officially tested and supported for binomial, poisson, gaussian, and Gamma families. For plotting exposure-response models (including those fitted with erglm), see the companion package [erplots](https://github.com/djnavarro/erplots), which supplies a model-agnostic mini-language for building exposure-response plots.
 
 ## Installation
 
-You can install the development version of erlr like so:
+You can install the development version of erglm like so:
 
 ``` r
-pak::pak("djnavarro/erlr")
+pak::pak("djnavarro/erglm")
 ```
 
 ## Models
 
 ```{r}
-#| label: lr-model
+#| label: erglm-model
 
-library(erlr)
+library(erglm)
 library(tibble)
 
-lr_data
+erglm_data
 
-mod <- lr_model(ae1 ~ aucss, lr_data)
+mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 mod
 ```
 
 ## Stepwise covariate modelling
 
 ```{r}
-mod1 <- lr_model(ae1 ~ aucss + sex + dose, lr_data)
-mod2 <- lr_scm_backward(mod1, candidates = c("sex", "dose"))
-lr_scm_history(mod2)
+mod1 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
+mod2 <- erglm_scm_backward(mod1, candidates = c("sex", "dose"))
+erglm_scm_history(mod2)
 ```
 
 ## VPC/Simulation
 
 ```{r}
-#| label: lr-vpc
-mod <- lr_model(ae1 ~ aucss + sex, lr_data)
-sim <- lr_vpc_sim(mod, seed = 1234)
+#| label: erglm-vpc
+mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+sim <- erglm_vpc_sim(mod, seed = 1234)
 sim
 ```
 
 To visualise the simulations against the observed data (e.g. as a VPC-style
 plot), see `erplots::er_vpc_plot()`.
-

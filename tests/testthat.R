@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(erlr)
+library(erglm)
 
-test_check("erlr")
+test_check("erglm")

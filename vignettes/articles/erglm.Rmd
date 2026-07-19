@@ -12,5 +12,5 @@ knitr::opts_chunk$set(
 This is the getting started article
 
 ```{r setup}
-library(erlr)
+library(erglm)
 ```

@@ -1,11 +1,11 @@
 
 
-.make_lr_data <- function(seed) {
+.make_erglm_data <- function(seed) {
   n <- 300L
   withr::with_seed(
     seed = seed,
     code = {
-      lr_data <- tibble::tibble(
+      erglm_data <- tibble::tibble(
         id = 1:n,
         sex = factor(sample(rep(c("Male", "Female"), c(n/2, n/2)))),
         age = sample(18:35, size = n, replace = TRUE)
@@ -53,28 +53,28 @@
         )
     }
   )
-  attr(lr_data$id, "label") <- "Subject"
-  attr(lr_data$sex, "label") <- "Sex"
-  attr(lr_data$age, "label") <- "Age"
-  attr(lr_data$weight, "label") <- "Weight"
-  attr(lr_data$dose, "label") <- "Dose"
-  attr(lr_data$treatment, "label") <- "Treatment"
-  attr(lr_data$aucss, "label") <- "AUCss"
-  attr(lr_data$cmaxss, "label") <- "Cmax,ss"
-  attr(lr_data$ae1, "label") <- "Response 1"
-  attr(lr_data$ae2, "label") <- "Response 2"
-  attr(lr_data$ae_count, "label") <- "AE count"
-  attr(lr_data$biomarker_change, "label") <- "Biomarker change from baseline"
-  attr(lr_data$ae_duration, "label") <- "AE duration"
-  return(lr_data)
+  attr(erglm_data$id, "label") <- "Subject"
+  attr(erglm_data$sex, "label") <- "Sex"
+  attr(erglm_data$age, "label") <- "Age"
+  attr(erglm_data$weight, "label") <- "Weight"
+  attr(erglm_data$dose, "label") <- "Dose"
+  attr(erglm_data$treatment, "label") <- "Treatment"
+  attr(erglm_data$aucss, "label") <- "AUCss"
+  attr(erglm_data$cmaxss, "label") <- "Cmax,ss"
+  attr(erglm_data$ae1, "label") <- "Response 1"
+  attr(erglm_data$ae2, "label") <- "Response 2"
+  attr(erglm_data$ae_count, "label") <- "AE count"
+  attr(erglm_data$biomarker_change, "label") <- "Biomarker change from baseline"
+  attr(erglm_data$ae_duration, "label") <- "AE duration"
+  return(erglm_data)
 }
 
-#lr_data <- .make_lr_data(seed = 2407L)
-#usethis::use_data(lr_data, overwrite = TRUE)
+#erglm_data <- .make_erglm_data(seed = 2407L)
+#usethis::use_data(erglm_data, overwrite = TRUE)
 
 #' Sample simulated data for exposure-response models with covariates
 #'
-#' @name lr_data
+#' @name erglm_data
 #' @format A data frame with columns:
 #' \describe{
 #' \item{id}{Identifier}
@@ -99,6 +99,6 @@
 #' You can find the data generating code in the package source code
 #'
 #' @examples
-#' lr_data
-"lr_data"
+#' erglm_data
+"erglm_data"
 

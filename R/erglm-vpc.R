@@ -3,7 +3,7 @@
 
 #' VPC simulations for exposure-response models
 #'
-#' @param object An erlr model, as returned by [lr_model()]
+#' @param object An erglm model, as returned by [erglm_model()]
 #' @param nsim Number of replicates
 #' @param seed RNG state
 #'
@@ -27,22 +27,22 @@
 #'
 #' @export
 #' @examples
-#' mod <- lr_model(ae2 ~ aucss + sex, lr_data)
-#' sim <- lr_vpc_sim(mod)
+#' mod <- erglm_model(ae2 ~ aucss + sex, erglm_data, family = binomial())
+#' sim <- erglm_vpc_sim(mod)
 #' sim
 #'
-#' mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
-#' lr_vpc_sim(mod_pois)
+#' mod_pois <- erglm_model(ae_count ~ aucss + sex, erglm_data, family = poisson())
+#' erglm_vpc_sim(mod_pois)
 #' 
-lr_vpc_sim <- function(object, nsim = 100, seed = NULL) {
+erglm_vpc_sim <- function(object, nsim = 100, seed = NULL) {
   ff <- object$formula
   vv <- all.vars(ff)
   rsp_var <- vv[1]
   dd <- object$data[, vv]
   family_name <- stats::family(object)$family
   dispersion <- summary(object)$dispersion
-  sim <- .lr_simulate_draws(object, newdata = dd, nsim = nsim, seed = seed)
-  sim[[rsp_var]] <- .lr_draw_response(family_name, fit = sim$fit_resp, dispersion = dispersion)
+  sim <- .erglm_simulate_draws(object, newdata = dd, nsim = nsim, seed = seed)
+  sim[[rsp_var]] <- .erglm_draw_response(family_name, fit = sim$fit_resp, dispersion = dispersion)
   sim$fit_resp <- NULL
   return(sim)
 }

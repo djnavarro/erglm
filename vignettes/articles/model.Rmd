@@ -12,16 +12,16 @@ knitr::opts_chunk$set(
 This is the modelling article
 
 ```{r setup}
-library(erlr)
+library(erglm)
 library(tibble)
 ```
 
 
 
-The core function is `lr_model()`, a very thin wrapper around `glm()`. By default it fits a logistic regression (`family = binomial(link = "logit")`), but any `glm()` family can be supplied explicitly -- `poisson`, `gaussian`, and `Gamma` are tested and supported alongside `binomial`. The package comes with a synthetic data set called `lr_data` that we can use:
+The core function is `erglm_model()`, a very thin wrapper around `glm()`. By default it fits a gaussian model (`family = gaussian()`, matching `glm()`'s own default), but any `glm()` family can be supplied explicitly -- `binomial`, `poisson`, and `Gamma` are also tested and supported. The package comes with a synthetic data set called `erglm_data` that we can use:
 
 ```{r data-1}
-lr_data
+erglm_data
 ```
 
 ## Fitting models
@@ -29,17 +29,17 @@ lr_data
 Creating a model:
 
 ```{r model-1}
-mod <- lr_model(formula = ae1 ~ aucss, data = lr_data)
+mod <- erglm_model(formula = ae1 ~ aucss, data = erglm_data, family = binomial())
 mod
 ```
 
 ## Prediction
 
-The `lr_predict()` function produces model predictions:
+The `erglm_predict()` function produces model predictions:
 
 ```{r predict-1}
 pred <- mod |> 
-  lr_predict(newdata = tibble(
+  erglm_predict(newdata = tibble(
     aucss = seq(from = 0, to = 1500, by = 100)
   ))
 pred
@@ -49,7 +49,7 @@ The confidence level can be adjusted using the `conf_level` argument
 
 ```{r predict-2}
 pred <- mod |> 
-  lr_predict(
+  erglm_predict(
     newdata = tibble(aucss = seq(from = 0, to = 1500, by = 100)), 
     conf_level = 0.8 
   )
@@ -58,39 +58,39 @@ pred
 
 ## Stepwise covariate modelling
 
-There are two functions that control SCM regression, `lr_scm_forward()` and `lr_scm_backward()`:
+There are two functions that control SCM regression, `erglm_scm_forward()` and `erglm_scm_backward()`:
 
 ```{r scm-1}
-base_mod <- lr_model(formula = ae1 ~ aucss, data = lr_data)
+base_mod <- erglm_model(formula = ae1 ~ aucss, data = erglm_data, family = binomial())
 candidates <- c("sex", "dose", "weight", "age")
 
 final_mod <- base_mod |> 
-  lr_scm_forward(candidates, threshold = 0.01, seed = 3425) |> 
-  lr_scm_backward(candidates, threshold = 0.001, seed = 9821)
+  erglm_scm_forward(candidates, threshold = 0.01, seed = 3425) |> 
+  erglm_scm_backward(candidates, threshold = 0.001, seed = 9821)
 
 final_mod
 ```
 
-To extract the log, use `lr_scm_history()`:
+To extract the log, use `erglm_scm_history()`:
 
 ```{r}
-lr_scm_history(final_mod)
+erglm_scm_history(final_mod)
 ```
 
 ## Other `glm()` families
 
-`lr_data` also includes a count response (`ae_count`), a continuous response (`biomarker_change`), and a right-skewed positive continuous response (`ae_duration`), for demonstrating `poisson`, `gaussian`, and `Gamma` models respectively:
+`erglm_data` also includes a count response (`ae_count`), a continuous response (`biomarker_change`), and a right-skewed positive continuous response (`ae_duration`), for demonstrating `poisson`, `gaussian`, and `Gamma` models respectively:
 
 ```{r model-2}
-mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
+mod_pois <- erglm_model(ae_count ~ aucss + sex, erglm_data, family = poisson())
 mod_pois
 ```
 
-`lr_predict()` and `lr_simulator()` work unchanged, since both operate on the link scale generically via `stats::family(object)$linkinv`:
+`erglm_predict()` and `erglm_simulator()` work unchanged, since both operate on the link scale generically via `stats::family(object)$linkinv`:
 
 ```{r predict-3}
 mod_pois |> 
-  lr_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
+  erglm_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
 ```
 
-Stepwise covariate modelling also generalises: by default `lr_scm_forward()`/`lr_scm_backward()` pick a likelihood-ratio chi-squared test for `poisson` (as here) and `binomial` models, and an F-test for `gaussian`/`Gamma` models, matching `stats::anova()`'s own `test` argument. This can be overridden with the `test` argument if needed.
+Stepwise covariate modelling also generalises: by default `erglm_scm_forward()`/`erglm_scm_backward()` pick a likelihood-ratio chi-squared test for `poisson` (as here) and `binomial` models, and an F-test for `gaussian`/`Gamma` models, matching `stats::anova()`'s own `test` argument. This can be overridden with the `test` argument if needed.

@@ -1,7 +1,7 @@
 
 #' Stepwise covariate modelling for exposure-response models
 #'
-#' @param mod An erlr model object
+#' @param mod An erglm model object
 #' @param candidates Character vector with list of candidate terms
 #' @param threshold Threshold to test against
 #' @param test Which significance test to use when comparing nested
@@ -13,24 +13,25 @@
 #' override.
 #' @param seed Optional seed to control order of term tests
 #'
-#' @returns For `lr_scm_forward()` and `lr_scm_backward()`, the updated erlr model
-#' is returned, with the SCM history log updated internally. For `lr_scm_history()`,
-#' a data frame is returned containing the SCM history log
+#' @returns For `erglm_scm_forward()` and `erglm_scm_backward()`, the
+#' updated erglm model is returned, with the SCM history log updated
+#' internally. For `erglm_scm_history()`, a data frame is returned
+#' containing the SCM history log
 #'
-#' @name lr_scm
+#' @name erglm_scm
 #' @examples
-#' mod0 <- lr_model(ae1 ~ aucss, lr_data)
-#' mod1 <- lr_scm_forward(mod0, candidates = c("sex", "dose"))
-#' lr_scm_history(mod1)
+#' mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
+#' mod1 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"))
+#' erglm_scm_history(mod1)
 #' 
-#' mod2 <- lr_model(ae1 ~ aucss + sex + dose, lr_data)
-#' mod3 <- lr_scm_backward(mod2, candidates = c("sex", "dose"))
-#' lr_scm_history(mod3)
+#' mod2 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
+#' mod3 <- erglm_scm_backward(mod2, candidates = c("sex", "dose"))
+#' erglm_scm_history(mod3)
 NULL
 
-#' @rdname lr_scm
+#' @rdname erglm_scm
 #' @export
-lr_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto", "Chisq", "F"), seed = NULL) {
+erglm_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto", "Chisq", "F"), seed = NULL) {
   test <- match.arg(test)
   if (is.null(seed)) {
     seed <- .pick_seed()
@@ -39,7 +40,7 @@ lr_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto", "
   withr::with_seed(
     seed = seed,
     code = {
-      mod_out <- .lr_scm_forward(
+      mod_out <- .erglm_scm_forward(
         mod = mod,
         candidates = candidates,
         threshold = threshold,
@@ -50,12 +51,12 @@ lr_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto", "
   return(mod_out)
 }
 
-.lr_scm_forward <- function(mod, candidates, threshold, test) {
-  history <- lr_scm_history(mod)
+.erglm_scm_forward <- function(mod, candidates, threshold, test) {
+  history <- erglm_scm_history(mod)
   last_iter <- max(history$iteration)
   while (TRUE) {
-    mod_new <- .lr_once_forward(mod, candidates, threshold, test)
-    history_new <- lr_scm_history(mod_new)
+    mod_new <- .erglm_once_forward(mod, candidates, threshold, test)
+    history_new <- erglm_scm_history(mod_new)
     this_iter <- max(history_new$iteration)
     if (this_iter == last_iter) return(mod)
     history <- history_new
@@ -68,9 +69,9 @@ lr_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto", "
   }
 }
 
-#' @rdname lr_scm
+#' @rdname erglm_scm
 #' @export
-lr_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("auto", "Chisq", "F"), seed = NULL) {
+erglm_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("auto", "Chisq", "F"), seed = NULL) {
   test <- match.arg(test)
   if (is.null(seed)) {
     seed <- .pick_seed()
@@ -79,7 +80,7 @@ lr_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("auto",
   withr::with_seed(
     seed = seed,
     code = {
-      mod_out <- .lr_scm_backward(
+      mod_out <- .erglm_scm_backward(
         mod = mod,
         candidates = candidates,
         threshold = threshold,
@@ -90,12 +91,12 @@ lr_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("auto",
   return(mod_out)
 }
 
-.lr_scm_backward <- function(mod, candidates, threshold, test) {
-  history <- lr_scm_history(mod)
+.erglm_scm_backward <- function(mod, candidates, threshold, test) {
+  history <- erglm_scm_history(mod)
   last_iter <- max(history$iteration)
   while (TRUE) {
-    mod_new <- .lr_once_backward(mod, candidates, threshold, test)
-    history_new <- lr_scm_history(mod_new)
+    mod_new <- .erglm_once_backward(mod, candidates, threshold, test)
+    history_new <- erglm_scm_history(mod_new)
     this_iter <- max(history_new$iteration)
     if (this_iter == last_iter) return(mod)
     history <- history_new
@@ -108,10 +109,10 @@ lr_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("auto",
   }
 }
 
-#' @rdname lr_scm
+#' @rdname erglm_scm
 #' @export
-lr_scm_history <- function(mod) {
-  history <- mod$erlr$history
+erglm_scm_history <- function(mod) {
+  history <- mod$erglm$history
   if (!is.null(history)) return(history)
   history_row <- tibble::tibble(
     iteration = 0L,
@@ -129,9 +130,9 @@ lr_scm_history <- function(mod) {
   return(history_row)
 }
 
-.lr_once_forward <- function(mod, candidates, threshold, test) {
+.erglm_once_forward <- function(mod, candidates, threshold, test) {
   candidates <- sample(candidates)
-  history <- lr_scm_history(mod)
+  history <- erglm_scm_history(mod)
   iter <- max(history$iteration) + 1L
   attm <- max(history$attempt)
   lowest_p <- threshold
@@ -140,9 +141,9 @@ lr_scm_history <- function(mod) {
   for (cc in candidates) {    
     add <- stats::as.formula(paste("~", cc))
     attm <- attm + 1L
-    if (!.term_in_model(mod, add)) {
-      mod_new <- .lr_add_term(mod, add, quiet = TRUE)
-      p_val <- .lr_anova_p(mod, mod_new, test)
+    if (!.erglm_term_in_model(mod, add)) {
+      mod_new <- .erglm_add_term(mod, add, quiet = TRUE)
+      p_val <- .erglm_anova_p(mod, mod_new, test)
       history_row <- tibble::tibble(
         iteration = iter,
         attempt = attm,
@@ -172,17 +173,17 @@ lr_scm_history <- function(mod) {
         TRUE ~ 0L
       )
     )
-  best_mod$erlr$history <- history
+  best_mod$erglm$history <- history
   return(best_mod)
 }
 
-.lr_once_backward <- function(mod, candidates, threshold, test) {
+.erglm_once_backward <- function(mod, candidates, threshold, test) {
   trm_mod <- stats::terms(mod)
   trm_lab <- attr(trm_mod, "term.labels")
   candidates <- intersect(trm_lab, candidates)
   if (length(candidates) == 0L) return(mod)
   candidates <- sample(candidates)
-  history <- lr_scm_history(mod)
+  history <- erglm_scm_history(mod)
   iter <- max(history$iteration) + 1L
   attm <- max(history$attempt)
   highest_p <- threshold
@@ -191,9 +192,9 @@ lr_scm_history <- function(mod) {
   for (cc in candidates) {    
     del <- stats::as.formula(paste("~", cc))
     attm <- attm + 1L
-    if (.term_in_model(mod, del)) {
-      mod_new <- .lr_remove_term(mod, del, quiet = TRUE)
-      p_val <- .lr_anova_p(mod, mod_new, test)
+    if (.erglm_term_in_model(mod, del)) {
+      mod_new <- .erglm_remove_term(mod, del, quiet = TRUE)
+      p_val <- .erglm_anova_p(mod, mod_new, test)
       history_row <- tibble::tibble(
         iteration = iter,
         attempt = attm,
@@ -223,19 +224,19 @@ lr_scm_history <- function(mod) {
         TRUE ~ 0L
       )
     )
-  best_mod$erlr$history <- history
+  best_mod$erglm$history <- history
   return(best_mod)
 }
 
-.lr_anova_p <- function(mod1, mod2, test) {
+.erglm_anova_p <- function(mod1, mod2, test) {
   family_name <- stats::family(mod1)$family
-  test <- .lr_resolve_test(test, family_name)
+  test <- .erglm_resolve_test(test, family_name)
   smm <- stats::anova(mod1, mod2, test = test)
   p_col <- grep("^Pr\\(", colnames(smm))[1]
   return(smm[[p_col]][2])
 }
 
-.term_in_model <- function(mod, term) {
+.erglm_term_in_model <- function(mod, term) {
   trm_mod <- stats::terms(mod)
   trm_tst <- stats::terms(term)
   trm_mod_lab <- attr(trm_mod, "term.labels")
@@ -244,7 +245,7 @@ lr_scm_history <- function(mod) {
   return(length(ind) != 0)
 }
 
-.lr_add_term <- function(mod, add, quiet = FALSE) {
+.erglm_add_term <- function(mod, add, quiet = FALSE) {
   trm_mod <- stats::terms(mod)
   trm_add <- stats::terms(add)
   trm_mod_lab <- attr(trm_mod, "term.labels")
@@ -264,10 +265,10 @@ lr_scm_history <- function(mod) {
   fml <- stats::as.formula(
     paste(deparse(mod$formula), deparse(add[[2]]), sep = " + ")
   )
-  lr_model(formula = fml, data = dat, family = stats::family(mod))
+  erglm_model(formula = fml, data = dat, family = stats::family(mod))
 }
 
-.lr_remove_term <- function(mod, remove, quiet = FALSE) {
+.erglm_remove_term <- function(mod, remove, quiet = FALSE) {
   trm_mod <- stats::terms(mod)
   trm_del <- stats::terms(remove)
   trm_mod_lab <- attr(trm_mod, "term.labels")
@@ -279,7 +280,6 @@ lr_scm_history <- function(mod) {
   }
   dat <- mod$data
   trm_new <- stats::drop.terms(trm_mod, ind, keep.response = TRUE)
-  lr_model(formula = trm_new, data = dat, family = stats::family(mod))
+  erglm_model(formula = trm_new, data = dat, family = stats::family(mod))
 }
-
 

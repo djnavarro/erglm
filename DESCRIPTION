@@ -1,15 +1,16 @@
-Package: erlr
-Title: Exposure-Response Tools for Logistic Regression Models
-Version: 0.1.0.9000
+Package: erglm
+Title: Exposure-Response Tools for GLM-Based Models
+Version: 0.2.0.9000
 Authors@R: 
     person("Danielle", "Navarro", , "djnavarro@protonmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0001-7648-6578"))
 Description:
-    Provides estimation tools for exposure-response models that use
-    logistic regression for binary responses: model fitting and
-    prediction, stepwise covariate modelling, and simulation-based
-    visual predictive checks. For a model-agnostic mini-language to
-    visualise exposure-response models (including those fitted with
-    erlr), see the companion package 'erplots'.
+    Provides estimation tools for exposure-response models based on
+    glm(): model fitting and prediction, stepwise covariate modelling,
+    and simulation-based visual predictive checks. Officially tested
+    and supported for binomial, poisson, gaussian, and Gamma families.
+    For a model-agnostic mini-language to visualise exposure-response
+    models (including those fitted with erglm), see the companion
+    package 'erplots'.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -25,8 +26,8 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
-URL: https://github.com/djnavarro/erlr, https://erlr.djnavarro.net/
-BugReports: https://github.com/djnavarro/erlr/issues
+URL: https://github.com/djnavarro/erglm, https://erglm.djnavarro.net/
+BugReports: https://github.com/djnavarro/erglm/issues
 Remotes:
     djnavarro/erplots
 Depends: 

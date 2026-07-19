@@ -1,26 +1,26 @@
 
 # Interoperability with erplots ------------------------------------------
 #
-# erlr has no hard dependency on erplots (a modeling package shouldn't need
+# erglm has no hard dependency on erplots (a modeling package shouldn't need
 # to pull in ggplot2/patchwork). But if erplots *is* installed and loaded,
-# erlr's model objects should work seamlessly with erplots' model-agnostic
+# erglm's model objects should work seamlessly with erplots' model-agnostic
 # plotting API (`er_plot_show_model()`, `er_vpc_plot()`, etc.), which relies
 # on the `er_predict()`/`er_simulate()`/`er_summary()` generics defined in
 # erplots (see `erplots::er_model_interface`).
 #
 # These methods are registered lazily at load time (via `.onLoad()` below),
 # so that neither erplots nor its dependencies need to be installed for
-# erlr's modeling functions to work standalone.
+# erglm's modeling functions to work standalone.
 
-er_predict.erlr_glm <- function(model, newdata, conf_level = 0.95, ...) {
-  lr_predict(object = model, newdata = newdata, conf_level = conf_level)
+er_predict.erglm_model <- function(model, newdata, conf_level = 0.95, ...) {
+  erglm_predict(object = model, newdata = newdata, conf_level = conf_level)
 }
 
-er_simulate.erlr_glm <- function(model, newdata, nsim = 100, seed = NULL, ...) {
-  .lr_simulate_draws(object = model, newdata = newdata, nsim = nsim, seed = seed)
+er_simulate.erglm_model <- function(model, newdata, nsim = 100, seed = NULL, ...) {
+  .erglm_simulate_draws(object = model, newdata = newdata, nsim = nsim, seed = seed)
 }
 
-er_summary.erlr_glm <- function(model, ...) {
+er_summary.erglm_model <- function(model, ...) {
   coefs <- summary(model)$coefficients
   if (nrow(coefs) < 2) return(NULL)
   # column is "Pr(>|z|)" for families with known dispersion (binomial,
@@ -32,9 +32,9 @@ er_summary.erlr_glm <- function(model, ...) {
 }
 
 .onLoad <- function(libname, pkgname) {
-  .s3_register("erplots::er_predict", "erlr_glm", er_predict.erlr_glm)
-  .s3_register("erplots::er_simulate", "erlr_glm", er_simulate.erlr_glm)
-  .s3_register("erplots::er_summary", "erlr_glm", er_summary.erlr_glm)
+  .s3_register("erplots::er_predict", "erglm_model", er_predict.erglm_model)
+  .s3_register("erplots::er_simulate", "erglm_model", er_simulate.erglm_model)
+  .s3_register("erplots::er_summary", "erglm_model", er_summary.erglm_model)
 }
 
 # Registers `method` as an S3 method for `generic` (given as
