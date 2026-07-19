@@ -92,6 +92,24 @@ pred
 #> 16  1500    6.45    0.844    0.998   0.992     1.000
 ```
 
+`pred` reports both the link-scale (`fit_link`) and response-scale
+(`fit_resp`) predictions. If you need to move between these two scales
+yourself – e.g. to transform a raw response-scale value onto the link
+scale –
+[`erglm_link()`](https://erglm.djnavarro.net/reference/erglm_link.md)
+and
+[`erglm_invlink()`](https://erglm.djnavarro.net/reference/erglm_link.md)
+extract the relevant functions straight from the model’s
+[`glm()`](https://rdrr.io/r/stats/glm.html) family:
+
+``` r
+
+erglm_link(mod)(0.5)    # response scale -> link scale
+#> [1] 0
+erglm_invlink(mod)(0)   # link scale -> response scale
+#> [1] 0.5
+```
+
 The confidence level can be adjusted using the `conf_level` argument
 
 ``` r

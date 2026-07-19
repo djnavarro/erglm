@@ -42,6 +42,6 @@ Other functions and objects
 
 - [`erglm_data`](https://erglm.djnavarro.net/reference/erglm_data.md) :
   Sample simulated data for exposure-response models with covariates
-- [`logit()`](https://erglm.djnavarro.net/reference/logit.md)
-  [`invlogit()`](https://erglm.djnavarro.net/reference/logit.md) : Logit
-  and inverse logit functions
+- [`erglm_link()`](https://erglm.djnavarro.net/reference/erglm_link.md)
+  [`erglm_invlink()`](https://erglm.djnavarro.net/reference/erglm_link.md)
+  : Link and inverse-link functions for a fitted model
