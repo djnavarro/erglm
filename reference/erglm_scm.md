@@ -59,6 +59,36 @@ model is returned, with the SCM history log updated internally. For
 `erglm_scm_history()`, a data frame is returned containing the SCM
 history log
 
+## Details
+
+`seed` exists as a safety measure against two hypothetical sources of
+run-to-run variation: (a) the order in which candidate terms are tested
+within a step, and (b) some part of the model-fitting machinery secretly
+depending on `.Random.seed`. As currently implemented, only (a) is real,
+and even then its effect is usually invisible. Concretely: each step of
+`erglm_scm_forward()`/ `erglm_scm_backward()` shuffles the candidate
+terms ([`sample()`](https://rdrr.io/r/base/sample.html)) before testing
+them one at a time, and the shuffled order is the *only* thing `seed`
+(via
+[`withr::with_seed()`](https://withr.r-lib.org/reference/with_seed.html))
+controls. Term p-values come from
+[`stats::anova()`](https://rdrr.io/r/stats/anova.html) on models fitted
+with [`stats::glm()`](https://rdrr.io/r/stats/glm.html), which is a
+deterministic algorithm (iteratively reweighted least squares, no random
+starting values) – so which candidate is *found* to be best does not
+depend on the seed. The seed can only change which candidate is
+*selected* in the (rare, essentially measure-zero for continuous
+predictors) case of an exact tie in p-values within a step, since ties
+are broken by encounter order (`p_val < lowest_p`/ `p_val > highest_p`
+are strict inequalities in the internal
+`.erglm_once_forward()`/`.erglm_once_backward()` helpers). In short: for
+typical data, `seed` is redundant for reproducibility of the *result*
+(though it still affects the row order of the intermediate attempts
+recorded in `erglm_scm_history()`) – it's retained mainly as a guard
+against future refactors reintroducing genuine seed-sensitivity (e.g. if
+candidate order were ever used as an early-stopping rule rather than
+exhaustively tested every step).
+
 ## Examples
 
 ``` r

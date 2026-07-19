@@ -108,6 +108,33 @@ updated erglm model is returned, with the SCM history log updated
 internally. For <code>erglm_scm_history()</code>, a data frame is returned
 containing the SCM history log</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><code>seed</code> exists as a safety measure against two hypothetical
+sources of run-to-run variation: (a) the order in which candidate
+terms are tested within a step, and (b) some part of the model-fitting
+machinery secretly depending on <code>.Random.seed</code>. As currently
+implemented, only (a) is real, and even then its effect is usually
+invisible. Concretely: each step of <code>erglm_scm_forward()</code>/
+<code>erglm_scm_backward()</code> shuffles the candidate terms (<code><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample()</a></code>)
+before testing them one at a time, and the shuffled order is the
+<em>only</em> thing <code>seed</code> (via <code><a href="https://withr.r-lib.org/reference/with_seed.html" class="external-link">withr::with_seed()</a></code>) controls. Term p-values
+come from <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">stats::anova()</a></code> on models fitted with <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">stats::glm()</a></code>, which
+is a deterministic algorithm (iteratively reweighted least squares,
+no random starting values) – so which candidate is <em>found</em> to be
+best does not depend on the seed. The seed can only change which
+candidate is <em>selected</em> in the (rare, essentially measure-zero for
+continuous predictors) case of an exact tie in p-values within a
+step, since ties are broken by encounter order (<code>p_val &lt; lowest_p</code>/
+<code>p_val &gt; highest_p</code> are strict inequalities in the internal
+<code>.erglm_once_forward()</code>/<code>.erglm_once_backward()</code> helpers). In short:
+for typical data, <code>seed</code> is redundant for reproducibility of the
+<em>result</em> (though it still affects the row order of the intermediate
+attempts recorded in <code>erglm_scm_history()</code>) – it's retained mainly
+as a guard against future refactors reintroducing genuine
+seed-sensitivity (e.g. if candidate order were ever used as an
+early-stopping rule rather than exhaustively tested every step).</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
