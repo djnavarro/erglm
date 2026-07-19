@@ -1,17 +1,31 @@
-test_that(".erglm_add_term works", {
+test_that("erglm_add_term works", {
   mod1 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
-  expect_no_error(.erglm_add_term(mod1, ~sex, quiet = TRUE))
-  mod2 <- .erglm_add_term(mod1, ~sex, quiet = TRUE)
+  expect_no_error(erglm_add_term(mod1, ~sex, quiet = TRUE))
+  mod2 <- erglm_add_term(mod1, ~sex, quiet = TRUE)
   expect_equal(deparse(mod2$formula), "ae1 ~ aucss + sex")
   expect_equal(length(coef(mod2)), length(coef(mod1)) + 1L)
 })
 
-test_that(".erglm_remove_term works", {
+test_that("erglm_remove_term works", {
   mod2 <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
-  expect_no_error(.erglm_remove_term(mod2, ~sex, quiet = TRUE))
-  mod1 <- .erglm_remove_term(mod2, ~sex, quiet = TRUE)
+  expect_no_error(erglm_remove_term(mod2, ~sex, quiet = TRUE))
+  mod1 <- erglm_remove_term(mod2, ~sex, quiet = TRUE)
   expect_equal(deparse(mod1$formula), "ae1 ~ aucss")
   expect_equal(length(coef(mod2)), length(coef(mod1)) + 1L)
+})
+
+test_that("erglm_add_term warns (unless quiet) when the term already exists", {
+  mod1 <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+  expect_warning(erglm_add_term(mod1, ~sex), "already exists")
+  expect_no_warning(mod2 <- erglm_add_term(mod1, ~sex, quiet = TRUE))
+  expect_equal(deparse(mod2$formula), deparse(mod1$formula))
+})
+
+test_that("erglm_remove_term warns (unless quiet) when the term isn't in the model", {
+  mod1 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
+  expect_warning(erglm_remove_term(mod1, ~sex), "does not exist")
+  expect_no_warning(mod2 <- erglm_remove_term(mod1, ~sex, quiet = TRUE))
+  expect_equal(deparse(mod2$formula), deparse(mod1$formula))
 })
 
 test_that("erglm_scm_history works when no scm called", {
@@ -104,12 +118,12 @@ test_that("erglm_scm_forward respects an explicit test override", {
   expect_equal(deparse(mod_auto$formula), deparse(mod_chisq$formula))
 })
 
-test_that(".erglm_add_term and .erglm_remove_term preserve the model's family", {
+test_that("erglm_add_term and erglm_remove_term preserve the model's family", {
   mod1 <- erglm_model(ae_count ~ aucss, erglm_data, family = poisson())
-  mod2 <- .erglm_add_term(mod1, ~sex, quiet = TRUE)
+  mod2 <- erglm_add_term(mod1, ~sex, quiet = TRUE)
   expect_equal(family(mod2)$family, "poisson")
 
   mod3 <- erglm_model(ae_count ~ aucss + sex, erglm_data, family = poisson())
-  mod4 <- .erglm_remove_term(mod3, ~sex, quiet = TRUE)
+  mod4 <- erglm_remove_term(mod3, ~sex, quiet = TRUE)
   expect_equal(family(mod4)$family, "poisson")
 })

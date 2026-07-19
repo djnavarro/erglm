@@ -142,7 +142,7 @@ erglm_scm_history <- function(mod) {
     add <- stats::as.formula(paste("~", cc))
     attm <- attm + 1L
     if (!.erglm_term_in_model(mod, add)) {
-      mod_new <- .erglm_add_term(mod, add, quiet = TRUE)
+      mod_new <- erglm_add_term(mod, add, quiet = TRUE)
       p_val <- .erglm_anova_p(mod, mod_new, test)
       history_row <- tibble::tibble(
         iteration = iter,
@@ -193,7 +193,7 @@ erglm_scm_history <- function(mod) {
     del <- stats::as.formula(paste("~", cc))
     attm <- attm + 1L
     if (.erglm_term_in_model(mod, del)) {
-      mod_new <- .erglm_remove_term(mod, del, quiet = TRUE)
+      mod_new <- erglm_remove_term(mod, del, quiet = TRUE)
       p_val <- .erglm_anova_p(mod, mod_new, test)
       history_row <- tibble::tibble(
         iteration = iter,
@@ -245,9 +245,44 @@ erglm_scm_history <- function(mod) {
   return(length(ind) != 0)
 }
 
-.erglm_add_term <- function(mod, add, quiet = FALSE) {
+#' Add or remove a covariate term from an exposure-response model
+#'
+#' Add or remove a single covariate term from an existing erglm model,
+#' returning a new fitted model object.
+#'
+#' @param mod An erglm model object, as returned by [erglm_model()]
+#' @param term A one-sided formula naming the term to add/remove, e.g.
+#' `~ sex`
+#' @param quiet If `TRUE`, suppress the warning issued when the term
+#' can't be added/removed (because it's already in the model / isn't in
+#' the model, respectively)
+#'
+#' @details These functions are not typically called directly; they
+#' underpin [erglm_scm_forward()] and [erglm_scm_backward()]. Named and
+#' shaped to match the companion `emaxnls` package's
+#' `emax_add_term()`/`emax_remove_term()`, which serve the same purpose
+#' for `emaxnls`/`emaxlogistic` models -- with one structural
+#' difference: `emaxnls`'s terms are two-sided formulas naming a
+#' structural parameter (e.g. `E0 ~ AGE`), since covariates there attach
+#' to a specific Emax parameter, whereas erglm's terms are plain
+#' one-sided `glm()` formula terms (e.g. `~ sex`), since erglm has no
+#' equivalent parameter-level structure to attach covariates to.
+#'
+#' @returns An erglm model object. If the term can't be added/removed
+#' (see `quiet`), the original `mod` is returned unchanged.
+#'
+#' @name erglm_term
+#' @examples
+#' mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
+#' mod2 <- erglm_add_term(mod, ~ sex)
+#' mod3 <- erglm_remove_term(mod2, ~ sex)
+NULL
+
+#' @rdname erglm_term
+#' @export
+erglm_add_term <- function(mod, term, quiet = FALSE) {
   trm_mod <- stats::terms(mod)
-  trm_add <- stats::terms(add)
+  trm_add <- stats::terms(term)
   trm_mod_lab <- attr(trm_mod, "term.labels")
   trm_add_lab <- attr(trm_add, "term.labels")
   ind <- which(trm_mod_lab == trm_add_lab)
@@ -263,14 +298,16 @@ erglm_scm_history <- function(mod) {
     return(mod)
   }
   fml <- stats::as.formula(
-    paste(deparse(mod$formula), deparse(add[[2]]), sep = " + ")
+    paste(deparse(mod$formula), deparse(term[[2]]), sep = " + ")
   )
   erglm_model(formula = fml, data = dat, family = stats::family(mod))
 }
 
-.erglm_remove_term <- function(mod, remove, quiet = FALSE) {
+#' @rdname erglm_term
+#' @export
+erglm_remove_term <- function(mod, term, quiet = FALSE) {
   trm_mod <- stats::terms(mod)
-  trm_del <- stats::terms(remove)
+  trm_del <- stats::terms(term)
   trm_mod_lab <- attr(trm_mod, "term.labels")
   trm_del_lab <- attr(trm_del, "term.labels")
   ind <- which(trm_mod_lab == trm_del_lab)
