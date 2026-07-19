@@ -49,7 +49,10 @@ fitted here), see the companion package
 with erplots by implementing the `er_predict()` / `er_simulate()` /
 `er_summary()` generics erplots defines, registered lazily at load time
 (see `R/er-methods.R`) -- erglm has no hard dependency on erplots or on
-plotting packages (ggplot2, patchwork).
+plotting packages (ggplot2, patchwork) in package code. `ggplot2` is a
+`Suggests`-only dependency used exclusively inside
+`vignettes/articles/simulate.Rmd` for demonstration plots (a predictive
+check and a parameter-uncertainty band); no `R/` file uses it.
 
 **Known follow-up (not yet done):** the companion `erplots` repo still
 references the old package/function names (`erlr::lr_model()`,
@@ -61,10 +64,14 @@ published, or its `erlr`-dependent tests/vignette will break.
 
 See [PLAN.md](PLAN.md) for the history of this generalisation/rename
 project. The family generalisation (steps 1-5), the `erglm` rename
-(step 6), and its manual infrastructure follow-ups (renaming the
-GitHub repo `djnavarro/erlr` -> `djnavarro/erglm`, and repointing the
-`erglm.djnavarro.net` pkgdown domain/DNS) are all now done. The only
-remaining item is the companion `erplots` repo update noted above.
+(step 6), its manual infrastructure follow-ups (renaming the GitHub
+repo `djnavarro/erlr` -> `djnavarro/erglm`, and repointing the
+`erglm.djnavarro.net` pkgdown domain/DNS), the emaxnls-harmonisation
+work (`simulate.erglm_model()`, `erglm_fun()`, exporting
+`erglm_add_term()`/`erglm_remove_term()`), and the pkgdown
+site/vignette restructuring that followed it are all now done. Two
+items remain: the companion `erplots` repo update noted above, and
+fleshing out the `erglm.Rmd` "Getting Started" stub (see PLAN.md).
 
 ## Structure
 
@@ -118,7 +125,25 @@ remaining item is the companion `erplots` repo update noted above.
   `tests/testthat/test-er-methods.R` exercises interop with erplots and is
   skipped if erplots isn't installed.
 - Vignettes/articles live in `vignettes/articles/` and are built for the
-  pkgdown site, not shipped with the package (see `.Rbuildignore`).
+  pkgdown site, not shipped with the package (see `.Rbuildignore`):
+  `erglm.Rmd` ("Getting Started", currently a near-empty stub -- see
+  [PLAN.md](PLAN.md)), `model.Rmd` (fitting, prediction, other `glm()`
+  families), `scm.Rmd` (stepwise covariate modelling, modelled on
+  emaxnls's `stepwise-covariate-modelling.Rmd`), `methods.Rmd` (base
+  `glm`/`lm` method inheritance), and `simulate.Rmd` (`simulate()`,
+  `erglm_fun()`, and `erglm_vpc_sim()`, modelled on emaxnls's
+  `simulating-from-emax-models.Rmd`; needs `ggplot2`, see above).
+  `_pkgdown.yml`'s `reference:` index and `articles:` list must be kept
+  in sync by hand when exports or articles are added/renamed --
+  `pkgdown::check_pkgdown()` catches drift (e.g. a reference to a
+  renamed/removed topic) without needing a full site build.
+- If `pkgdown::build_articles()`/`build_site()` fails with "lazy-load
+  database ... is corrupt" / "internal error 1 in R_decompress1", the
+  installed copy of erglm is stale or was partially overwritten while a
+  live session still had it loaded. Fix: unload it from the live
+  session (`unloadNamespace("erglm")`), reinstall from a clean shell
+  (`R CMD INSTALL .`, not `devtools::install()`, which hit the same
+  issue when the package was already loaded), then retry.
 
 ## Conventions
 

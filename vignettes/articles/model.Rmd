@@ -56,26 +56,7 @@ pred <- mod |>
 pred
 ```
 
-## Stepwise covariate modelling
-
-There are two functions that control SCM regression, `erglm_scm_forward()` and `erglm_scm_backward()`:
-
-```{r scm-1}
-base_mod <- erglm_model(formula = ae1 ~ aucss, data = erglm_data, family = binomial())
-candidates <- c("sex", "dose", "weight", "age")
-
-final_mod <- base_mod |> 
-  erglm_scm_forward(candidates, threshold = 0.01, seed = 3425) |> 
-  erglm_scm_backward(candidates, threshold = 0.001, seed = 9821)
-
-final_mod
-```
-
-To extract the log, use `erglm_scm_history()`:
-
-```{r}
-erglm_scm_history(final_mod)
-```
+Choosing which covariates belong in the model -- stepwise covariate modelling with `erglm_scm_forward()`/`erglm_scm_backward()` -- is covered in its own article, "Stepwise covariate modelling".
 
 ## Other `glm()` families
 
@@ -93,4 +74,4 @@ mod_pois |>
   erglm_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
 ```
 
-Stepwise covariate modelling also generalises: by default `erglm_scm_forward()`/`erglm_scm_backward()` pick a likelihood-ratio chi-squared test for `poisson` (as here) and `binomial` models, and an F-test for `gaussian`/`Gamma` models, matching `stats::anova()`'s own `test` argument. This can be overridden with the `test` argument if needed.
+Stepwise covariate modelling also generalises across families -- see the "Stepwise covariate modelling" article for details.

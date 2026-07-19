@@ -8,22 +8,29 @@ reference:
 - contents:
   - erglm_model
   - erglm_predict
+- title: Covariate selection
+  desc: Stepwise covariate modelling for exposure-response models
+- contents:
   - erglm_scm
+  - erglm_term
 - title: Simulate
   desc: Simulation tools for exposure-response glm() models
 - contents:
-  - erglm_simulator
+  - erglm_fun
+  - simulate.erglm_model
   - erglm_vpc_sim
 - title: Other
   desc: Other functions and objects
 - contents:
   - erglm_data
   - logit
+  - invlogit
 
 articles:
   - title:
     navbar:
     contents: 
       - articles/model
+      - articles/scm
       - articles/methods
       - articles/simulate
