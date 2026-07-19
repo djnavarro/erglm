@@ -12,8 +12,8 @@
 <link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Exposure-Response Tools for GLM-Based Models">
-<meta name="description" content="Provides estimation tools for exposure-response models based on glm(): model fitting and prediction, stepwise covariate modelling, and simulation-based visual predictive checks. Officially tested and supported for binomial, poisson, gaussian, and Gamma families. For a model-agnostic mini-language to visualise exposure-response models (including those fitted with erglm), see the companion package erplots.">
-<meta property="og:description" content="Provides estimation tools for exposure-response models based on glm(): model fitting and prediction, stepwise covariate modelling, and simulation-based visual predictive checks. Officially tested and supported for binomial, poisson, gaussian, and Gamma families. For a model-agnostic mini-language to visualise exposure-response models (including those fitted with erglm), see the companion package erplots.">
+<meta name="description" content="Provides estimation tools for exposure-response models based on glm(): model fitting and prediction, stepwise covariate modelling, and simulation-based visual predictive checks. Tested and supported for binomial, poisson, gaussian, and gamma families. For a model-agnostic mini-language to visualise exposure-response models (including those fitted with erglm), see the companion package erplots.">
+<meta property="og:description" content="Provides estimation tools for exposure-response models based on glm(): model fitting and prediction, stepwise covariate modelling, and simulation-based visual predictive checks. Tested and supported for binomial, poisson, gaussian, and gamma families. For a model-agnostic mini-language to visualise exposure-response models (including those fitted with erglm), see the companion package erplots.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -69,7 +69,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>Provides estimation tools for exposure-response models based on <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>. It is mostly intended as a convenience package: the core tools are wrappers around <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>, officially tested and supported for binomial, poisson, gaussian, and Gamma families. For plotting exposure-response models (including those fitted with erglm), see the companion package <a href="https://github.com/djnavarro/erplots" class="external-link">erplots</a>, which supplies a model-agnostic mini-language for building exposure-response plots.</p>
+<p>Provides estimation tools for exposure-response models based on <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>. It is mostly intended as a convenience package: the core tools are wrappers around <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>, tested and supported for binomial, poisson, gaussian, and gamma families. For plotting exposure-response models (including those fitted with erglm), see the companion package <a href="https://github.com/djnavarro/erplots" class="external-link">erplots</a>, which supplies a model-agnostic mini-language for building exposure-response plots.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -120,14 +120,14 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dose</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">mod1</span>, candidates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sex"</span>, <span class="st">"dose"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Using seed = 7116</span></span>
+<span><span class="co">#&gt; Using seed = 9353</span></span>
 <span><span class="fu"><a href="reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 4 × 11</span></span>
 <span><span class="co">#&gt;   iteration attempt step       action term_tested model_tested   model_converged</span></span>
 <span><span class="co">#&gt;       &lt;int&gt;   &lt;int&gt; &lt;chr&gt;      &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;          &lt;lgl&gt;          </span></span>
 <span><span class="co">#&gt; 1         0       0 base model &lt;NA&gt;   &lt;NA&gt;        ae1 ~ aucss +… TRUE           </span></span>
-<span><span class="co">#&gt; 2         1       1 backward   remove ~sex        ae1 ~ aucss +… TRUE           </span></span>
-<span><span class="co">#&gt; 3         1       2 backward   remove ~dose       ae1 ~ aucss +… TRUE           </span></span>
+<span><span class="co">#&gt; 2         1       1 backward   remove ~dose       ae1 ~ aucss +… TRUE           </span></span>
+<span><span class="co">#&gt; 3         1       2 backward   remove ~sex        ae1 ~ aucss +… TRUE           </span></span>
 <span><span class="co">#&gt; 4         2       3 backward   remove ~sex        ae1 ~ aucss    TRUE           </span></span>
 <span><span class="co">#&gt; # ℹ 4 more variables: term_p_value &lt;dbl&gt;, model_aic &lt;dbl&gt;, model_bic &lt;dbl&gt;,</span></span>
 <span><span class="co">#&gt; #   model_updated &lt;int&gt;</span></span></code></pre></div>
@@ -146,12 +146,12 @@
 <span><span class="co">#&gt;  2     1 2806. Female      2      1</span></span>
 <span><span class="co">#&gt;  3     0    0  Female      3      1</span></span>
 <span><span class="co">#&gt;  4     1 1169. Female      4      1</span></span>
-<span><span class="co">#&gt;  5     0  377. Male        5      1</span></span>
-<span><span class="co">#&gt;  6     1  327. Female      6      1</span></span>
+<span><span class="co">#&gt;  5     1  377. Male        5      1</span></span>
+<span><span class="co">#&gt;  6     0  327. Female      6      1</span></span>
 <span><span class="co">#&gt;  7     0    0  Male        7      1</span></span>
 <span><span class="co">#&gt;  8     1 1208. Female      8      1</span></span>
 <span><span class="co">#&gt;  9     0    0  Male        9      1</span></span>
-<span><span class="co">#&gt; 10     1  254. Female     10      1</span></span>
+<span><span class="co">#&gt; 10     0  254. Female     10      1</span></span>
 <span><span class="co">#&gt; # ℹ 29,990 more rows</span></span></code></pre></div>
 <p>To visualise the simulations against the observed data (e.g. as a VPC-style plot), see <code><a href="https://erplots.djnavarro.net/reference/er_vpc_plot.html" class="external-link">erplots::er_vpc_plot()</a></code>.</p>
 </div>

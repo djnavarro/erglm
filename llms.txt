@@ -3,12 +3,12 @@
 Provides estimation tools for exposure-response models based on
 [`glm()`](https://rdrr.io/r/stats/glm.html). It is mostly intended as a
 convenience package: the core tools are wrappers around
-[`glm()`](https://rdrr.io/r/stats/glm.html), officially tested and
-supported for binomial, poisson, gaussian, and Gamma families. For
-plotting exposure-response models (including those fitted with erglm),
-see the companion package
-[erplots](https://github.com/djnavarro/erplots), which supplies a
-model-agnostic mini-language for building exposure-response plots.
+[`glm()`](https://rdrr.io/r/stats/glm.html), tested and supported for
+binomial, poisson, gaussian, and gamma families. For plotting
+exposure-response models (including those fitted with erglm), see the
+companion package [erplots](https://github.com/djnavarro/erplots), which
+supplies a model-agnostic mini-language for building exposure-response
+plots.
 
 ## Installation
 
@@ -63,14 +63,14 @@ mod
 
 mod1 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 mod2 <- erglm_scm_backward(mod1, candidates = c("sex", "dose"))
-#> Using seed = 7116
+#> Using seed = 9353
 erglm_scm_history(mod2)
 #> # A tibble: 4 × 11
 #>   iteration attempt step       action term_tested model_tested   model_converged
 #>       <int>   <int> <chr>      <chr>  <chr>       <chr>          <lgl>          
 #> 1         0       0 base model <NA>   <NA>        ae1 ~ aucss +… TRUE           
-#> 2         1       1 backward   remove ~sex        ae1 ~ aucss +… TRUE           
-#> 3         1       2 backward   remove ~dose       ae1 ~ aucss +… TRUE           
+#> 2         1       1 backward   remove ~dose       ae1 ~ aucss +… TRUE           
+#> 3         1       2 backward   remove ~sex        ae1 ~ aucss +… TRUE           
 #> 4         2       3 backward   remove ~sex        ae1 ~ aucss    TRUE           
 #> # ℹ 4 more variables: term_p_value <dbl>, model_aic <dbl>, model_bic <dbl>,
 #> #   model_updated <int>
@@ -90,12 +90,12 @@ sim
 #>  2     1 2806. Female      2      1
 #>  3     0    0  Female      3      1
 #>  4     1 1169. Female      4      1
-#>  5     0  377. Male        5      1
-#>  6     1  327. Female      6      1
+#>  5     1  377. Male        5      1
+#>  6     0  327. Female      6      1
 #>  7     0    0  Male        7      1
 #>  8     1 1208. Female      8      1
 #>  9     0    0  Male        9      1
-#> 10     1  254. Female     10      1
+#> 10     0  254. Female     10      1
 #> # ℹ 29,990 more rows
 ```
 
