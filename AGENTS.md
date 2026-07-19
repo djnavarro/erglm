@@ -45,20 +45,21 @@ plotting packages (ggplot2, patchwork).
 
 **Known follow-up (not yet done):** the companion `erplots` repo still
 references the old package/function names
-([`erlr::lr_model()`](https://erlr.djnavarro.net/reference/lr_model.html),
-[`erlr::lr_data`](https://erlr.djnavarro.net/reference/lr_data.html)) in
-its `DESCRIPTION` `Suggests`, test helpers, and a vignette article – it
+([`erlr::lr_model()`](https://rdrr.io/pkg/erlr/man/lr_model.html),
+[`erlr::lr_data`](https://rdrr.io/pkg/erlr/man/lr_data.html)) in its
+`DESCRIPTION` `Suggests`, test helpers, and a vignette article – it
 needs a corresponding update once this rename is published, or its
 `erlr`-dependent tests/vignette will break.
 
 ## Planned work
 
 See [PLAN.md](https://erglm.djnavarro.net/PLAN.md) for the history of
-this generalisation/rename project. Both the family generalisation
-(steps 1-5) and the `erglm` rename (step 6) described there are now
-done. Renaming the actual GitHub repo (`djnavarro/erlr` -\>
-`djnavarro/erglm`) and repointing the `erglm.djnavarro.net` pkgdown
-domain are manual follow-ups, not done by editing files in this repo.
+this generalisation/rename project. The family generalisation (steps
+1-5), the `erglm` rename (step 6), and its manual infrastructure
+follow-ups (renaming the GitHub repo `djnavarro/erlr` -\>
+`djnavarro/erglm`, and repointing the `erglm.djnavarro.net` pkgdown
+domain/DNS) are all now done. The only remaining item is the companion
+`erplots` repo update noted above.
 
 ## Structure
 
