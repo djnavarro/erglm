@@ -10,28 +10,32 @@ library(tibble)
 
 The core function is
 [`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md), a very
-thin wrapper around [`glm()`](https://rdrr.io/r/stats/glm.html) that
-specifies the family and link function to create a logistic regression.
-The package comes with a synthetic data set called `lr_data` that we can
-use:
+thin wrapper around [`glm()`](https://rdrr.io/r/stats/glm.html). By
+default it fits a logistic regression
+(`family = binomial(link = "logit")`), but any
+[`glm()`](https://rdrr.io/r/stats/glm.html) family can be supplied
+explicitly – `poisson`, `gaussian`, and `Gamma` are tested and supported
+alongside `binomial`. The package comes with a synthetic data set called
+`lr_data` that we can use:
 
 ``` r
 
 lr_data
-#> # A tibble: 300 × 10
-#>       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2
-#>    <int> <fct>  <int>  <dbl> <dbl> <fct>     <dbl>  <dbl> <dbl> <dbl>
-#>  1     1 Male      35     79   200 Drug       673.   97.3     0     1
-#>  2     2 Female    22     58   200 Drug      2806.  301.      1     1
-#>  3     3 Female    28     58     0 Placebo      0     0       0     0
-#>  4     4 Female    18     57   100 Drug      1169.  198.      1     1
-#>  5     5 Male      28     77   100 Drug       377.   51.4     0     0
-#>  6     6 Female    19     76   200 Drug       327.   25.4     1     0
-#>  7     7 Male      30     70     0 Placebo      0     0       0     0
-#>  8     8 Female    34     60   100 Drug      1208.  133.      1     1
-#>  9     9 Male      21     89     0 Placebo      0     0       0     0
-#> 10    10 Female    34     56   200 Drug       254.   31.0     0     0
+#> # A tibble: 300 × 13
+#>       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2 ae_count
+#>    <int> <fct>  <int>  <dbl> <dbl> <fct>     <dbl>  <dbl> <dbl> <dbl>    <int>
+#>  1     1 Male      35     79   200 Drug       673.   97.3     0     1        1
+#>  2     2 Female    22     58   200 Drug      2806.  301.      1     1        6
+#>  3     3 Female    28     58     0 Placebo      0     0       0     0        1
+#>  4     4 Female    18     57   100 Drug      1169.  198.      1     1        0
+#>  5     5 Male      28     77   100 Drug       377.   51.4     0     0        0
+#>  6     6 Female    19     76   200 Drug       327.   25.4     1     0        0
+#>  7     7 Male      30     70     0 Placebo      0     0       0     0        0
+#>  8     8 Female    34     60   100 Drug      1208.  133.      1     1        1
+#>  9     9 Male      21     89     0 Placebo      0     0       0     0        0
+#> 10    10 Female    34     56   200 Drug       254.   31.0     0     0        1
 #> # ℹ 290 more rows
+#> # ℹ 2 more variables: biomarker_change <dbl>, ae_duration <dbl>
 ```
 
 ## Fitting models
@@ -43,8 +47,7 @@ Creating a model:
 mod <- lr_model(formula = ae1 ~ aucss, data = lr_data)
 mod
 #> 
-#> Call:  stats::glm(formula = formula, family = stats::binomial(link = "logit"), 
-#>     data = data)
+#> Call:  stats::glm(formula = formula, family = family, data = data)
 #> 
 #> Coefficients:
 #> (Intercept)        aucss  
@@ -136,8 +139,7 @@ final_mod <- base_mod |>
 
 final_mod
 #> 
-#> Call:  stats::glm(formula = formula, family = stats::binomial(link = "logit"), 
-#>     data = data)
+#> Call:  stats::glm(formula = formula, family = family, data = data)
 #> 
 #> Coefficients:
 #> (Intercept)        aucss  
@@ -165,3 +167,54 @@ lr_scm_history(final_mod)
 #> # ℹ 4 more variables: term_p_value <dbl>, model_aic <dbl>, model_bic <dbl>,
 #> #   model_updated <int>
 ```
+
+## Other `glm()` families
+
+`lr_data` also includes a count response (`ae_count`), a continuous
+response (`biomarker_change`), and a right-skewed positive continuous
+response (`ae_duration`), for demonstrating `poisson`, `gaussian`, and
+`Gamma` models respectively:
+
+``` r
+
+mod_pois <- lr_model(ae_count ~ aucss + sex, lr_data, family = poisson())
+mod_pois
+#> 
+#> Call:  stats::glm(formula = formula, family = family, data = data)
+#> 
+#> Coefficients:
+#> (Intercept)        aucss      sexMale  
+#>   -0.930026     0.001053    -0.172638  
+#> 
+#> Degrees of Freedom: 299 Total (i.e. Null);  297 Residual
+#> Null Deviance:       868.8 
+#> Residual Deviance: 272.4     AIC: 712.6
+```
+
+[`lr_predict()`](https://erlr.djnavarro.net/reference/lr_predict.md) and
+[`lr_simulator()`](https://erlr.djnavarro.net/reference/lr_simulator.md)
+work unchanged, since both operate on the link scale generically via
+`stats::family(object)$linkinv`:
+
+``` r
+
+mod_pois |> 
+  lr_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
+#> # A tibble: 7 × 7
+#>   aucss sex    fit_link se_link fit_resp ci_lower ci_upper
+#>   <dbl> <chr>     <dbl>   <dbl>    <dbl>    <dbl>    <dbl>
+#> 1     0 Female   -0.930  0.104     0.395    0.322    0.484
+#> 2   500 Female   -0.404  0.0888    0.668    0.561    0.795
+#> 3  1000 Female    0.123  0.0769    1.13     0.973    1.31 
+#> 4  1500 Female    0.650  0.0696    1.91     1.67     2.19 
+#> 5  2000 Female    1.18   0.0684    3.24     2.84     3.71 
+#> 6  2500 Female    1.70   0.0736    5.49     4.75     6.34 
+#> 7  3000 Female    2.23   0.0841    9.29     7.88    11.0
+```
+
+Stepwise covariate modelling also generalises: by default
+[`lr_scm_forward()`](https://erlr.djnavarro.net/reference/lr_scm.md)/[`lr_scm_backward()`](https://erlr.djnavarro.net/reference/lr_scm.md)
+pick a likelihood-ratio chi-squared test for `poisson` (as here) and
+`binomial` models, and an F-test for `gaussian`/`Gamma` models, matching
+[`stats::anova()`](https://rdrr.io/r/stats/anova.html)’s own `test`
+argument. This can be overridden with the `test` argument if needed.

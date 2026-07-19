@@ -80,25 +80,30 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erlr" class="external-link">erlr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span></code></pre></div>
 <p>The core function is <code><a href="../reference/lr_model.html">lr_model()</a></code>, a very thin wrapper
-around <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> that specifies the family and link function to
-create a logistic regression. The package comes with a synthetic data
-set called <code>lr_data</code> that we can use:</p>
+around <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>. By default it fits a logistic regression
+(<code>family = binomial(link = "logit")</code>), but any
+<code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> family can be supplied explicitly –
+<code>poisson</code>, <code>gaussian</code>, and <code>Gamma</code> are
+tested and supported alongside <code>binomial</code>. The package comes
+with a synthetic data set called <code>lr_data</code> that we can
+use:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lr_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 300 × 10</span></span></span>
-<span><span class="co">#&gt;       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1 Male      35     79   200 Drug       673.   97.3     0     1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2 Female    22     58   200 Drug      <span style="text-decoration: underline;">2</span>806.  301.      1     1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3 Female    28     58     0 Placebo      0     0       0     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4 Female    18     57   100 Drug      <span style="text-decoration: underline;">1</span>169.  198.      1     1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5 Male      28     77   100 Drug       377.   51.4     0     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6 Female    19     76   200 Drug       327.   25.4     1     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7 Male      30     70     0 Placebo      0     0       0     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8 Female    34     60   100 Drug      <span style="text-decoration: underline;">1</span>208.  133.      1     1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9 Male      21     89     0 Placebo      0     0       0     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10 Female    34     56   200 Drug       254.   31.0     0     0</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 290 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 300 × 13</span></span></span>
+<span><span class="co">#&gt;       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2 ae_count</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1 Male      35     79   200 Drug       673.   97.3     0     1        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2 Female    22     58   200 Drug      <span style="text-decoration: underline;">2</span>806.  301.      1     1        6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3 Female    28     58     0 Placebo      0     0       0     0        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4 Female    18     57   100 Drug      <span style="text-decoration: underline;">1</span>169.  198.      1     1        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5 Male      28     77   100 Drug       377.   51.4     0     0        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6 Female    19     76   200 Drug       327.   25.4     1     0        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7 Male      30     70     0 Placebo      0     0       0     0        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8 Female    34     60   100 Drug      <span style="text-decoration: underline;">1</span>208.  133.      1     1        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9 Male      21     89     0 Placebo      0     0       0     0        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10 Female    34     56   200 Drug       254.   31.0     0     0        1</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 290 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: biomarker_change &lt;dbl&gt;, ae_duration &lt;dbl&gt;</span></span></span></code></pre></div>
 <div class="section level2">
 <h2 id="fitting-models">Fitting models<a class="anchor" aria-label="anchor" href="#fitting-models"></a>
 </h2>
@@ -107,8 +112,7 @@ set called <code>lr_data</code> that we can use:</p>
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lr_model.html">lr_model</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span>, data <span class="op">=</span> <span class="va">lr_data</span><span class="op">)</span></span>
 <span><span class="va">mod</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:  stats::glm(formula = formula, family = stats::binomial(link = "logit"), </span></span>
-<span><span class="co">#&gt;     data = data)</span></span>
+<span><span class="co">#&gt; Call:  stats::glm(formula = formula, family = family, data = data)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt; (Intercept)        aucss  </span></span>
@@ -192,8 +196,7 @@ predictions:</p>
 <span></span>
 <span><span class="va">final_mod</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:  stats::glm(formula = formula, family = stats::binomial(link = "logit"), </span></span>
-<span><span class="co">#&gt;     data = data)</span></span>
+<span><span class="co">#&gt; Call:  stats::glm(formula = formula, family = family, data = data)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt; (Intercept)        aucss  </span></span>
@@ -215,6 +218,52 @@ predictions:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>         1       4 forward    add    ~dose       ae1 ~ aucss +… TRUE           </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: term_p_value &lt;dbl&gt;, model_aic &lt;dbl&gt;, model_bic &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   model_updated &lt;int&gt;</span></span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="other-glm-families">Other <code>glm()</code> families<a class="anchor" aria-label="anchor" href="#other-glm-families"></a>
+</h2>
+<p><code>lr_data</code> also includes a count response
+(<code>ae_count</code>), a continuous response
+(<code>biomarker_change</code>), and a right-skewed positive continuous
+response (<code>ae_duration</code>), for demonstrating
+<code>poisson</code>, <code>gaussian</code>, and <code>Gamma</code>
+models respectively:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lr_model.html">lr_model</a></span><span class="op">(</span><span class="va">ae_count</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">lr_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">mod_pois</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  stats::glm(formula = formula, family = family, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt; (Intercept)        aucss      sexMale  </span></span>
+<span><span class="co">#&gt;   -0.930026     0.001053    -0.172638  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 299 Total (i.e. Null);  297 Residual</span></span>
+<span><span class="co">#&gt; Null Deviance:       868.8 </span></span>
+<span><span class="co">#&gt; Residual Deviance: 272.4     AIC: 712.6</span></span></code></pre></div>
+<p><code><a href="../reference/lr_predict.html">lr_predict()</a></code> and <code><a href="../reference/lr_simulator.html">lr_simulator()</a></code> work
+unchanged, since both operate on the link scale generically via
+<code>stats::family(object)$linkinv</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod_pois</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/lr_predict.html">lr_predict</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3000</span>, by <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, sex <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 7</span></span></span>
+<span><span class="co">#&gt;   aucss sex    fit_link se_link fit_resp ci_lower ci_upper</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     0 Female   -<span style="color: #BB0000;">0.930</span>  0.104     0.395    0.322    0.484</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   500 Female   -<span style="color: #BB0000;">0.404</span>  0.088<span style="text-decoration: underline;">8</span>    0.668    0.561    0.795</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">1</span>000 Female    0.123  0.076<span style="text-decoration: underline;">9</span>    1.13     0.973    1.31 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">1</span>500 Female    0.650  0.069<span style="text-decoration: underline;">6</span>    1.91     1.67     2.19 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>000 Female    1.18   0.068<span style="text-decoration: underline;">4</span>    3.24     2.84     3.71 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>500 Female    1.70   0.073<span style="text-decoration: underline;">6</span>    5.49     4.75     6.34 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>  <span style="text-decoration: underline;">3</span>000 Female    2.23   0.084<span style="text-decoration: underline;">1</span>    9.29     7.88    11.0</span></span></code></pre></div>
+<p>Stepwise covariate modelling also generalises: by default
+<code><a href="../reference/lr_scm.html">lr_scm_forward()</a></code>/<code><a href="../reference/lr_scm.html">lr_scm_backward()</a></code> pick a
+likelihood-ratio chi-squared test for <code>poisson</code> (as here) and
+<code>binomial</code> models, and an F-test for
+<code>gaussian</code>/<code>Gamma</code> models, matching
+<code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">stats::anova()</a></code>’s own <code>test</code> argument. This can
+be overridden with the <code>test</code> argument if needed.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

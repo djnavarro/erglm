@@ -1,13 +1,25 @@
-# Stepwise covariate modelling for logistic regression
+# Stepwise covariate modelling for exposure-response models
 
-Stepwise covariate modelling for logistic regression
+Stepwise covariate modelling for exposure-response models
 
 ## Usage
 
 ``` r
-lr_scm_forward(mod, candidates, threshold = 0.01, seed = NULL)
+lr_scm_forward(
+  mod,
+  candidates,
+  threshold = 0.01,
+  test = c("auto", "Chisq", "F"),
+  seed = NULL
+)
 
-lr_scm_backward(mod, candidates, threshold = 0.001, seed = NULL)
+lr_scm_backward(
+  mod,
+  candidates,
+  threshold = 0.001,
+  test = c("auto", "Chisq", "F"),
+  seed = NULL
+)
 
 lr_scm_history(mod)
 ```
@@ -25,6 +37,16 @@ lr_scm_history(mod)
 - threshold:
 
   Threshold to test against
+
+- test:
+
+  Which significance test to use when comparing nested models. `"auto"`
+  (the default) picks a likelihood-ratio chi-squared test (`"Chisq"`)
+  for families with known dispersion (binomial, poisson) and an F-test
+  (`"F"`) for families with an estimated dispersion parameter (gaussian,
+  Gamma, inverse.gaussian, quasi\*), matching
+  [`stats::anova()`](https://rdrr.io/r/stats/anova.html)'s own `test`
+  argument. Set explicitly to override.
 
 - seed:
 

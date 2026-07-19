@@ -1,6 +1,6 @@
-# Simulate from a logistic regression model
+# Simulate from an exposure-response model
 
-Simulate from a logistic regression model
+Simulate from an exposure-response model
 
 ## Usage
 
@@ -12,7 +12,8 @@ lr_simulator(object)
 
 - object:
 
-  A logistic regression model
+  An erlr model, as returned by
+  [`lr_model()`](https://erlr.djnavarro.net/reference/lr_model.md)
 
 ## Value
 
@@ -28,9 +29,10 @@ A function with arguments `param`, `data`, and `type`.
 Takes a fitted glm object as input and returns a function that will
 evaluate the underlying structural model with user-specified parameters
 or data (e.g., for VPCs or other counterfactual simulation scenarios).
-In principle this should work for glms more generally, not merely
-logistic regressions, but has not been tested except for logistic
-regression models
+Uses `stats::family(object)$linkinv`, so this works for any
+[`glm()`](https://rdrr.io/r/stats/glm.html) family, not just
+binomial/logistic models; tested for binomial, poisson, gaussian, and
+Gamma families.
 
 ## Examples
 
