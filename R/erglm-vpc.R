@@ -12,7 +12,8 @@
 #' response variable replaced by its simulated value under parameter
 #' uncertainty.
 #'
-#' @details For each replicate, parameter uncertainty is reflected by
+#' @details A thin, VPC-shaped wrapper around [simulate.erglm_model()]
+#' (i.e. `simulate(object, ...)`): parameter uncertainty is reflected by
 #' sampling coefficients from the model's asymptotic sampling
 #' distribution and computing the expected response at those
 #' coefficients; family-appropriate residual noise is then added on top
@@ -22,8 +23,12 @@
 #' for that noise is a single point estimate
 #' (`summary(object)$dispersion`), not resampled per replicate. Other
 #' `glm()` families are not currently supported and will raise an
-#' error. To visualise the result (e.g. as a VPC-style plot comparing
-#' observed and simulated response rates), see `erplots::er_vpc_plot()`.
+#' error. Unlike `simulate()`, the sampled coefficients and the expected
+#' response (`mu`) are dropped, and the simulated response (`val`) is
+#' spliced back into the response column's original name -- this is the
+#' data frame shape expected by `erplots::er_vpc_plot()` for visualising
+#' the result (e.g. as a VPC-style plot comparing observed and simulated
+#' response rates).
 #'
 #' @export
 #' @examples
@@ -35,14 +40,14 @@
 #' erglm_vpc_sim(mod_pois)
 #' 
 erglm_vpc_sim <- function(object, nsim = 100, seed = NULL) {
-  ff <- object$formula
-  vv <- all.vars(ff)
+  vv <- all.vars(object$formula)
   rsp_var <- vv[1]
-  dd <- object$data[, vv]
-  family_name <- stats::family(object)$family
-  dispersion <- summary(object)$dispersion
-  sim <- .erglm_simulate_draws(object, newdata = dd, nsim = nsim, seed = seed)
-  sim[[rsp_var]] <- .erglm_draw_response(family_name, fit = sim$fit_resp, dispersion = dispersion)
-  sim$fit_resp <- NULL
-  return(sim)
+  predictors <- setdiff(vv, rsp_var)
+
+  sim <- stats::simulate(object, nsim = nsim, seed = seed)
+  sim[[rsp_var]] <- sim$val
+
+  sim |>
+    dplyr::rename(row_id = dat_id) |>
+    dplyr::select(dplyr::all_of(c(rsp_var, predictors, "row_id", "sim_id")))
 }

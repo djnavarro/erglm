@@ -22,7 +22,9 @@ Predictions and confidence intervals for exposure-response models
 \details{
 Computes intervals on the link scale and back-transforms with
 \code{stats::family(object)$linkinv}, so this works for any \code{glm()} family,
-not just binomial/logistic models.
+not just binomial/logistic models. See also \code{\link[=erglm_fun]{erglm_fun()}} for
+generating predictions at arbitrary (possibly counterfactual)
+parameters or data.
 
 This is a tidy, opinionated alternative to calling base R's
 \code{predict()} directly on \code{object} -- since \code{object} is a genuine

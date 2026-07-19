@@ -23,7 +23,8 @@ uncertainty.
 VPC simulations for exposure-response models
 }
 \details{
-For each replicate, parameter uncertainty is reflected by
+A thin, VPC-shaped wrapper around \code{\link[=simulate.erglm_model]{simulate.erglm_model()}}
+(i.e. \code{simulate(object, ...)}): parameter uncertainty is reflected by
 sampling coefficients from the model's asymptotic sampling
 distribution and computing the expected response at those
 coefficients; family-appropriate residual noise is then added on top
@@ -33,8 +34,12 @@ draws for \code{binomial}, Poisson draws for \code{poisson}, normal draws for
 for that noise is a single point estimate
 (\code{summary(object)$dispersion}), not resampled per replicate. Other
 \code{glm()} families are not currently supported and will raise an
-error. To visualise the result (e.g. as a VPC-style plot comparing
-observed and simulated response rates), see \code{erplots::er_vpc_plot()}.
+error. Unlike \code{simulate()}, the sampled coefficients and the expected
+response (\code{mu}) are dropped, and the simulated response (\code{val}) is
+spliced back into the response column's original name -- this is the
+data frame shape expected by \code{erplots::er_vpc_plot()} for visualising
+the result (e.g. as a VPC-style plot comparing observed and simulated
+response rates).
 }
 \examples{
 mod <- erglm_model(ae2 ~ aucss + sex, erglm_data, family = binomial())

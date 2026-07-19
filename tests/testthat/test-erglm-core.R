@@ -9,28 +9,27 @@ test_that("erglm_model defaults to family = gaussian()", {
   expect_equal(family(mod)$family, "gaussian")
 })
 
-test_that("erglm_simulator returns a function", {
+test_that("erglm_fun returns a function", {
   mod1 <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
-  expect_no_error(erglm_simulator(mod1))
-  mod1_sim <- erglm_simulator(mod1)
-  expect_type(mod1_sim, "closure")
+  expect_no_error(erglm_fun(mod1))
+  mod1_fun <- erglm_fun(mod1)
+  expect_type(mod1_fun, "closure")
 })
 
-test_that("erglm_simulator works", {
+test_that("erglm_fun works", {
 
-  # simulator setup
   mod1 <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
   par1 <- coef(mod1)
-  mod1_sim <- erglm_simulator(mod1)
+  mod1_fun <- erglm_fun(mod1)
 
   # no counterfactuals
-  p1 <- mod1_sim(param = par1, data = erglm_data) 
+  p1 <- mod1_fun(param = par1, data = erglm_data) 
   p2 <- unname(predict(mod1, type = "response")) # same result
   expect_equal(p1, p2)
 
   # user modifies the data set
   erglm_data2 <- erglm_data[1:20, ]
-  p3 <- mod1_sim(param = par1, data = erglm_data2) 
+  p3 <- mod1_fun(param = par1, data = erglm_data2) 
   p4 <- unname(predict(mod1, newdata = erglm_data2, type = "response")) # same result
   expect_equal(p3, p4)
 
@@ -38,9 +37,31 @@ test_that("erglm_simulator works", {
   par2 <- par1
   int1 <- par1["(Intercept)"]
   par2["(Intercept)"] <- 0
-  p5 <- mod1_sim(param = par2, data = erglm_data)
+  p5 <- mod1_fun(param = par2, data = erglm_data)
   expect_equal(logit(p1), logit(p5) + int1)
   
+})
+
+test_that("erglm_fun defaults param to fitted coefficients and data to the fitted data", {
+  mod1 <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+  mod1_fun <- erglm_fun(mod1)
+
+  p1 <- mod1_fun()
+  p2 <- unname(predict(mod1, type = "response"))
+  expect_equal(p1, p2)
+
+  # data supplied, param defaulted
+  erglm_data2 <- erglm_data[1:20, ]
+  p3 <- mod1_fun(data = erglm_data2)
+  p4 <- unname(predict(mod1, newdata = erglm_data2, type = "response"))
+  expect_equal(p3, p4)
+
+  # param supplied, data defaulted
+  par2 <- coef(mod1)
+  par2["(Intercept)"] <- 0
+  p5 <- mod1_fun(param = par2)
+  p6 <- mod1_fun(param = par2, data = erglm_data)
+  expect_equal(p5, p6)
 })
 
 test_that("erglm_predict works with default data", {
@@ -98,11 +119,11 @@ test_that("erglm_predict is family-generic", {
   expect_equal(prd_gauss$fit_resp, pr_resp_gauss$fit)
 })
 
-test_that("erglm_simulator is family-generic", {
+test_that("erglm_fun is family-generic", {
   mod_pois <- erglm_model(ae_count ~ aucss + sex, erglm_data, family = poisson())
   par1 <- coef(mod_pois)
-  sim_fn <- erglm_simulator(mod_pois)
-  p1 <- sim_fn(param = par1, data = erglm_data)
+  fn <- erglm_fun(mod_pois)
+  p1 <- fn(param = par1, data = erglm_data)
   p2 <- unname(predict(mod_pois, type = "response"))
   expect_equal(p1, p2)
 })

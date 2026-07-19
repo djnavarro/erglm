@@ -33,5 +33,6 @@ utils::globalVariables(c(
   "id",
   "aucss",
   "sex",
-  "weight"
+  "weight",
+  "dat_id"
 ))

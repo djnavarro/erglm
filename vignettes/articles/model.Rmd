@@ -86,7 +86,7 @@ mod_pois <- erglm_model(ae_count ~ aucss + sex, erglm_data, family = poisson())
 mod_pois
 ```
 
-`erglm_predict()` and `erglm_simulator()` work unchanged, since both operate on the link scale generically via `stats::family(object)$linkinv`:
+`erglm_predict()` and `erglm_fun()` work unchanged, since both operate on the link scale generically via `stats::family(object)$linkinv`:
 
 ```{r predict-3}
 mod_pois |> 

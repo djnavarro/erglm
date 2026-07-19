@@ -1,11 +1,12 @@
 
-# Family-dispatch helpers shared across SCM (R/erglm-scm.R) and VPC
-# (R/erglm-vpc.R). Officially tested/supported for binomial, poisson,
-# gaussian, and Gamma; other glm() families work through the same
-# generic mechanisms elsewhere in the package (erglm_predict(),
-# erglm_simulator()) but are not covered by these two helpers.
+# Family-dispatch helpers shared across SCM (R/erglm-scm.R) and response
+# simulation (R/erglm-simulate.R, R/erglm-vpc.R). Officially
+# tested/supported for binomial, poisson, gaussian, and Gamma; other
+# glm() families work through the same generic mechanisms elsewhere in
+# the package (erglm_predict(), erglm_fun()) but are not covered by
+# these helpers.
 
-.erglm_supported_vpc_families <- c("binomial", "poisson", "gaussian", "Gamma")
+.erglm_supported_response_families <- c("binomial", "poisson", "gaussian", "Gamma")
 
 # Picks the appropriate `stats::anova(..., test = )` flavour for a given
 # glm family: a likelihood-ratio chi-squared test is appropriate for
@@ -29,6 +30,8 @@
 # point estimate (e.g. from `summary(model)$dispersion`) applied to every
 # draw -- parameter uncertainty is already reflected in `fit` varying
 # across replicates, but dispersion uncertainty itself is not resampled.
+# Used by both `simulate.erglm_model()` and (via `simulate()`)
+# `erglm_vpc_sim()`.
 .erglm_draw_response <- function(family_name, fit, dispersion) {
   n <- length(fit)
   switch(
@@ -39,9 +42,10 @@
     Gamma = stats::rgamma(n, shape = 1 / dispersion, rate = 1 / (dispersion * fit)),
     rlang::abort(
       paste0(
-        "erglm_vpc_sim() does not support family \"", family_name, "\". ",
+        "erglm does not support simulating responses for family \"",
+        family_name, "\" (via simulate() or erglm_vpc_sim()). ",
         "Supported families are: ",
-        paste(.erglm_supported_vpc_families, collapse = ", "), "."
+        paste(.erglm_supported_response_families, collapse = ", "), "."
       )
     )
   )

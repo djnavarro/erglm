@@ -6,14 +6,28 @@ erglm provides estimation tools for exposure-response models based on
 `glm()`: model fitting (`erglm_model()`), prediction with confidence
 intervals (`erglm_predict()`), stepwise covariate modelling
 (`erglm_scm_forward()` / `erglm_scm_backward()` / `erglm_scm_history()`),
-and simulation (`erglm_simulator()`, `erglm_vpc_sim()`).
-`erglm_model()` takes a `family` argument, defaulting to
-`stats::gaussian()` (matching `glm()`'s own default); binomial, poisson,
-gaussian, and Gamma are tested and officially supported end to end
-(fitting, prediction, SCM significance testing, and VPC simulation).
-Other `glm()` families work through the same generic mechanisms in
-`erglm_predict()`/`erglm_simulator()` but aren't covered by SCM's test
-selection or VPC's noise draws.
+and simulation (`erglm_fun()`, `simulate.erglm_model()`,
+`erglm_vpc_sim()`). `erglm_model()` takes a `family` argument,
+defaulting to `stats::gaussian()` (matching `glm()`'s own default);
+binomial, poisson, gaussian, and Gamma are tested and officially
+supported end to end (fitting, prediction, SCM significance testing,
+and VPC simulation). Other `glm()` families work through the same
+generic mechanisms in `erglm_predict()`/`erglm_fun()` but aren't
+covered by SCM's test selection or `simulate()`/VPC's noise draws.
+
+The package's design is deliberately harmonised with the companion
+`emaxnls` package (nonlinear-least-squares Emax models, also by this
+author) where the two overlap: SCM forward/backward/history functions
+mirror `emax_scm_forward()`/`emax_scm_backward()`/`emax_scm_history()`
+closely, `erglm_fun()` mirrors `emax_fun()` (a zero-argument-callable
+prediction-function factory), and `simulate.erglm_model()` mirrors
+`emaxnls`'s `simulate()` output shape (one row per observation per
+replicate, with sampled coefficients and both expected/simulated
+response columns). Genuine differences remain where the model classes
+differ -- e.g. `erglm_fun()`'s returned function's coefficient columns
+are prefixed `coef_*` in `simulate.erglm_model()`'s output to avoid
+colliding with predictor columns of the same name, which isn't an
+issue for `emaxnls`'s parameter-name convention.
 
 This package was previously called `erlr` (logistic-regression-only,
 `lr_*`-prefixed functions); it was renamed to `erglm` and generalised to
@@ -48,11 +62,19 @@ remaining item is the companion `erplots` repo update noted above.
 ## Structure
 
 - `R/erglm-core.R` -- `erglm_model()`, `erglm_predict()`, the
-  `erglm_simulator()` closure factory, and the shared
+  `erglm_fun()` closure factory, and the shared
   `.erglm_simulate_draws()` helper (used by both `erglm_vpc_sim()` and,
   via erplots, spaghetti-style plots).
 - `R/erglm-scm.R` -- forward/backward stepwise covariate modelling.
-- `R/erglm-vpc.R` -- `erglm_vpc_sim()`.
+- `R/erglm-simulate.R` -- `simulate.erglm_model()`, the `stats::simulate()`
+  S3 method (and its `.erglm_resample()` helper), modelled on emaxnls's
+  `simulate()` output shape: one row per observation per replicate, with
+  `dat_id`/`sim_id`, expected/simulated response (`mu`/`val`), sampled
+  `coef_*` columns, and the model's predictor columns.
+- `R/erglm-vpc.R` -- `erglm_vpc_sim()`, a thin wrapper that calls
+  `simulate.erglm_model()` internally and reshapes its output into a
+  VPC-ready data set (splicing the simulated response back into the
+  original response column instead of returning sampled coefficients).
 - `R/erglm-family.R` -- shared family-dispatch helpers used by SCM and
   VPC: `.erglm_default_test()` (picks `"Chisq"` vs `"F"` for
   `stats::anova()` based on the family's dispersion behaviour) and

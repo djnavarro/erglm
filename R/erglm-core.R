@@ -49,7 +49,9 @@ erglm_model <- function(formula, data, family = stats::gaussian(), ...) {
 #'
 #' @details Computes intervals on the link scale and back-transforms with
 #' `stats::family(object)$linkinv`, so this works for any `glm()` family,
-#' not just binomial/logistic models.
+#' not just binomial/logistic models. See also [erglm_fun()] for
+#' generating predictions at arbitrary (possibly counterfactual)
+#' parameters or data.
 #'
 #' This is a tidy, opinionated alternative to calling base R's
 #' `predict()` directly on `object` -- since `object` is a genuine
@@ -88,13 +90,15 @@ erglm_predict <- function(object, newdata = NULL, conf_level = .95) {
   return(out)
 }
 
-#' Simulate from an exposure-response model
+#' Prediction function for an exposure-response model
 #'
 #' @param object An erglm model, as returned by [erglm_model()]
 #'
 #' @returns A function with arguments `param`, `data`, and `type`.
-#' - The `param` argument should be a vector of coefficients
-#' - The `data` argument should be a data frame or tibble
+#' - The `param` argument should be a vector of coefficients; defaults
+#'   to `coef(object)` (the fitted coefficients) if not supplied.
+#' - The `data` argument should be a data frame or tibble; defaults to
+#'   `object$data` (the data the model was fitted to) if not supplied.
 #' - The `type` argument should be a string indicating the type
 #'   of prediction to generate (defaults to `"response"`)
 #'
@@ -104,34 +108,37 @@ erglm_predict <- function(object, newdata = NULL, conf_level = .95) {
 #' other counterfactual simulation scenarios). Uses
 #' `stats::family(object)$linkinv`, so this works for any `glm()`
 #' family, not just binomial/logistic models; tested for
-#' binomial, poisson, gaussian, and Gamma families.
+#' binomial, poisson, gaussian, and Gamma families. Named `erglm_fun()`
+#' for consistency with the companion `emaxnls` package's `emax_fun()`,
+#' which serves the same purpose for `emaxnls`/`emaxlogistic` models.
 #'  
 #' @examples
 #' mod1 <- erglm_model(ae2 ~ aucss + sex, erglm_data, family = binomial())
-#' par1 <- coef(mod1)
-#' mod1_sim <- erglm_simulator(mod1)
+#' mod1_fun <- erglm_fun(mod1)
 #' 
-#' # no counterfactuals
-#' p1 <- mod1_sim(param = par1, data = erglm_data) 
+#' # no arguments: reproduces the fitted model's own predictions
+#' p1 <- mod1_fun()
 #' p2 <- unname(predict(mod1, type = "response")) # same result
 #' 
 #' # user modifies the data set
 #' erglm_data2 <- erglm_data[1:20, ]
-#' p3 <- mod1_sim(param = par1, data = erglm_data2) 
+#' p3 <- mod1_fun(data = erglm_data2) 
 #' p4 <- unname(predict(mod1, newdata = erglm_data2, type = "response")) # same result
 #' 
 #' # user modifies the parameters
-#' par2 <- par1
-#' int1 <- par1["(Intercept)"]
+#' par2 <- coef(mod1)
+#' int1 <- par2["(Intercept)"]
 #' par2["(Intercept)"] <- 0
-#' p5 <- mod1_sim(param = par2, data = erglm_data)
+#' p5 <- mod1_fun(param = par2)
 #' 
 #' @export
 #' 
-erglm_simulator <- function(object) {
+erglm_fun <- function(object) {
   ff <- stats::delete.response(stats::terms(object$formula))
   force(ff)
-  function(param, data, type = "response") {
+  function(param = NULL, data = NULL, type = "response") {
+    if (is.null(param)) param <- stats::coef(object)
+    if (is.null(data)) data <- object$data
     mm <- stats::model.matrix(ff, data)
     pred <- as.vector(mm %*% param)
     if (type == "response") pred <- stats::family(object)$linkinv(pred)
@@ -150,7 +157,7 @@ erglm_simulator <- function(object) {
     seed <- .pick_seed()
     rlang::inform(paste("Using seed =", seed))
   }
-  fn <- erglm_simulator(object)
+  fn <- erglm_fun(object)
   withr::with_seed(
     seed = seed,
     code = {
