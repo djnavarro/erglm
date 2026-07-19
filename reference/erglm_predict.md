@@ -32,7 +32,10 @@ A tibble
 Computes intervals on the link scale and back-transforms with
 `stats::family(object)$linkinv`, so this works for any
 [`glm()`](https://rdrr.io/r/stats/glm.html) family, not just
-binomial/logistic models.
+binomial/logistic models. See also
+[`erglm_fun()`](https://erglm.djnavarro.net/reference/erglm_fun.md) for
+generating predictions at arbitrary (possibly counterfactual) parameters
+or data.
 
 This is a tidy, opinionated alternative to calling base R's
 [`predict()`](https://rdrr.io/r/stats/predict.html) directly on `object`

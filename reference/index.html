@@ -20,6 +20,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/model.html">Modelling</a></li>
+    <li><a class="dropdown-item" href="../articles/scm.html">Stepwise covariate modelling</a></li>
     <li><a class="dropdown-item" href="../articles/methods.html">Using base R model methods</a></li>
     <li><a class="dropdown-item" href="../articles/simulate.html">Simulation</a></li>
   </ul></li>
@@ -66,13 +67,29 @@
 
         </dt>
         <dd>Predictions and confidence intervals for exposure-response models</dd>
+      </dl></div><div class="section level2">
+      <h2 id="covariate-selection">Covariate selection<a class="anchor" aria-label="anchor" href="#covariate-selection"></a></h2>
 
-        <dt>
+      <div class="section-desc"><p>Stepwise covariate modelling for exposure-response models</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="erglm_scm.html">erglm_scm_forward()</a></code> <code><a href="erglm_scm.html">erglm_scm_backward()</a></code> <code><a href="erglm_scm.html">erglm_scm_history()</a></code>
 
         </dt>
         <dd>Stepwise covariate modelling for exposure-response models</dd>
+
+        <dt>
+
+          <code><a href="erglm_term.html">erglm_add_term()</a></code> <code><a href="erglm_term.html">erglm_remove_term()</a></code>
+
+        </dt>
+        <dd>Add or remove a covariate term from an exposure-response model</dd>
       </dl></div><div class="section level2">
       <h2 id="simulate">Simulate<a class="anchor" aria-label="anchor" href="#simulate"></a></h2>
 
@@ -85,10 +102,17 @@
 
       <dl><dt>
 
-          <code><a href="erglm_simulator.html">erglm_simulator()</a></code>
+          <code><a href="erglm_fun.html">erglm_fun()</a></code>
 
         </dt>
-        <dd>Simulate from an exposure-response model</dd>
+        <dd>Prediction function for an exposure-response model</dd>
+
+        <dt>
+
+          <code><a href="simulate.erglm_model.html">simulate(<i>&lt;erglm_model&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Simulate responses from an exposure-response model</dd>
 
         <dt>
 

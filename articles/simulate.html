@@ -36,6 +36,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/model.html">Modelling</a></li>
+    <li><a class="dropdown-item" href="../articles/scm.html">Stepwise covariate modelling</a></li>
     <li><a class="dropdown-item" href="../articles/methods.html">Using base R model methods</a></li>
     <li><a class="dropdown-item" href="../articles/simulate.html">Simulation</a></li>
   </ul>
@@ -76,61 +77,335 @@
 
     
     
-<p>This is the simulation article</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/get_theme.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Once a model has been fitted, it’s often useful to generate
+<em>new</em> data from it: for predictive checks, for simulation-based
+intervals, or as the input to some downstream analysis. The package
+offers two tools for this, operating at different levels:</p>
+<ul>
+<li>
+<strong><code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code></strong> is the high-level method.
+It generates complete replicate datasets from a fitted model,
+automatically propagating both the uncertainty in the parameter
+estimates and the observation-level noise.</li>
+<li>
+<strong><code><a href="../reference/erglm_fun.html">erglm_fun()</a></code></strong> is the low-level building
+block. It extracts the deterministic prediction function from a fitted
+model, letting you evaluate it at any parameter values and any data you
+choose – the raw material for building custom simulations by hand.</li>
+</ul>
+<p>Both rely on the <strong>mvtnorm</strong> package for drawing
+parameter values, so it needs to be installed. This article works
+through both tools using a gaussian model, then shows that they
+generalise unchanged to the other <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> families erglm
+supports.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">biomarker_change</span> <span class="op">~</span> <span class="va">aucss</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="the-simulate-method">The <code>simulate()</code> method<a class="anchor" aria-label="anchor" href="#the-simulate-method"></a>
+</h2>
+<p>Calling <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> generates one or more replicate
+datasets. The number of replicates is set by <code>nsim</code>, and a
+<code>seed</code> can be supplied for reproducibility:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">1</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">sim1</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 300 × 7</span></span></span>
+<span><span class="co">#&gt;    dat_id sim_id     mu      val `coef_(Intercept)` coef_aucss aucss</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>      1      1 -<span style="color: #BB0000;">0.437</span> -<span style="color: #BB0000;">1.69</span>                 -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span>  673.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>      2      1  3.62   6.00                 -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span> <span style="text-decoration: underline;">2</span>806.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>      3      1 -<span style="color: #BB0000;">1.72</span>  -<span style="color: #BB0000;">1.22</span>                 -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span>    0 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>      4      1  0.505 -<span style="color: #BB0000;">0.722</span>                -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span> <span style="text-decoration: underline;">1</span>169.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>      5      1 -<span style="color: #BB0000;">0.999</span> -<span style="color: #BB0000;">0.270</span>                -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span>  377.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>      6      1 -<span style="color: #BB0000;">1.09</span>   0.009<span style="text-decoration: underline;">74</span>              -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span>  327.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>      7      1 -<span style="color: #BB0000;">1.72</span>  -<span style="color: #BB0000;">0.855</span>                -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span>    0 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>      8      1  0.579  0.122                -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span> <span style="text-decoration: underline;">1</span>208.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>      9      1 -<span style="color: #BB0000;">1.72</span>   0.545                -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span>    0 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     10      1 -<span style="color: #BB0000;">1.23</span>  -<span style="color: #BB0000;">0.651</span>                -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span>  254.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 290 more rows</span></span></span></code></pre></div>
+<div class="section level3">
+<h3 id="what-simulate-actually-does">What <code>simulate()</code> actually does<a class="anchor" aria-label="anchor" href="#what-simulate-actually-does"></a>
+</h3>
+<p>Generating a replicate involves two distinct sources of randomness,
+and <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> accounts for both:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Parameter uncertainty.</strong> A fresh parameter vector is
+drawn from the multivariate normal distribution implied by the estimates
+and their covariance matrix, using <code>coef(mod)</code> and
+<code>vcov(mod)</code>. This represents how uncertain we are about the
+fitted parameters themselves.</li>
+<li>
+<strong>Observation noise.</strong> Given that parameter draw, the
+expected response
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\mu_i</annotation></semantics></math>
+is evaluated at each observation’s exposure and covariates, and a
+response is generated around it. The noise model is family-appropriate:
+Bernoulli draws for <code>binomial</code>, Poisson draws for
+<code>poisson</code>, normal draws for <code>gaussian</code> (as here),
+and gamma draws for <code>Gamma</code>.</li>
+</ol>
+<p>Because both sources are included, the simulated <code>val</code>
+column behaves like a genuine new dataset drawn from the fitted model,
+not merely a noiseless prediction.</p>
+</div>
+<div class="section level3">
+<h3 id="the-output-format">The output format<a class="anchor" aria-label="anchor" href="#the-output-format"></a>
+</h3>
+<p>The result is a tidy, long-format tibble with
+<code>nsim</code><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math><code>nobs</code>
+rows:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "dat_id"           "sim_id"           "mu"               "val"             </span></span>
+<span><span class="co">#&gt; [5] "coef_(Intercept)" "coef_aucss"       "aucss"</span></span></code></pre></div>
+<p>The columns are:</p>
+<ul>
+<li>
+<code>dat_id</code> – an index identifying the original observation
+(row of the data).</li>
+<li>
+<code>sim_id</code> – which replicate the row belongs to
+(<code>1</code> to <code>nsim</code>).</li>
+<li>
+<code>mu</code> – the expected response (response scale) for that
+observation under the sampled parameters.</li>
+<li>
+<code>val</code> – the simulated response (the mean plus
+family-appropriate noise).</li>
+<li>the sampled coefficient values, prefixed <code>coef_*</code>
+(e.g. <code>coef_`(Intercept)`</code>, <code>coef_aucss</code>) to avoid
+colliding with predictor columns of the same name, repeated across all
+rows of a replicate – one parameter draw is used per replicate.</li>
+<li>the model’s predictor columns (<code>aucss</code>), carried along so
+you can group or plot by exposure and covariates.</li>
+</ul>
+<p>Requesting several replicates stacks them, and the sampled
+coefficients vary from one replicate to the next while staying constant
+within a replicate:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">sims</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 15000     7</span></span>
+<span></span>
+<span><span class="co"># one parameter draw per replicate</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">sims</span><span class="op">[</span><span class="va">sims</span><span class="op">$</span><span class="va">sim_id</span> <span class="op">&lt;=</span> <span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sim_id"</span>, <span class="st">"coef_(Intercept)"</span>, <span class="st">"coef_aucss"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 3</span></span></span>
+<span><span class="co">#&gt;   sim_id `coef_(Intercept)` coef_aucss</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      1              -<span style="color: #BB0000;">1.72</span>    0.001<span style="text-decoration: underline;">90</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>      2              -<span style="color: #BB0000;">1.74</span>    0.002<span style="text-decoration: underline;">02</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>      3              -<span style="color: #BB0000;">1.61</span>    0.001<span style="text-decoration: underline;">76</span></span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="a-predictive-check">A predictive check<a class="anchor" aria-label="anchor" href="#a-predictive-check"></a>
+</h3>
+<p>A natural use of these replicates is a <em>predictive check</em>: if
+the model is adequate, the distribution of simulated responses should
+resemble the distribution of the observed response. Overlaying the
+density of the observed <code>biomarker_change</code> on the densities
+of several simulated replicates gives a quick visual check:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sims</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">val</span>, group <span class="op">=</span> <span class="va">sim_id</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"density"</span>, colour <span class="op">=</span> <span class="st">"steelblue"</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">biomarker_change</span><span class="op">)</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">erglm_data</span>,</span>
+<span>    stat <span class="op">=</span> <span class="st">"density"</span>,</span>
+<span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    colour <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>    linewidth <span class="op">=</span> <span class="fl">1</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="st">"Biomarker change from baseline"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Density"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Observed (black) vs 50 simulated replicates (blue)"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="simulate_files/figure-html/ppc-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
+<p>The observed distribution sits comfortably within the spread of the
+simulated replicates, which is what we’d hope to see from a well-fitting
+model.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="the-erglm_fun-tool">The <code>erglm_fun()</code> tool<a class="anchor" aria-label="anchor" href="#the-erglm_fun-tool"></a>
+</h2>
+<p>Where <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> bundles parameter sampling and noise
+generation together, <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> exposes the deterministic
+core: the prediction function itself. It returns a function of two
+arguments, <code>param</code> and <code>data</code>, both of which
+default to the values used when the model was fitted:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_fun.html">erglm_fun</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># with no arguments, it reproduces the fitted values</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] -0.4013  3.5360 -1.6437  0.5142 -0.9473 -1.0400</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       1       2       3       4       5       6 </span></span>
+<span><span class="co">#&gt; -0.4013  3.5360 -1.6437  0.5142 -0.9473 -1.0400</span></span></code></pre></div>
+<p>Because you control both arguments, you can evaluate the model in
+situations the original fit never saw. Supplying <code>param</code> lets
+you ask counterfactual “what if the parameters were different?”
+questions – for example, setting the intercept to zero:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">alt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
+<span><span class="va">alt</span><span class="op">[</span><span class="st">"(Intercept)"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span>param <span class="op">=</span> <span class="va">alt</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1.2424 5.1797 0.0000 2.1579 0.6964 0.6037</span></span></code></pre></div>
+<p>Supplying <code>data</code> lets you evaluate the curve at exposures
+and covariate values of your choosing – for instance, tracing the
+exposure-response relationship over a grid of <code>aucss</code>
+values:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1000</span>, <span class="fl">2000</span>, <span class="fl">3000</span>, <span class="fl">4000</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">f</span><span class="op">(</span>data <span class="op">=</span> <span class="va">grid</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] -1.6437  0.2022  2.0480  3.8939  5.7397</span></span></code></pre></div>
+<p>By default <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> returns predictions on the
+response scale (<code>type = "response"</code>); pass
+<code>type = "link"</code> for the link scale.</p>
+<div class="section level3">
+<h3 id="building-a-custom-simulation">Building a custom simulation<a class="anchor" aria-label="anchor" href="#building-a-custom-simulation"></a>
+</h3>
+<p><code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> is the tool to reach for when
+<code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> doesn’t do exactly what you need and you want to
+assemble the pieces yourself. As an illustration, we can build an
+exposure-response curve with a parameter-uncertainty band by combining
+<code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> with a manual parameter draw – reproducing, at
+a lower level, the parameter-sampling step that <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code>
+performs internally.</p>
+<p>The recipe is: draw many parameter vectors from the estimated
+sampling distribution, evaluate the curve over an exposure grid for each
+draw, and summarise the resulting family of curves pointwise.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">n_draws</span> <span class="op">&lt;-</span> <span class="fl">500</span></span>
+<span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu">mvtnorm</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n_draws</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">draws</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">curve_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">erglm_data</span><span class="op">$</span><span class="va">aucss</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># evaluate the curve for every parameter draw</span></span>
+<span><span class="va">curves</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">draws</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="fu">f</span><span class="op">(</span>data <span class="op">=</span> <span class="va">curve_grid</span>, param <span class="op">=</span> <span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># summarise pointwise across draws</span></span>
+<span><span class="va">band</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  aucss <span class="op">=</span> <span class="va">curve_grid</span><span class="op">$</span><span class="va">aucss</span>,</span>
+<span>  fit <span class="op">=</span> <span class="fu">f</span><span class="op">(</span>data <span class="op">=</span> <span class="va">curve_grid</span><span class="op">)</span>,</span>
+<span>  lwr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">curves</span>, <span class="fl">1</span>, <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span>, probs <span class="op">=</span> <span class="fl">0.025</span><span class="op">)</span>,</span>
+<span>  upr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">curves</span>, <span class="fl">1</span>, <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span>, probs <span class="op">=</span> <span class="fl">0.975</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">band</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">aucss</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lwr</span>, ymax <span class="op">=</span> <span class="va">upr</span><span class="op">)</span>, fill <span class="op">=</span> <span class="st">"firebrick"</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">fit</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"firebrick"</span>, linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"AUCss"</span>, y <span class="op">=</span> <span class="st">"Mean biomarker change"</span>, subtitle <span class="op">=</span> <span class="st">"Point estimate with 95% parameter-uncertainty band"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="simulate_files/figure-html/custom-sim-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
+<p>This band reflects <em>only</em> parameter uncertainty, because we
+summarised the mean curve and never added residual noise – it’s the
+analogue of a confidence band. Adding a step that draws
+<code>rnorm(..., sd = sqrt(summary(mod)$dispersion))</code> around each
+evaluated mean would turn it into a prediction band that also captures
+observation noise, which is precisely the extra ingredient
+<code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> supplies for you. This is the essential
+trade-off between the two tools: <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> is convenient
+and complete, while <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> is transparent and fully
+under your control.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="the-same-tools-across-other-glm-families">The same tools across other <code>glm()</code> families<a class="anchor" aria-label="anchor" href="#the-same-tools-across-other-glm-families"></a>
+</h2>
+<p>Both tools work unchanged for the other families erglm supports; only
+the noise model and scale differ. For a binomial model, <code>mu</code>
+is the fitted probability and <code>val</code> is a 0/1 outcome drawn
+from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Bernoulli</mtext><mo stretchy="false" form="prefix">(</mo><mi>μ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Bernoulli}(\mu)</annotation></semantics></math>:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sim_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod_b</span>, nsim <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">sim_b</span><span class="op">$</span><span class="va">val</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0 1</span></span>
+<span></span>
+<span><span class="va">f_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_fun.html">erglm_fun</a></span><span class="op">(</span><span class="va">mod_b</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu">f_b</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.1234 1.0000</span></span></code></pre></div>
+<p>For a Poisson model, <code>val</code> is drawn from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Poisson</mtext><mo stretchy="false" form="prefix">(</mo><mi>μ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Poisson}(\mu)</annotation></semantics></math>
+and is always a non-negative integer:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae_count</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sim_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod_p</span>, nsim <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">sim_p</span><span class="op">$</span><span class="va">val</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">sim_p</span><span class="op">$</span><span class="va">val</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">sim_p</span><span class="op">$</span><span class="va">val</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>Everything else – custom parameter values, custom data grids, and
+building your own simulations on top of the prediction function –
+carries over exactly as in the gaussian case.</p>
+</div>
 <div class="section level2">
 <h2 id="visual-predictive-checks">Visual predictive checks<a class="anchor" aria-label="anchor" href="#visual-predictive-checks"></a>
 </h2>
-<p><code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> draws simulated response values that
-reflect both parameter uncertainty (by resampling coefficients from the
-model’s asymptotic sampling distribution) and, family-appropriately,
-residual noise around the resulting expectation:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae2</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
+<p><code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> is a thin, VPC-shaped wrapper around
+<code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code>: it drops the sampled coefficients and the
+<code>mu</code> column, and splices the simulated response back into a
+column with the response variable’s own name, producing the data frame
+shape expected by <code><a href="https://erplots.djnavarro.net/reference/er_vpc_plot.html" class="external-link">erplots::er_vpc_plot()</a></code>:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim</a></span><span class="op">(</span><span class="va">mod_b</span>, nsim <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
 <span><span class="va">sim</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6,000 × 5</span></span></span>
-<span><span class="co">#&gt;      ae2 aucss sex    row_id sim_id</span></span>
+<span><span class="co">#&gt;      ae1 aucss sex    row_id sim_id</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0  673. Male        1      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1  673. Male        1      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1 <span style="text-decoration: underline;">2</span>806. Female      2      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     0    0  Female      3      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1    0  Female      3      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1 <span style="text-decoration: underline;">1</span>169. Female      4      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     0  377. Male        5      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1  377. Male        5      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     0  327. Female      6      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     0    0  Male        7      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1 <span style="text-decoration: underline;">1</span>208. Female      8      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     0    0  Male        9      1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     0  254. Female     10      1</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5,990 more rows</span></span></span></code></pre></div>
-<p>The noise model is family-specific: Bernoulli draws for
-<code>binomial</code>, Poisson draws for <code>poisson</code>, normal
-draws for <code>gaussian</code>, and gamma draws for <code>Gamma</code>.
-For example, with a Poisson response:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mod_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae_count</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">sim_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim</a></span><span class="op">(</span><span class="va">mod_pois</span>, nsim <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
-<span><span class="va">sim_pois</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6,000 × 5</span></span></span>
-<span><span class="co">#&gt;    ae_count aucss sex    row_id sim_id</span></span>
-<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        2  673. Male        1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>       11 <span style="text-decoration: underline;">2</span>806. Female      2      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        0    0  Female      3      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        0 <span style="text-decoration: underline;">1</span>169. Female      4      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        0  377. Male        5      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        0  327. Female      6      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        0    0  Male        7      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        0 <span style="text-decoration: underline;">1</span>208. Female      8      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1    0  Male        9      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        0  254. Female     10      1</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5,990 more rows</span></span></span></code></pre></div>
-<p>Other <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> families aren’t currently supported by
-<code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> and will raise an informative error rather
-than silently falling back to an expectation-only draw.</p>
+<p>Reach for <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> when you want the full simulation
+detail (sampled parameters, expected and simulated response); reach for
+<code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> when you just want a VPC-ready data set to
+hand to a plotting function.</p>
 </div>
-  </main>
+<div class="section level2">
+<h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
+</h2>
+<ul>
+<li>Both <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> and <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code>’s
+uncertainty workflows draw parameters with <strong>mvtnorm</strong>,
+which must be installed.</li>
+<li>
+<code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> captures two sources of variability
+(parameter uncertainty and observation noise); a band built from
+<code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> captures only whatever you choose to include,
+so decide deliberately whether you want a confidence-style band (means
+only) or a prediction-style band (means plus residual noise).</li>
+<li>For a quick analytic interval on the mean, prefer
+<code><a href="../reference/erglm_predict.html">erglm_predict()</a></code> or
+<code>predict(..., se.fit = TRUE)</code>, described in the modelling and
+methods articles. Reach for <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> and
+<code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> when you need replicate datasets or bespoke
+simulation logic.</li>
+<li>Other <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> families are not currently supported by
+<code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code>/<code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> and will raise an
+informative error rather than silently falling back to an
+expectation-only draw.</li>
+</ul>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

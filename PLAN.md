@@ -56,6 +56,93 @@ article. This needs a follow-up PR *in that repo*; it will break once
 `erglm` is published under its new name, since `erlr` will no longer be
 findable. Tracked here only as a reminder — no erglm-side action needed.
 
+## Done: harmonise with emaxnls; fix stale pkgdown site; dedicated SCM/simulation vignettes
+
+Completed across a few sessions; summary:
+
+**API harmonisation with the companion `emaxnls` package** (see
+AGENTS.md for the detailed rationale of what’s genuinely shared vs.
+genuinely different between the two packages):
+
+- Added
+  [`simulate.erglm_model()`](https://erglm.djnavarro.net/reference/simulate.erglm_model.md)
+  (`R/erglm-simulate.R`), a
+  [`stats::simulate()`](https://rdrr.io/r/stats/simulate.html) S3 method
+  modelled on emaxnls’s
+  [`simulate()`](https://rdrr.io/r/stats/simulate.html) output shape
+  (`dat_id`/`sim_id`/`mu`/`val` plus sampled `coef_*` columns and the
+  model’s predictor columns).
+- Renamed `erglm_simulator()` to
+  [`erglm_fun()`](https://erglm.djnavarro.net/reference/erglm_fun.md)
+  (clean break, no deprecated alias, consistent with the earlier `erlr`
+  → `erglm` precedent), matching emaxnls’s `emax_fun()`, and gave the
+  returned function default `param`/`data` arguments
+  (`coef(object)`/`object$data`) so `erglm_fun(mod)()` alone reproduces
+  the fitted model, mirroring `emax_fun()`’s zero-argument ergonomics.
+- Refactored
+  [`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
+  into a thin wrapper around
+  [`simulate()`](https://rdrr.io/r/stats/simulate.html), removing
+  duplicated parameter-sampling/response-noise logic; the shared
+  unsupported-family error message (`.erglm_draw_response()` in
+  `R/erglm-family.R`) was generalised since it’s now reachable from both
+  callers.
+- Exported the previously-internal `.erglm_add_term()`/
+  `.erglm_remove_term()` as public
+  [`erglm_add_term()`](https://erglm.djnavarro.net/reference/erglm_term.md)/
+  [`erglm_remove_term()`](https://erglm.djnavarro.net/reference/erglm_term.md),
+  matching emaxnls’s `emax_add_term()`/ `emax_remove_term()` – while
+  keeping the genuine, documented structural difference (erglm’s terms
+  are one-sided formulas like `~ sex`; emaxnls’s are two-sided and
+  parameter-attached, like `E0 ~ AGE`, since only emaxnls has structural
+  parameters to attach covariates to).
+
+**pkgdown site fix + vignette restructuring**, prompted by
+[`pkgdown::build_site()`](https://pkgdown.r-lib.org/reference/build_site.html)
+failing because `_pkgdown.yml` had gone stale relative to the API
+changes above:
+
+- Fixed `_pkgdown.yml`’s `reference:` index: renamed the
+  `erglm_simulator` entry to `erglm_fun`, added the missing
+  `erglm_term`, `simulate.erglm_model`, and `invlogit` topics, and
+  restructured the sections to mirror emaxnls’s own layout (`Build` /
+  `Covariate selection` / `Simulate` / `Other`).
+- Split stepwise covariate modelling out of `model.Rmd` into its own
+  article, `vignettes/articles/scm.Rmd`, modelled on emaxnls’s
+  `stepwise-covariate-modelling.Rmd`: building blocks
+  ([`erglm_add_term()`](https://erglm.djnavarro.net/reference/erglm_term.md)/[`erglm_remove_term()`](https://erglm.djnavarro.net/reference/erglm_term.md)),
+  setting up a search, forward addition and backward elimination
+  (demonstrated separately, since `erglm_data`’s true covariate effects
+  turn out too weak to survive the default forward threshold once
+  `aucss` is in the model – a saturated-model backward-elimination
+  example was used instead to show the mechanics doing real,
+  multi-iteration work), the audit log
+  ([`erglm_scm_history()`](https://erglm.djnavarro.net/reference/erglm_scm.md)),
+  and generalisation across [`glm()`](https://rdrr.io/r/stats/glm.html)
+  families.
+- Expanded `vignettes/articles/simulate.Rmd` (previously a ~35-line stub
+  covering only
+  [`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md))
+  to also cover [`simulate()`](https://rdrr.io/r/stats/simulate.html)
+  and
+  [`erglm_fun()`](https://erglm.djnavarro.net/reference/erglm_fun.md),
+  modelled on emaxnls’s `simulating-from-emax-models.Rmd`: output
+  format, a predictive-check density plot,
+  [`erglm_fun()`](https://erglm.djnavarro.net/reference/erglm_fun.md) as
+  the deterministic building block (zero-argument default,
+  counterfactual `param`, custom `data` grids), a hand-rolled
+  parameter-uncertainty band, and generalisation across families. This
+  needed adding `ggplot2` to `Suggests` (vignette-only; see AGENTS.md
+  for why this doesn’t contradict “no plotting code”).
+- `_pkgdown.yml`’s `articles:` list updated to include the new `scm`
+  article.
+- Verified
+  [`pkgdown::check_pkgdown()`](https://pkgdown.r-lib.org/reference/check_pkgdown.html)
+  and a full `build_site()`/ `build_articles()` pass cleanly end to end
+  (see AGENTS.md for a note on a corrupt-lazy-load-database gotcha hit
+  and fixed along the way – an installed-library staleness issue, not a
+  content bug).
+
 ## Next initiative: document `glm`/`lm` method inheritance
 
 ### Motivation

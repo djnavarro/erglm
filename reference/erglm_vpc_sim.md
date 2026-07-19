@@ -31,19 +31,25 @@ variable replaced by its simulated value under parameter uncertainty.
 
 ## Details
 
-For each replicate, parameter uncertainty is reflected by sampling
-coefficients from the model's asymptotic sampling distribution and
-computing the expected response at those coefficients;
+A thin, VPC-shaped wrapper around
+[`simulate.erglm_model()`](https://erglm.djnavarro.net/reference/simulate.erglm_model.md)
+(i.e. `simulate(object, ...)`): parameter uncertainty is reflected by
+sampling coefficients from the model's asymptotic sampling distribution
+and computing the expected response at those coefficients;
 family-appropriate residual noise is then added on top of that
 expectation to produce a full predictive draw (Bernoulli draws for
 `binomial`, Poisson draws for `poisson`, normal draws for `gaussian`,
 gamma draws for `Gamma`). The dispersion parameter used for that noise
 is a single point estimate (`summary(object)$dispersion`), not resampled
 per replicate. Other [`glm()`](https://rdrr.io/r/stats/glm.html)
-families are not currently supported and will raise an error. To
-visualise the result (e.g. as a VPC-style plot comparing observed and
-simulated response rates), see
-[`erplots::er_vpc_plot()`](https://erplots.djnavarro.net/reference/er_vpc_plot.html).
+families are not currently supported and will raise an error. Unlike
+[`simulate()`](https://rdrr.io/r/stats/simulate.html), the sampled
+coefficients and the expected response (`mu`) are dropped, and the
+simulated response (`val`) is spliced back into the response column's
+original name – this is the data frame shape expected by
+[`erplots::er_vpc_plot()`](https://erplots.djnavarro.net/reference/er_vpc_plot.html)
+for visualising the result (e.g. as a VPC-style plot comparing observed
+and simulated response rates).
 
 ## Examples
 
@@ -55,33 +61,33 @@ sim
 #> # A tibble: 30,000 × 5
 #>      ae2 aucss sex    row_id sim_id
 #>    <int> <dbl> <fct>   <int>  <int>
-#>  1     0  673. Male        1      1
+#>  1     1  673. Male        1      1
 #>  2     1 2806. Female      2      1
 #>  3     0    0  Female      3      1
 #>  4     1 1169. Female      4      1
 #>  5     0  377. Male        5      1
 #>  6     0  327. Female      6      1
 #>  7     0    0  Male        7      1
-#>  8     0 1208. Female      8      1
+#>  8     1 1208. Female      8      1
 #>  9     0    0  Male        9      1
 #> 10     0  254. Female     10      1
 #> # ℹ 29,990 more rows
 
 mod_pois <- erglm_model(ae_count ~ aucss + sex, erglm_data, family = poisson())
 erglm_vpc_sim(mod_pois)
-#> Using seed = 9053
+#> Using seed = 1484
 #> # A tibble: 30,000 × 5
 #>    ae_count aucss sex    row_id sim_id
 #>       <int> <dbl> <fct>   <int>  <int>
-#>  1        0  673. Male        1      1
-#>  2        5 2806. Female      2      1
-#>  3        1    0  Female      3      1
+#>  1        1  673. Male        1      1
+#>  2        7 2806. Female      2      1
+#>  3        0    0  Female      3      1
 #>  4        1 1169. Female      4      1
-#>  5        1  377. Male        5      1
+#>  5        0  377. Male        5      1
 #>  6        0  327. Female      6      1
 #>  7        0    0  Male        7      1
-#>  8        1 1208. Female      8      1
-#>  9        1    0  Male        9      1
+#>  8        0 1208. Female      8      1
+#>  9        0    0  Male        9      1
 #> 10        1  254. Female     10      1
 #> # ℹ 29,990 more rows
 ```

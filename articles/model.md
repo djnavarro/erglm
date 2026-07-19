@@ -123,52 +123,10 @@ pred
 #> 16  1500    6.45    0.844    0.998    0.995    0.999
 ```
 
-## Stepwise covariate modelling
-
-There are two functions that control SCM regression,
-[`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
-and
-[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md):
-
-``` r
-
-base_mod <- erglm_model(formula = ae1 ~ aucss, data = erglm_data, family = binomial())
-candidates <- c("sex", "dose", "weight", "age")
-
-final_mod <- base_mod |> 
-  erglm_scm_forward(candidates, threshold = 0.01, seed = 3425) |> 
-  erglm_scm_backward(candidates, threshold = 0.001, seed = 9821)
-
-final_mod
-#> 
-#> Call:  stats::glm(formula = formula, family = family, data = data)
-#> 
-#> Coefficients:
-#> (Intercept)        aucss  
-#>   -1.791383     0.005497  
-#> 
-#> Degrees of Freedom: 299 Total (i.e. Null);  298 Residual
-#> Null Deviance:       402.1 
-#> Residual Deviance: 193.4     AIC: 197.4
-```
-
-To extract the log, use
-[`erglm_scm_history()`](https://erglm.djnavarro.net/reference/erglm_scm.md):
-
-``` r
-
-erglm_scm_history(final_mod)
-#> # A tibble: 5 × 11
-#>   iteration attempt step       action term_tested model_tested   model_converged
-#>       <int>   <int> <chr>      <chr>  <chr>       <chr>          <lgl>          
-#> 1         0       0 base model NA     NA          ae1 ~ aucss    TRUE           
-#> 2         1       1 forward    add    ~sex        ae1 ~ aucss +… TRUE           
-#> 3         1       2 forward    add    ~weight     ae1 ~ aucss +… TRUE           
-#> 4         1       3 forward    add    ~age        ae1 ~ aucss +… TRUE           
-#> 5         1       4 forward    add    ~dose       ae1 ~ aucss +… TRUE           
-#> # ℹ 4 more variables: term_p_value <dbl>, model_aic <dbl>, model_bic <dbl>,
-#> #   model_updated <int>
-```
+Choosing which covariates belong in the model – stepwise covariate
+modelling with
+[`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
+– is covered in its own article, “Stepwise covariate modelling”.
 
 ## Other `glm()` families
 
@@ -194,8 +152,7 @@ mod_pois
 ```
 
 [`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md)
-and
-[`erglm_simulator()`](https://erglm.djnavarro.net/reference/erglm_simulator.md)
+and [`erglm_fun()`](https://erglm.djnavarro.net/reference/erglm_fun.md)
 work unchanged, since both operate on the link scale generically via
 `stats::family(object)$linkinv`:
 
@@ -215,9 +172,5 @@ mod_pois |>
 #> 7  3000 Female    2.23   0.0841    9.29     7.88    11.0
 ```
 
-Stepwise covariate modelling also generalises: by default
-[`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
-pick a likelihood-ratio chi-squared test for `poisson` (as here) and
-`binomial` models, and an F-test for `gaussian`/`Gamma` models, matching
-[`stats::anova()`](https://rdrr.io/r/stats/anova.html)’s own `test`
-argument. This can be overridden with the `test` argument if needed.
+Stepwise covariate modelling also generalises across families – see the
+“Stepwise covariate modelling” article for details.
