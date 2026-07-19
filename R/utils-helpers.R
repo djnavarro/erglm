@@ -14,21 +14,30 @@
 
 # simple helpers ----------------------------------------------------------
 
-#' Logit and inverse logit functions
+#' Link and inverse-link functions for a fitted model
 #'
-#' @param x Numeric vector
-#' @returns Numeric vector
+#' Every `glm()` family already carries its link and inverse-link
+#' functions (`stats::family(mod)$linkfun` / `stats::family(mod)$linkinv`),
+#' but many users don't realise these are available for the taking.
+#' `erglm_link()` and `erglm_invlink()` are thin, discoverable wrappers
+#' around them: `erglm_link()` maps the response scale to the linear
+#' predictor scale, and `erglm_invlink()` maps the linear predictor
+#' scale back to the response scale.
+#'
+#' @param mod A fitted model, typically an `erglm_model`/`glm` object.
+#' @returns A function of one numeric-vector argument.
 #' @examples
-#' logit((1:9)/10)
-#' invlogit(-3:3)
-#' logit(invlogit(-3:3))
-#' @name logit
+#' mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+#' erglm_link(mod)(0.5)
+#' erglm_invlink(mod)(0)
+#' erglm_link(mod)(erglm_invlink(mod)(-2:2))
+#' @name erglm_link
 NULL
 
 #' @export
-#' @rdname logit
-logit <- function(x) log(x / (1-x))
+#' @rdname erglm_link
+erglm_link <- function(mod) stats::family(mod)$linkfun
 
 #' @export
-#' @rdname logit
-invlogit <- function(x) 1 / (1 + exp(-x))
+#' @rdname erglm_link
+erglm_invlink <- function(mod) stats::family(mod)$linkinv

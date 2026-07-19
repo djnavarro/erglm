@@ -116,6 +116,37 @@ relative to the API changes above:
   on a corrupt-lazy-load-database gotcha hit and fixed along the way --
   an installed-library staleness issue, not a content bug).
 
+## Done: generalise `logit`/`invlogit` into `erglm_link()`/`erglm_invlink()`
+
+Completed in one session. `logit()`/`invlogit()` were leftovers from the
+pre-generalisation, binomial-only `erlr` days -- hardcoded logit-scale
+helpers that no longer matched a package supporting arbitrary `glm()`
+families. Every `glm()` family already carries its own link/inverse-link
+functions (`stats::family(mod)$linkfun`/`$linkinv`), so:
+
+- Replaced `logit()`/`invlogit()` in `R/utils-helpers.R` with
+  `erglm_link()`/`erglm_invlink()`, thin family-generic wrappers that
+  take a fitted model and return `stats::family(mod)$linkfun`/
+  `$linkinv` respectively -- discoverability helpers for users who
+  don't realise these are available directly from the family object.
+  Another clean-break rename, no deprecated aliases (same rationale as
+  `erlr` → `erglm` and `erglm_simulator()` → `erglm_fun()` above).
+- Updated the two internal call sites: `R/erglm-data.R`'s
+  `.make_erglm_data()` generator (which used `logit()` for a
+  latent-logistic Bernoulli draw) now uses base R's `stats::qlogis()`
+  instead; a `test-erglm-core.R` assertion now uses `erglm_link(mod1)`.
+  `erglm_data` itself (the shipped, pre-generated dataset) is
+  unaffected, since it isn't rebuilt from this code at load time.
+- Regenerated `NAMESPACE`/`man/` via `devtools::document()`;
+  `_pkgdown.yml`'s `Other` section now lists `erglm_link`/
+  `erglm_invlink` instead of `logit`/`invlogit` (superseding the
+  `invlogit` topic mentioned in the harmonisation section above).
+- Added a short link-scale/response-scale conversion example to
+  `vignettes/articles/model.Rmd`, alongside the existing
+  `erglm_predict()` discussion of `fit_link`/`fit_resp`.
+- `AGENTS.md` updated to document the rename under the
+  `R/utils-helpers.R` structure bullet.
+
 ## Next initiative: document `glm`/`lm` method inheritance
 
 ### Motivation

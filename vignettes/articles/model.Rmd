@@ -45,6 +45,13 @@ pred <- mod |>
 pred
 ```
 
+`pred` reports both the link-scale (`fit_link`) and response-scale (`fit_resp`) predictions. If you need to move between these two scales yourself -- e.g. to transform a raw response-scale value onto the link scale -- `erglm_link()` and `erglm_invlink()` extract the relevant functions straight from the model's `glm()` family:
+
+```{r link-1}
+erglm_link(mod)(0.5)    # response scale -> link scale
+erglm_invlink(mod)(0)   # link scale -> response scale
+```
+
 The confidence level can be adjusted using the `conf_level` argument
 
 ```{r predict-2}

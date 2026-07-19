@@ -113,7 +113,13 @@ fleshing out the `erglm.Rmd` "Getting Started" stub (see PLAN.md).
 - `R/utils-helpers.R`, `R/utils-global.R` -- small internal helpers and
   `globalVariables()` declarations for NSE. `.as_erglm()` records the
   fitted model's actual family (`stats::family(mod)$family`) in
-  `mod$erglm$type`.
+  `mod$erglm$type`. `R/utils-helpers.R` also exports `erglm_link()` /
+  `erglm_invlink()`, thin discoverable wrappers around a fitted model's
+  `stats::family(mod)$linkfun` / `$linkinv` (link scale <-> response
+  scale). These replaced the earlier binomial-only `logit()`/`invlogit()`
+  helpers -- another clean-break rename (no deprecated aliases, same
+  rationale as the `erlr` -> `erglm` rename above) once the package
+  generalised beyond binomial families.
 
 ## Development workflow
 

@@ -33,8 +33,8 @@
           cmaxss = (exp(log(aucss/10) + stats::rnorm(n)/3) + stats::rnorm(n)) |> 
             (\(x) dplyr::if_else(dose == 0, 0, x))() |> 
             round(digits = 3),
-          ae1 = as.numeric(logit(stats::runif(n)) < aucss/200 - 2 + 1 * as.numeric(sex=="Female")),
-          ae2 = as.numeric(logit(stats::runif(n)) < aucss/500 - 2.0),
+          ae1 = as.numeric(stats::qlogis(stats::runif(n)) < aucss/200 - 2 + 1 * as.numeric(sex=="Female")),
+          ae2 = as.numeric(stats::qlogis(stats::runif(n)) < aucss/500 - 2.0),
         ) |>
         # additional non-binary responses, for demonstrating/testing
         # poisson, gaussian, and Gamma families -- appended after the

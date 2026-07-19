@@ -38,7 +38,8 @@ test_that("erglm_fun works", {
   int1 <- par1["(Intercept)"]
   par2["(Intercept)"] <- 0
   p5 <- mod1_fun(param = par2, data = erglm_data)
-  expect_equal(logit(p1), logit(p5) + int1)
+  link1 <- erglm_link(mod1)
+  expect_equal(link1(p1), link1(p5) + int1)
   
 })
 
