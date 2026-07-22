@@ -155,7 +155,7 @@ erglm_fun <- function(object) {
 .erglm_simulate_draws <- function(object, newdata, nsim = 100, seed = NULL) {
   if (is.null(seed)) {
     seed <- .pick_seed()
-    rlang::inform(paste("Using seed =", seed))
+    rlang::inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))
   }
   fn <- erglm_fun(object)
   withr::with_seed(

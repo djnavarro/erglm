@@ -70,7 +70,7 @@ simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
 .erglm_resample <- function(mod, nsim, seed = NULL) {
   if (is.null(seed)) {
     seed <- .pick_seed()
-    rlang::inform(paste("Using seed =", seed))
+    rlang::inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))
   }
 
   family_name <- stats::family(mod)$family

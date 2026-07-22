@@ -60,7 +60,6 @@ erglm_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto"
   test <- match.arg(test)
   if (is.null(seed)) {
     seed <- .pick_seed()
-    rlang::inform(paste("Using seed =", seed))
   }
   withr::with_seed(
     seed = seed,
@@ -100,7 +99,6 @@ erglm_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("aut
   test <- match.arg(test)
   if (is.null(seed)) {
     seed <- .pick_seed()
-    rlang::inform(paste("Using seed =", seed))
   }
   withr::with_seed(
     seed = seed,

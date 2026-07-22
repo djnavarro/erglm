@@ -79,7 +79,12 @@ Started" stub are all now done. One item remains: the companion
 - `R/erglm-core.R` -- `erglm_model()`, `erglm_predict()`, the
   `erglm_fun()` closure factory, and the shared
   `.erglm_simulate_draws()` helper (used by both `erglm_vpc_sim()` and,
-  via erplots, spaghetti-style plots).
+  via erplots, spaghetti-style plots). When `.erglm_simulate_draws()`
+  auto-picks a seed (`seed = NULL`, via `.pick_seed()`), it reports
+  this via `rlang::inform()` -- e.g. `"Using seed = 1234. Pass \`seed =
+  1234\` to reproduce this result."` -- because the seed genuinely
+  determines the random coefficient draws returned, unlike the SCM
+  functions below.
 - `R/erglm-scm.R` -- forward/backward stepwise covariate modelling
   (`erglm_scm_forward()`/`erglm_scm_backward()`/`erglm_scm_history()`),
   and the single-term `erglm_add_term()`/`erglm_remove_term()` helpers
@@ -92,11 +97,18 @@ Started" stub are all now done. One item remains: the companion
   p-value tie between competing candidates -- documented in the
   `@details` of `erglm_scm`'s shared roxygen block, with a seed-
   invariance regression test in `tests/testthat/test-erglm-scm.R`.
+  Because of that irrelevance, `erglm_scm_forward()`/
+  `erglm_scm_backward()` auto-pick a seed via `.pick_seed()` silently
+  when `seed = NULL` and do *not* report it via `rlang::inform()` --
+  unlike the simulation functions below, where the seed does matter.
 - `R/erglm-simulate.R` -- `simulate.erglm_model()`, the `stats::simulate()`
   S3 method (and its `.erglm_resample()` helper), modelled on emaxnls's
   `simulate()` output shape: one row per observation per replicate, with
   `dat_id`/`sim_id`, expected/simulated response (`mu`/`val`), sampled
-  `coef_*` columns, and the model's predictor columns.
+  `coef_*` columns, and the model's predictor columns. Like
+  `.erglm_simulate_draws()`, `.erglm_resample()` reports an auto-picked
+  seed via `rlang::inform()` (with the same "pass `seed = ...`" wording)
+  since it drives the actual simulated values in the output.
 - `R/erglm-vpc.R` -- `erglm_vpc_sim()`, a thin wrapper that calls
   `simulate.erglm_model()` internally and reshapes its output into a
   VPC-ready data set (splicing the simulated response back into the
