@@ -62,7 +62,7 @@ A data frame with columns:
 
 - ae_duration:
 
-  Continuous, strictly positive, right-skewed response (for Gamma
+  Continuous, strictly positive, right-skewed response (for gamma
   models)
 
 ## Details

@@ -4,7 +4,7 @@ erglm provides estimation tools for exposure-response models based on
 [`glm()`](https://rdrr.io/r/stats/glm.html). It’s mostly a convenience
 package: the core tools are thin wrappers around
 [`glm()`](https://rdrr.io/r/stats/glm.html) and its usual machinery,
-tested and supported for binomial, poisson, gaussian, and Gamma
+tested and supported for binomial, poisson, gaussian, and gamma
 families. This article is a quick tour of the main pieces; the other
 articles go into more depth on each.
 

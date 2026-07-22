@@ -34,7 +34,7 @@ or data (e.g., for VPCs or other counterfactual simulation scenarios).
 Uses `stats::family(object)$linkinv`, so this works for any
 [`glm()`](https://rdrr.io/r/stats/glm.html) family, not just
 binomial/logistic models; tested for binomial, poisson, gaussian, and
-Gamma families. Named `erglm_fun()` for consistency with the companion
+gamma families. Named `erglm_fun()` for consistency with the companion
 `emaxnls` package's `emax_fun()`, which serves the same purpose for
 `emaxnls`/`emaxlogistic` models.
 

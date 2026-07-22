@@ -44,7 +44,7 @@ erglm_scm_history(mod)
   (the default) picks a likelihood-ratio chi-squared test (`"Chisq"`)
   for families with known dispersion (binomial, poisson) and an F-test
   (`"F"`) for families with an estimated dispersion parameter (gaussian,
-  Gamma, inverse.gaussian, quasi\*), matching
+  gamma, inverse.gaussian, quasi\*), matching
   [`stats::anova()`](https://rdrr.io/r/stats/anova.html)'s own `test`
   argument. Set explicitly to override.
 
