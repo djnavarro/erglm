@@ -129,7 +129,16 @@ Started" stub are all now done. One item remains: the companion
   via `.onLoad()` (vendored `s3_register()` -- the standard pattern for
   optional cross-package S3 methods). `er_summary.erglm_model()`'s
   p-value extraction is family-generic (matches `Pr(>|z|)` or
-  `Pr(>|t|)` by pattern).
+  `Pr(>|t|)` by pattern). It also returns `coefficients` (one row per
+  model term, with Wald `conf_low`/`conf_high` computed the same way
+  `erglm_predict()` does -- a `qnorm()` z-score times the standard
+  error, not profile likelihood) and `glance` (model-level
+  goodness-of-fit: `n`, `df_residual`, `logLik`, `aic`, `bic`,
+  `deviance`, `r_squared`, `converged`), per erplots'
+  `er_model_interface` contract. `r_squared` is only populated (as
+  `1 - deviance/null.deviance`) for the classic OLS case -- gaussian
+  family with an identity link -- and is `NA` otherwise, since it isn't
+  a meaningful summary for other family/link combinations.
 - `R/utils-helpers.R`, `R/utils-global.R` -- small internal helpers and
   `globalVariables()` declarations for NSE. `.as_erglm()` records the
   fitted model's actual family (`stats::family(mod)$family`) in

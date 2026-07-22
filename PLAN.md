@@ -249,6 +249,43 @@ other, more detailed articles rather than duplicating them:
   companion `erplots` repo's own `erlr`-reference cleanup, which is out
   of scope for this repo.
 
+## Done: enrich `er_summary.erglm_model()` with `coefficients`/`glance`
+
+Completed in one session, prompted by erplots' `er_summary()` generic
+contract (`erplots::er_model_interface`) being fleshed out on the
+erplots side to specify `coefficients`/`glance` list elements alongside
+the existing `p_value`. erglm's method only ever returned `p_value`;
+this closes the gap now that the contract exists to implement against.
+
+- `er_summary.erglm_model()` (`R/er-methods.R`) now also returns:
+  - `coefficients`: a tibble with one row per model term (`term`,
+    `estimate`, `std_error`, `statistic`, `p_value`, `conf_low`,
+    `conf_high`). Confidence intervals are Wald (a `qnorm()` z-score
+    times the standard error), matching `erglm_predict()`'s existing
+    approach, rather than introducing profile-likelihood machinery.
+  - `glance`: a single-row goodness-of-fit tibble (`n`, `df_residual`,
+    `logLik`, `aic`, `bic`, `deviance`, `r_squared`, `converged`).
+    `r_squared` is only populated for the classic OLS case (gaussian
+    family, identity link, where `1 - deviance/null.deviance`
+    coincides with the usual $R^2$); `NA` for every other family/link
+    combination, since it isn't a meaningful summary there.
+  - Added a `conf_level` argument (default `0.95`) to control the new
+    confidence intervals; erplots' generic passes no such argument
+    today, so this only matters for direct calls.
+- Considered but declined adding a `label` column to `coefficients`
+  (erplots' contract allows one, falling back to `term`): erglm's terms
+  are already plain design-matrix column names (e.g. `aucss`,
+  `sexMale`), unlike emaxnls's opaque structural parameter codes
+  (`E0`/`Emax`/etc.) that genuinely benefit from a translated label.
+  Prettifying factor-dummy terms like `sexMale` would need fragile
+  heuristics against `model$xlevels`/`term.labels` that could misfire
+  on interactions or ambiguous variable names, so it was left out.
+- Extended `tests/testthat/test-er-methods.R` to assert the new fields'
+  presence/shape and the `r_squared` NA-vs-non-NA behaviour across a
+  binomial and a gaussian model.
+- No new package dependency needed -- `tibble` was already imported.
+- `AGENTS.md` updated under the `R/er-methods.R` structure bullet.
+
 ## Next initiative: CRAN submission prep
 
 ### Motivation

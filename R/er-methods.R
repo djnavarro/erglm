@@ -20,7 +20,7 @@ er_simulate.erglm_model <- function(model, newdata, nsim = 100, seed = NULL, ...
   .erglm_simulate_draws(object = model, newdata = newdata, nsim = nsim, seed = seed)
 }
 
-er_summary.erglm_model <- function(model, ...) {
+er_summary.erglm_model <- function(model, conf_level = 0.95, ...) {
   coefs <- summary(model)$coefficients
   if (nrow(coefs) < 2) return(NULL)
   # column is "Pr(>|z|)" for families with known dispersion (binomial,
@@ -28,7 +28,50 @@ er_summary.erglm_model <- function(model, ...) {
   # parameter (gaussian, gamma, inverse.gaussian, quasi*) -- match by
   # pattern rather than exact name.
   p_col <- grep("^Pr\\(", colnames(coefs))[1]
-  list(p_value = unname(coefs[2, p_col]))
+
+  # Wald intervals, matching erglm_predict()'s approach (a normal-quantile
+  # z-score applied to the standard error) rather than profile likelihood --
+  # cheap, and consistent with the rest of the package.
+  z_scale <- -stats::qnorm((1 - conf_level) / 2)
+  estimate <- unname(coefs[, 1])
+  std_error <- unname(coefs[, 2])
+
+  coefficients <- tibble::tibble(
+    term = rownames(coefs),
+    estimate = estimate,
+    std_error = std_error,
+    statistic = unname(coefs[, 3]),
+    p_value = unname(coefs[, p_col]),
+    conf_low = estimate - z_scale * std_error,
+    conf_high = estimate + z_scale * std_error,
+  )
+
+  # r_squared is only meaningful for the classic OLS case (gaussian family,
+  # identity link) -- 1 - deviance/null.deviance then coincides with the
+  # usual R^2. Left NA for every other family/link combination.
+  fam <- stats::family(model)
+  r_squared <- if (fam$family == "gaussian" && fam$link == "identity") {
+    1 - model$deviance / model$null.deviance
+  } else {
+    NA_real_
+  }
+
+  glance <- tibble::tibble(
+    n = stats::nobs(model),
+    df_residual = model$df.residual,
+    logLik = as.numeric(stats::logLik(model)),
+    aic = stats::AIC(model),
+    bic = stats::BIC(model),
+    deviance = model$deviance,
+    r_squared = r_squared,
+    converged = model$converged,
+  )
+
+  list(
+    p_value = unname(coefs[2, p_col]),
+    coefficients = coefficients,
+    glance = glance
+  )
 }
 
 .onLoad <- function(libname, pkgname) {

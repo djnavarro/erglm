@@ -12,7 +12,17 @@ test_that("erglm_model methods for erplots' generics are registered when erplots
 
   smm <- erplots::er_summary(mod)
   expect_true(is.list(smm))
-  expect_true("p_value" %in% names(smm))
+  expect_true(all(c("p_value", "coefficients", "glance") %in% names(smm)))
+
+  expect_s3_class(smm$coefficients, "data.frame")
+  expect_equal(nrow(smm$coefficients), 2L)
+  expect_true(all(c("term", "estimate", "std_error", "statistic", "p_value", "conf_low", "conf_high") %in% names(smm$coefficients)))
+
+  expect_s3_class(smm$glance, "data.frame")
+  expect_equal(nrow(smm$glance), 1L)
+  expect_true(all(c("n", "df_residual", "logLik", "aic", "bic", "deviance", "r_squared", "converged") %in% names(smm$glance)))
+  # binomial family/link isn't the OLS case, so r_squared isn't meaningful
+  expect_true(is.na(smm$glance$r_squared))
 })
 
 test_that("er_summary extracts p-values generically across dispersion parameterisations", {
@@ -22,6 +32,8 @@ test_that("er_summary extracts p-values generically across dispersion parameteri
   smm_gauss <- erplots::er_summary(mod_gauss)
   coefs <- summary(mod_gauss)$coefficients
   expect_equal(smm_gauss$p_value, unname(coefs[2, "Pr(>|t|)"]))
+  # gaussian + identity link is the OLS case, so r_squared is meaningful
+  expect_false(is.na(smm_gauss$glance$r_squared))
 
   mod_pois <- erglm_model(ae_count ~ aucss, erglm_data, family = poisson())
   smm_pois <- erplots::er_summary(mod_pois)
