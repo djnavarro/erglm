@@ -56,7 +56,7 @@ and simulated response rates).
 ``` r
 mod <- erglm_model(ae2 ~ aucss + sex, erglm_data, family = binomial())
 sim <- erglm_vpc_sim(mod)
-#> Using seed = 7603
+#> Using seed = 7603. Pass `seed = 7603` to reproduce this result.
 sim
 #> # A tibble: 30,000 × 5
 #>      ae2 aucss sex    row_id sim_id
@@ -75,7 +75,7 @@ sim
 
 mod_pois <- erglm_model(ae_count ~ aucss + sex, erglm_data, family = poisson())
 erglm_vpc_sim(mod_pois)
-#> Using seed = 1484
+#> Using seed = 1484. Pass `seed = 1484` to reproduce this result.
 #> # A tibble: 30,000 × 5
 #>    ae_count aucss sex    row_id sim_id
 #>       <int> <dbl> <fct>   <int>  <int>

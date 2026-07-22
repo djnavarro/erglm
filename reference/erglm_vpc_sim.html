@@ -104,7 +104,7 @@ response rates).</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae2</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">erglm_vpc_sim</span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Using seed = 7603</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using seed = 7603. Pass `seed = 7603` to reproduce this result.</span>
 <span class="r-in"><span><span class="va">sim</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 30,000 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      ae2 aucss sex    row_id sim_id</span>
@@ -123,7 +123,7 @@ response rates).</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">mod_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae_count</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">erglm_vpc_sim</span><span class="op">(</span><span class="va">mod_pois</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Using seed = 1484</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using seed = 1484. Pass `seed = 1484` to reproduce this result.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 30,000 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    ae_count aucss sex    row_id sim_id</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>

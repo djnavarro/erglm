@@ -94,7 +94,6 @@ exhaustively tested every step).
 ``` r
 mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 mod1 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"))
-#> Using seed = 6292
 erglm_scm_history(mod1)
 #> # A tibble: 3 × 11
 #>   iteration attempt step       action term_tested model_tested   model_converged
@@ -107,7 +106,6 @@ erglm_scm_history(mod1)
 
 mod2 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 mod3 <- erglm_scm_backward(mod2, candidates = c("sex", "dose"))
-#> Using seed = 6526
 erglm_scm_history(mod3)
 #> # A tibble: 4 × 11
 #>   iteration attempt step       action term_tested model_tested   model_converged
