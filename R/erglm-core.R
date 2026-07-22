@@ -108,7 +108,7 @@ erglm_predict <- function(object, newdata = NULL, conf_level = .95) {
 #' other counterfactual simulation scenarios). Uses
 #' `stats::family(object)$linkinv`, so this works for any `glm()`
 #' family, not just binomial/logistic models; tested for
-#' binomial, poisson, gaussian, and Gamma families. Named `erglm_fun()`
+#' binomial, poisson, gaussian, and gamma families. Named `erglm_fun()`
 #' for consistency with the companion `emaxnls` package's `emax_fun()`,
 #' which serves the same purpose for `emaxnls`/`emaxlogistic` models.
 #'  

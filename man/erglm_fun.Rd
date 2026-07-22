@@ -26,7 +26,7 @@ user-specified parameters or data (e.g., for VPCs or
 other counterfactual simulation scenarios). Uses
 \code{stats::family(object)$linkinv}, so this works for any \code{glm()}
 family, not just binomial/logistic models; tested for
-binomial, poisson, gaussian, and Gamma families. Named \code{erglm_fun()}
+binomial, poisson, gaussian, and gamma families. Named \code{erglm_fun()}
 for consistency with the companion \code{emaxnls} package's \code{emax_fun()},
 which serves the same purpose for \code{emaxnls}/\code{emaxlogistic} models.
 }

@@ -10,7 +10,7 @@ built on the single-term `erglm_add_term()`/`erglm_remove_term()`), and
 simulation (`erglm_fun()`, `simulate.erglm_model()`, `erglm_vpc_sim()`).
 `erglm_model()` takes a `family` argument,
 defaulting to `stats::gaussian()` (matching `glm()`'s own default);
-binomial, poisson, gaussian, and Gamma are tested and officially
+binomial, poisson, gaussian, and gamma are tested and officially
 supported end to end (fitting, prediction, SCM significance testing,
 and VPC simulation). Other `glm()` families work through the same
 generic mechanisms in `erglm_predict()`/`erglm_fun()` but aren't
@@ -117,13 +117,13 @@ Started" stub are all now done. One item remains: the companion
   VPC: `.erglm_default_test()` (picks `"Chisq"` vs `"F"` for
   `stats::anova()` based on the family's dispersion behaviour) and
   `.erglm_draw_response()` (family-specific residual noise draws for
-  VPC simulation; binomial/poisson/gaussian/Gamma only, errors
+  VPC simulation; binomial/poisson/gaussian/gamma only, errors
   informatively otherwise).
 - `R/erglm-data.R` -- the synthetic `erglm_data` example dataset. Has
   binary (`ae1`, `ae2`), count (`ae_count`), continuous
   (`biomarker_change`), and positive/right-skewed continuous
   (`ae_duration`) response columns, for demonstrating
-  binomial/poisson/gaussian/Gamma models respectively.
+  binomial/poisson/gaussian/gamma models respectively.
 - `R/er-methods.R` -- erplots interoperability: S3 methods for
   `er_predict()`/`er_simulate()`/`er_summary()`, plus lazy registration
   via `.onLoad()` (vendored `s3_register()` -- the standard pattern for

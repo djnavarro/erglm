@@ -36,7 +36,7 @@ erglm_scm_history(mod)
 models. \code{"auto"} (the default) picks a likelihood-ratio chi-squared
 test (\code{"Chisq"}) for families with known dispersion (binomial,
 poisson) and an F-test (\code{"F"}) for families with an estimated
-dispersion parameter (gaussian, Gamma, inverse.gaussian, quasi*),
+dispersion parameter (gaussian, gamma, inverse.gaussian, quasi*),
 matching \code{stats::anova()}'s own \code{test} argument. Set explicitly to
 override.}
 

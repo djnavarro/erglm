@@ -37,7 +37,7 @@
           ae2 = as.numeric(stats::qlogis(stats::runif(n)) < aucss/500 - 2.0),
         ) |>
         # additional non-binary responses, for demonstrating/testing
-        # poisson, gaussian, and Gamma families -- appended after the
+        # poisson, gaussian, and gamma families -- appended after the
         # existing columns so their random draws don't perturb ae1/ae2
         # under the same seed.
         dplyr::mutate(
@@ -91,7 +91,7 @@
 #' \item{biomarker_change}{Continuous response, can be negative (for
 #' gaussian models)}
 #' \item{ae_duration}{Continuous, strictly positive, right-skewed
-#' response (for Gamma models)}
+#' response (for gamma models)}
 #' }
 #' @details
 #'

@@ -8,7 +8,7 @@
 #' models. `"auto"` (the default) picks a likelihood-ratio chi-squared
 #' test (`"Chisq"`) for families with known dispersion (binomial,
 #' poisson) and an F-test (`"F"`) for families with an estimated
-#' dispersion parameter (gaussian, Gamma, inverse.gaussian, quasi*),
+#' dispersion parameter (gaussian, gamma, inverse.gaussian, quasi*),
 #' matching `stats::anova()`'s own `test` argument. Set explicitly to
 #' override.
 #' @param seed Optional seed to control order of term tests

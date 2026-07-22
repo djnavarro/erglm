@@ -1,7 +1,7 @@
 
 # Family-dispatch helpers shared across SCM (R/erglm-scm.R) and response
 # simulation (R/erglm-simulate.R, R/erglm-vpc.R). Officially
-# tested/supported for binomial, poisson, gaussian, and Gamma; other
+# tested/supported for binomial, poisson, gaussian, and gamma; other
 # glm() families work through the same generic mechanisms elsewhere in
 # the package (erglm_predict(), erglm_fun()) but are not covered by
 # these helpers.
@@ -12,7 +12,7 @@
 # glm family: a likelihood-ratio chi-squared test is appropriate for
 # families with known dispersion (binomial, poisson); an F-test is the
 # standard choice for families with an estimated dispersion parameter
-# (gaussian, Gamma, inverse.gaussian, quasi*).
+# (gaussian, gamma, inverse.gaussian, quasi*).
 .erglm_default_test <- function(family_name) {
   if (family_name %in% c("binomial", "poisson")) return("Chisq")
   "F"

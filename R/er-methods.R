@@ -25,7 +25,7 @@ er_summary.erglm_model <- function(model, ...) {
   if (nrow(coefs) < 2) return(NULL)
   # column is "Pr(>|z|)" for families with known dispersion (binomial,
   # poisson) but "Pr(>|t|)" for families with an estimated dispersion
-  # parameter (gaussian, Gamma, inverse.gaussian, quasi*) -- match by
+  # parameter (gaussian, gamma, inverse.gaussian, quasi*) -- match by
   # pattern rather than exact name.
   p_col <- grep("^Pr\\(", colnames(coefs))[1]
   list(p_value = unname(coefs[2, p_col]))

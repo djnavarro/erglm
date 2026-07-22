@@ -21,7 +21,7 @@ A data frame with columns:
 \item{biomarker_change}{Continuous response, can be negative (for
 gaussian models)}
 \item{ae_duration}{Continuous, strictly positive, right-skewed
-response (for Gamma models)}
+response (for gamma models)}
 }
 }
 \usage{

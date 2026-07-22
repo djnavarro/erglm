@@ -15,7 +15,7 @@ Completed (see git history for the full diff; `4c663e7`, `c31a4ef`,
   families and renamed `erglm`.
 - `erglm_model()` takes a `family` argument, defaulting to
   `stats::gaussian()` (matching `glm()`'s own default). Binomial,
-  poisson, gaussian, and Gamma are tested and officially supported
+  poisson, gaussian, and gamma are tested and officially supported
   end to end (fitting, prediction, SCM significance testing, VPC
   simulation); other `glm()` families work through the same generic
   mechanisms but aren't covered by SCM's test selection or VPC's noise
@@ -31,7 +31,7 @@ Completed (see git history for the full diff; `4c663e7`, `c31a4ef`,
 - The example dataset (`erglm_data`, formerly `lr_data`) gained count
   (`ae_count`), continuous (`biomarker_change`), and right-skewed
   continuous (`ae_duration`) response columns alongside the original
-  binary ones, to exercise poisson/gaussian/Gamma.
+  binary ones, to exercise poisson/gaussian/gamma.
 - All exported names, the model class, internal helpers, and package
   name were renamed (`lr_*` → `erglm_*`, class `erlr_glm` →
   `erglm_model`). This was a clean break with no deprecated aliases,
