@@ -286,6 +286,47 @@ this closes the gap now that the contract exists to implement against.
 - No new package dependency needed -- `tibble` was already imported.
 - `AGENTS.md` updated under the `R/er-methods.R` structure bullet.
 
+## Done: remove `erglm_vpc_sim()`, superseded by `er_vpc_plot(model = ...)`
+
+Completed in one session, prompted by reconsidering whether
+`erglm_vpc_sim()` still earned its place now that erplots' own
+`er_simulate()` generic (and `.erglm_simulate_draws()` on the erglm
+side) gained a `sim_resp` column and erplots added
+`er_vpc_plot(model = ...)` as its preferred VPC entry point.
+
+- Confirmed the wrapper was genuinely orphaned: `er_vpc_plot(model =
+  mod)` now calls `er_simulate(model, ...)` internally and reads
+  `sim_resp` straight off `.erglm_simulate_draws()`'s output, so the
+  `sim`-shaped data frame `erglm_vpc_sim()` used to produce is no
+  longer needed for erglm models specifically (erplots' `sim=`
+  argument remains, but only as a fallback for models that don't
+  implement `er_simulate()`'s `sim_resp` extension).
+- Removed `R/erglm-vpc.R`, `tests/testthat/test-erglm-vpc.R`,
+  `man/erglm_vpc_sim.Rd`, and the `NAMESPACE` export; regenerated via
+  `devtools::document()`.
+- Updated every reference: `README.Rmd`/`README.md` (VPC section now
+  demonstrates `simulate()` directly and points to `er_vpc_plot(model
+  = ...)`), `vignettes/articles/simulate.Rmd` (dropped the "Visual
+  predictive checks" section's `erglm_vpc_sim()` example in favour of
+  pointing at `er_vpc_plot(model = ...)`), `vignettes/articles/erglm.Rmd`
+  (simulation teaser now uses `simulate()`), `_pkgdown.yml` (removed
+  the reference entry), and roxygen `@details`/inline comments in
+  `R/erglm-core.R`, `R/erglm-simulate.R`, and `R/erglm-family.R` that
+  mentioned `erglm_vpc_sim()`.
+- Verified `devtools::test()` (119 passing), `devtools::document()`
+  (no warnings), and `pkgdown::check_pkgdown()` (no problems) all pass
+  cleanly after the removal.
+- Clean break, no deprecated alias -- consistent with this package's
+  established convention (see the `erlr` -> `erglm` rename and
+  `erglm_simulator()` -> `erglm_fun()` rename above) and reasonable
+  here too, since the package predates any CRAN release.
+- `AGENTS.md` updated: removed `erglm_vpc_sim()` from the feature
+  summary and `R/erglm-vpc.R` structure bullet, and rewrote the
+  `sim_resp`-addition note to describe the full arc (widened
+  `er_simulate()` contract -> `er_vpc_plot(model = ...)` ->
+  `erglm_vpc_sim()` removal) now that it's resolved rather than
+  in-progress.
+
 ## Next initiative: CRAN submission prep
 
 ### Motivation
@@ -329,10 +370,26 @@ to prepare for a first CRAN submission.
    build and examples don't implicitly depend on it too (articles
    aren't shipped, so this mainly matters for `R/er-methods.R`'s
    lazy-registration path and any `\dontrun`/example code).
-4. **Roxygen/Rd completeness for CRAN.** Every exported function needs
-   a `@return`/`\value` tag (CRAN now enforces this) and a runnable
-   `@examples` block without gratuitous `\dontrun{}`. Needs an audit
-   pass across `R/erglm-core.R`, `R/erglm-scm.R`, `R/erglm-vpc.R`.
+4. ~~**Roxygen/Rd completeness for CRAN.**~~ Effectively done. Every
+   exported function needs a `@return`/`\value` tag (CRAN now enforces
+   this) and a runnable `@examples` block without gratuitous
+   `\dontrun{}`. `erglm_vpc_sim()`'s removal (see above) drops one of
+   the three files this item originally flagged for audit
+   (`R/erglm-vpc.R`); auditing the remaining two confirms all exported
+   topics already comply: `R/erglm-core.R` (`erglm_model()`,
+   `erglm_predict()`, `erglm_fun()`) and `R/erglm-scm.R`
+   (`erglm_scm_forward()`/`erglm_scm_backward()`/`erglm_scm_history()`
+   sharing one `@returns` via `@name erglm_scm`;
+   `erglm_add_term()`/`erglm_remove_term()` sharing one via `@name
+   erglm_term()`) each have a `@returns` and runnable `@examples`, as do
+   `simulate.erglm_model()` (`R/erglm-simulate.R`) and
+   `erglm_link()`/`erglm_invlink()` (`R/utils-helpers.R`, shared via
+   `@rdname erglm_link`). `erglm_data`'s dataset docs use `@format`
+   rather than `@returns`, which is the standard convention for data
+   objects and satisfies the same CRAN check. No `\dontrun{}` anywhere
+   in the package, and `devtools::check_man()` reports no issues.
+   Nothing further to do here short of the full `R CMD check` pass in
+   item 5, which will catch anything this manual audit missed.
 5. **Pre-submission checks.** Run and resolve findings from:
    `devtools::check(remote = TRUE, manual = TRUE)`,
    `devtools::spell_check()`, `urlchecker::url_check()`, and ideally
@@ -355,9 +412,12 @@ to prepare for a first CRAN submission.
 ### Suggested step ordering
 
 1. ~~Fix the `LICENSE.md` copyright holder mismatch (item 2).~~ Done.
-2. Write `NEWS.md` covering the `erlr` → `erglm` history (item 1).
-3. Audit roxygen `@return`/`@examples` coverage across all exported
-   functions (item 4).
+2. Write `NEWS.md` covering the `erlr` → `erglm` history (item 1) --
+   worth mentioning the `erglm_vpc_sim()` removal here too, alongside
+   the rename/generalisation, since it's a second user-visible breaking
+   change relative to any pre-CRAN `erlr`/early-`erglm` usage.
+3. ~~Audit roxygen `@return`/`@examples` coverage across all exported
+   functions (item 4).~~ Done -- see item 4 above.
 4. Decide the release version number (item 7) — needs user input.
 5. Run the full pre-submission check suite (item 5), including a
    check with `erplots` uninstalled (item 3), and fix anything it
@@ -365,6 +425,6 @@ to prepare for a first CRAN submission.
 6. Draft `cran-comments.md` (item 6) and do a final review pass before
    `devtools::release()`.
 
-This ordering isn't committed — steps 2–3 have no open design
-questions and could be done in any order or in parallel; step 4 blocks
-tagging a release but not the mechanical cleanup in 2–3.
+This ordering isn't committed — step 2 has no open design questions;
+step 4 blocks tagging a release but not the mechanical cleanup in
+step 2.

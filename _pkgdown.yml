@@ -18,7 +18,6 @@ reference:
 - contents:
   - erglm_fun
   - simulate.erglm_model
-  - erglm_vpc_sim
 - title: Other
   desc: Other functions and objects
 - contents:

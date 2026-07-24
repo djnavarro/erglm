@@ -70,12 +70,11 @@ treatment, including the forward/backward workflow and the audit log
 
 ## Simulation
 
-`simulate()` generates replicate datasets from a fitted model, and
-`erglm_vpc_sim()` reshapes those replicates into a data set ready for a
-visual predictive check:
+`simulate()` generates replicate datasets from a fitted model, capturing
+both parameter uncertainty and observation-level noise:
 
 ```{r simulate}
-erglm_vpc_sim(mod, nsim = 5, seed = 2048)
+simulate(mod, nsim = 5, seed = 2048)
 ```
 
 See the ["Simulation"](simulate.html) article for details, including the
@@ -98,7 +97,6 @@ tour of these.
   workflow in full.
 - ["Using base R model methods"](methods.html) -- the `glm`/`lm` methods
   that come for free.
-- ["Simulation"](simulate.html) -- `simulate()`, `erglm_fun()`, and
-  `erglm_vpc_sim()`.
+- ["Simulation"](simulate.html) -- `simulate()` and `erglm_fun()`.
 - the companion [erplots](https://github.com/djnavarro/erplots) package,
   for visualising exposure-response models fitted with erglm.

@@ -190,18 +190,11 @@ Everything else -- custom parameter values, custom data grids, and building your
 
 ## Visual predictive checks
 
-`erglm_vpc_sim()` is a thin, VPC-shaped wrapper around `simulate()`: it drops the sampled coefficients and the `mu` column, and splices the simulated response back into a column with the response variable's own name, producing the data frame shape expected by `erplots::er_vpc_plot()`:
-
-```{r vpc-1}
-sim <- erglm_vpc_sim(mod_b, nsim = 20, seed = 1234)
-sim
-```
-
-Reach for `simulate()` when you want the full simulation detail (sampled parameters, expected and simulated response); reach for `erglm_vpc_sim()` when you just want a VPC-ready data set to hand to a plotting function.
+For a VPC-style plot comparing observed and simulated response rates, see the companion `erplots` package's `er_vpc_plot()`. Passing a fitted erglm model directly (`er_vpc_plot(data, ..., model = mod_b)`) builds the necessary simulated replicates internally via `erplots::er_simulate()` -- which erglm implements on top of the same parameter-sampling/noise machinery `simulate()` uses -- so no separate erglm-side VPC helper is needed.
 
 ## Notes
 
 - Both `simulate()` and `erglm_fun()`'s uncertainty workflows draw parameters with **mvtnorm**, which must be installed.
 - `simulate()` captures two sources of variability (parameter uncertainty and observation noise); a band built from `erglm_fun()` captures only whatever you choose to include, so decide deliberately whether you want a confidence-style band (means only) or a prediction-style band (means plus residual noise).
 - For a quick analytic interval on the mean, prefer `erglm_predict()` or `predict(..., se.fit = TRUE)`, described in the modelling and methods articles. Reach for `simulate()` and `erglm_fun()` when you need replicate datasets or bespoke simulation logic.
-- Other `glm()` families are not currently supported by `simulate()`/`erglm_vpc_sim()` and will raise an informative error rather than silently falling back to an expectation-only draw.
+- Other `glm()` families are not currently supported by `simulate()` and will raise an informative error rather than silently falling back to an expectation-only draw.

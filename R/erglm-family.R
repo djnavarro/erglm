@@ -1,10 +1,9 @@
 
 # Family-dispatch helpers shared across SCM (R/erglm-scm.R) and response
-# simulation (R/erglm-simulate.R, R/erglm-vpc.R). Officially
-# tested/supported for binomial, poisson, gaussian, and gamma; other
-# glm() families work through the same generic mechanisms elsewhere in
-# the package (erglm_predict(), erglm_fun()) but are not covered by
-# these helpers.
+# simulation (R/erglm-simulate.R). Officially tested/supported for
+# binomial, poisson, gaussian, and gamma; other glm() families work
+# through the same generic mechanisms elsewhere in the package
+# (erglm_predict(), erglm_fun()) but are not covered by these helpers.
 
 .erglm_supported_response_families <- c("binomial", "poisson", "gaussian", "Gamma")
 
@@ -30,8 +29,8 @@
 # point estimate (e.g. from `summary(model)$dispersion`) applied to every
 # draw -- parameter uncertainty is already reflected in `fit` varying
 # across replicates, but dispersion uncertainty itself is not resampled.
-# Used by both `simulate.erglm_model()` and (via `simulate()`)
-# `erglm_vpc_sim()`.
+# Used by `simulate.erglm_model()` and `.erglm_simulate_draws()`
+# (the latter powering erplots' `er_simulate()` method).
 .erglm_draw_response <- function(family_name, fit, dispersion) {
   n <- length(fit)
   switch(
@@ -43,7 +42,7 @@
     rlang::abort(
       paste0(
         "erglm does not support simulating responses for family \"",
-        family_name, "\" (via simulate() or erglm_vpc_sim()). ",
+        family_name, "\" (via simulate() or er_simulate()). ",
         "Supported families are: ",
         paste(.erglm_supported_response_families, collapse = ", "), "."
       )

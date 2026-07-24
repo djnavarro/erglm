@@ -47,22 +47,19 @@ distribution implied by the model's variance-covariance matrix (via
 \code{mvtnorm::rmvnorm()}), evaluates the expected response at each sampled
 parameter vector using \code{\link[=erglm_fun]{erglm_fun()}}, then draws a simulated
 response at each prediction using family-appropriate residual noise
-(the same \code{.erglm_draw_response()} mechanism used by
-\code{\link[=erglm_vpc_sim]{erglm_vpc_sim()}}: Bernoulli draws for \code{binomial}, Poisson draws for
+(the same \code{.erglm_draw_response()} mechanism used elsewhere in the
+package: Bernoulli draws for \code{binomial}, Poisson draws for
 \code{poisson}, normal draws for \code{gaussian}, gamma draws for \code{Gamma}). The
 dispersion parameter used for that noise is a single point estimate
 (\code{summary(object)$dispersion}), not resampled per replicate. Other
 \code{glm()} families are not currently supported and will raise an
 informative error.
 
-\code{\link[=erglm_vpc_sim]{erglm_vpc_sim()}} is a thin wrapper around this method: it calls
-\code{simulate()} internally, then drops the sampled coefficients and \code{mu}
-and splices the simulated response (\code{val}) back into the response
-column's original name, to produce a VPC-ready data set. Use
-\code{simulate()} directly when you want the full simulation detail
-(sampled parameters, expected and simulated response, one row per
-observation per replicate); use \code{erglm_vpc_sim()} when you just want
-a VPC-shaped data set.
+For a VPC-style plot comparing observed and simulated response rates,
+see the companion \code{erplots} package's \code{er_vpc_plot()}, which can build
+its simulated replicates directly from a fitted model (\verb{model =}
+argument) via the same \code{.erglm_draw_response()} noise mechanism this
+method uses, without needing to call \code{simulate()} yourself.
 }
 \examples{
 mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())

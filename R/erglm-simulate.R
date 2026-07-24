@@ -20,22 +20,19 @@
 #' `mvtnorm::rmvnorm()`), evaluates the expected response at each sampled
 #' parameter vector using [erglm_fun()], then draws a simulated
 #' response at each prediction using family-appropriate residual noise
-#' (the same `.erglm_draw_response()` mechanism used by
-#' [erglm_vpc_sim()]: Bernoulli draws for `binomial`, Poisson draws for
+#' (the same `.erglm_draw_response()` mechanism used elsewhere in the
+#' package: Bernoulli draws for `binomial`, Poisson draws for
 #' `poisson`, normal draws for `gaussian`, gamma draws for `Gamma`). The
 #' dispersion parameter used for that noise is a single point estimate
 #' (`summary(object)$dispersion`), not resampled per replicate. Other
 #' `glm()` families are not currently supported and will raise an
 #' informative error.
 #'
-#' [erglm_vpc_sim()] is a thin wrapper around this method: it calls
-#' `simulate()` internally, then drops the sampled coefficients and `mu`
-#' and splices the simulated response (`val`) back into the response
-#' column's original name, to produce a VPC-ready data set. Use
-#' `simulate()` directly when you want the full simulation detail
-#' (sampled parameters, expected and simulated response, one row per
-#' observation per replicate); use `erglm_vpc_sim()` when you just want
-#' a VPC-shaped data set.
+#' For a VPC-style plot comparing observed and simulated response rates,
+#' see the companion `erplots` package's `er_vpc_plot()`, which can build
+#' its simulated replicates directly from a fitted model (`model =`
+#' argument) via the same `.erglm_draw_response()` noise mechanism this
+#' method uses, without needing to call `simulate()` yourself.
 #'
 #' @returns A tibble with one row per observation per simulated
 #' replicate, containing:
@@ -60,8 +57,7 @@ simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
   .erglm_resample(object, nsim = nsim, seed = seed)
 }
 
-# Shared resampling engine behind `simulate.erglm_model()` (and, via
-# that generic, `erglm_vpc_sim()`). Distinct from
+# Shared resampling engine behind `simulate.erglm_model()`. Distinct from
 # `.erglm_simulate_draws()` (used only by the erplots `er_simulate()`
 # method for spaghetti-style plots), which samples parameters/predictions
 # but leaves adding response noise to its caller: this helper does both

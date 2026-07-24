@@ -7,14 +7,14 @@ erglm provides estimation tools for exposure-response models based on
 intervals (`erglm_predict()`), stepwise covariate modelling
 (`erglm_scm_forward()` / `erglm_scm_backward()` / `erglm_scm_history()`,
 built on the single-term `erglm_add_term()`/`erglm_remove_term()`), and
-simulation (`erglm_fun()`, `simulate.erglm_model()`, `erglm_vpc_sim()`).
+simulation (`erglm_fun()`, `simulate.erglm_model()`).
 `erglm_model()` takes a `family` argument,
 defaulting to `stats::gaussian()` (matching `glm()`'s own default);
 binomial, poisson, gaussian, and gamma are tested and officially
 supported end to end (fitting, prediction, SCM significance testing,
-and VPC simulation). Other `glm()` families work through the same
+and simulation). Other `glm()` families work through the same
 generic mechanisms in `erglm_predict()`/`erglm_fun()` but aren't
-covered by SCM's test selection or `simulate()`/VPC's noise draws.
+covered by SCM's test selection or `simulate()`'s noise draws.
 
 The package's design is deliberately harmonised with the companion
 `emaxnls` package (nonlinear-least-squares Emax models, also by this
@@ -60,22 +60,31 @@ references the old package/function names (`erlr::lr_model()`,
 vignette article -- it needs a corresponding update once this rename is
 published, or its `erlr`-dependent tests/vignette will break.
 
-**`sim_resp` addition (this branch, not yet merged).** erplots'
-`er_vpc_plot()` used to require a bespoke, model-package-specific
-simulation helper (`erglm_vpc_sim()`) rather than going through the
-shared `er_predict()`/`er_simulate()`/`er_summary()` interface -- a
-design gap on the erplots side. It was closed by widening erplots'
+**`erglm_vpc_sim()` removed.** erplots' `er_vpc_plot()` used to require
+a bespoke, model-package-specific simulation helper (`erglm_vpc_sim()`)
+rather than going through the shared
+`er_predict()`/`er_simulate()`/`er_summary()` interface -- a design gap
+on the erplots side. That gap was closed by widening erplots'
 `er_simulate()` contract (additively: a method may now return an
-optional `sim_resp` column alongside `fit_resp`) rather than adding a
-new generic, since `.erglm_simulate_draws()` and
-`.erglm_draw_response()` already had everything needed to compute a
-full response-level draw -- see erplots'
-`?erplots::er_model_interface` for the contract this satisfies.
-`er_simulate.erglm_model()` (`R/er-methods.R`) needed no change itself;
-only its `.erglm_simulate_draws()` engine did.
-`erglm_vpc_sim()`/`simulate.erglm_model()`/`.erglm_resample()` are
-unaffected and still work exactly as before -- they're a separate code
-path, not a caller of `.erglm_simulate_draws()`.
+optional `sim_resp` column alongside `fit_resp`), since
+`.erglm_simulate_draws()` and `.erglm_draw_response()` already had
+everything needed to compute a full response-level draw -- see
+erplots' `?erplots::er_model_interface` for the contract this
+satisfies. `er_simulate.erglm_model()` (`R/er-methods.R`) needed no
+change itself; only its `.erglm_simulate_draws()` engine did (it now
+returns `sim_resp` as well as `fit_resp`). erplots then added
+`er_vpc_plot(model = ...)` as its preferred VPC entry point, calling
+`er_simulate()` internally rather than accepting a pre-built `sim`
+data frame. Once that path existed, `erglm_vpc_sim()` had no remaining
+purpose -- it was a thin wrapper around `simulate.erglm_model()`
+whose sole reason to exist was producing the `sim` data frame
+`er_vpc_plot()` used to require -- so it (and its file, tests, and
+docs references) were removed as a clean break, no deprecated alias,
+matching this package's established rename/removal convention.
+`simulate.erglm_model()`/`.erglm_resample()` are unaffected and remain
+the package's user-facing simulation entry point for anyone who wants
+full replicate detail (sampled coefficients, expected and simulated
+response) without going through erplots.
 
 ## Planned work
 
@@ -87,18 +96,17 @@ repo `djnavarro/erlr` -> `djnavarro/erglm`, and repointing the
 work (`simulate.erglm_model()`, `erglm_fun()`, exporting
 `erglm_add_term()`/`erglm_remove_term()`), the pkgdown site/vignette
 restructuring that followed it, the `glm`/`lm` method-inheritance
-documentation (`methods.Rmd`), and fleshing out the `erglm.Rmd` "Getting
-Started" stub are all now done. One item remains: the companion
-`erplots` repo update noted above (see PLAN.md).
+documentation (`methods.Rmd`), fleshing out the `erglm.Rmd` "Getting
+Started" stub, and removing `erglm_vpc_sim()` (superseded by erplots'
+`er_vpc_plot(model = ...)`) are all now done. One item remains: the
+companion `erplots` repo update noted above (see PLAN.md).
 
 ## Structure
 
 - `R/erglm-core.R` -- `erglm_model()`, `erglm_predict()`, the
   `erglm_fun()` closure factory, and the shared
   `.erglm_simulate_draws()` helper (used directly by
-  `er_simulate.erglm_model()`, and indirectly -- via
-  `simulate.erglm_model()`/`.erglm_resample()` in `R/erglm-simulate.R`
-  -- by `erglm_vpc_sim()`). Its output carries both `fit_resp` (the
+  `er_simulate.erglm_model()`). Its output carries both `fit_resp` (the
   expected response at a sampled parameter vector -- parameter
   uncertainty only, used by erplots' spaghetti-style plots) and
   `sim_resp` (that same `fit_resp` plus family-appropriate residual
@@ -137,16 +145,13 @@ Started" stub are all now done. One item remains: the companion
   `.erglm_simulate_draws()`, `.erglm_resample()` reports an auto-picked
   seed via `rlang::inform()` (with the same "pass `seed = ...`" wording)
   since it drives the actual simulated values in the output.
-- `R/erglm-vpc.R` -- `erglm_vpc_sim()`, a thin wrapper that calls
-  `simulate.erglm_model()` internally and reshapes its output into a
-  VPC-ready data set (splicing the simulated response back into the
-  original response column instead of returning sampled coefficients).
 - `R/erglm-family.R` -- shared family-dispatch helpers used by SCM and
-  VPC: `.erglm_default_test()` (picks `"Chisq"` vs `"F"` for
+  simulation: `.erglm_default_test()` (picks `"Chisq"` vs `"F"` for
   `stats::anova()` based on the family's dispersion behaviour) and
-  `.erglm_draw_response()` (family-specific residual noise draws for
-  VPC simulation; binomial/poisson/gaussian/gamma only, errors
-  informatively otherwise).
+  `.erglm_draw_response()` (family-specific residual noise draws used
+  by both `.erglm_resample()` and `.erglm_simulate_draws()`;
+  binomial/poisson/gaussian/gamma only, errors informatively
+  otherwise).
 - `R/erglm-data.R` -- the synthetic `erglm_data` example dataset. Has
   binary (`ae1`, `ae2`), count (`ae_count`), continuous
   (`biomarker_change`), and positive/right-skewed continuous
@@ -196,9 +201,11 @@ Started" stub are all now done. One item remains: the companion
   other `glm()` families), `scm.Rmd` (stepwise covariate modelling,
   modelled on emaxnls's `stepwise-covariate-modelling.Rmd`),
   `methods.Rmd` (base `glm`/`lm` method inheritance), and `simulate.Rmd`
-  (`simulate()`, `erglm_fun()`, and `erglm_vpc_sim()`, modelled on
-  emaxnls's `simulating-from-emax-models.Rmd`; needs `ggplot2`, see
-  above). `_pkgdown.yml`'s `reference:` index and `articles:` list must
+  (`simulate()` and `erglm_fun()`, modelled on emaxnls's
+  `simulating-from-emax-models.Rmd`; needs `ggplot2`, see above; points
+  to erplots' `er_vpc_plot(model = ...)` for VPC-style plots rather
+  than documenting an erglm-side VPC helper). `_pkgdown.yml`'s
+  `reference:` index and `articles:` list must
   be kept in sync by hand when exports or articles are added/renamed --
   `pkgdown::check_pkgdown()` catches drift (e.g. a reference to a
   renamed/removed topic) without needing a full site build.

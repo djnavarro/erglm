@@ -149,10 +149,9 @@ erglm_fun <- function(object) {
 # shared helper: draws `nsim` sets of coefficients from the sampling
 # distribution implied by the model's variance-covariance matrix, and
 # evaluates the linear predictor at each draw for the supplied `newdata`.
-# Used by `erglm_vpc_sim()` (indirectly, via `simulate.erglm_model()`/
-# `.erglm_resample()` -- see erglm-simulate.R) and directly by the
-# `er_simulate.erglm_model()` method (used by erplots, if installed, for
-# both spaghetti-style uncertainty bands via `fit_resp`, and for
+# Used directly by the `er_simulate.erglm_model()` method (used by
+# erplots, if installed, for both spaghetti-style uncertainty bands via
+# `fit_resp`, and for
 # `er_vpc_plot(model = ...)` via `sim_resp` -- see `?er_model_interface`
 # in erplots for the distinction between the two columns). `sim_resp` adds
 # family-appropriate residual/dispersion noise on top of `fit_resp`, via
