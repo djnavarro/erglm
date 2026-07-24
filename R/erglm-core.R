@@ -149,15 +149,23 @@ erglm_fun <- function(object) {
 # shared helper: draws `nsim` sets of coefficients from the sampling
 # distribution implied by the model's variance-covariance matrix, and
 # evaluates the linear predictor at each draw for the supplied `newdata`.
-# Used both by `erglm_vpc_sim()` and by the `er_simulate.erglm_model()`
-# method (used by erplots, if installed, for spaghetti-style uncertainty
-# bands).
+# Used by `erglm_vpc_sim()` (indirectly, via `simulate.erglm_model()`/
+# `.erglm_resample()` -- see erglm-simulate.R) and directly by the
+# `er_simulate.erglm_model()` method (used by erplots, if installed, for
+# both spaghetti-style uncertainty bands via `fit_resp`, and for
+# `er_vpc_plot(model = ...)` via `sim_resp` -- see `?er_model_interface`
+# in erplots for the distinction between the two columns). `sim_resp` adds
+# family-appropriate residual/dispersion noise on top of `fit_resp`, via
+# the same `.erglm_draw_response()` helper `.erglm_resample()` itself
+# uses, so both simulation entry points share one noise model.
 .erglm_simulate_draws <- function(object, newdata, nsim = 100, seed = NULL) {
   if (is.null(seed)) {
     seed <- .pick_seed()
     rlang::inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))
   }
   fn <- erglm_fun(object)
+  family_name <- stats::family(object)$family
+  dispersion <- summary(object)$dispersion
   withr::with_seed(
     seed = seed,
     code = {
@@ -166,14 +174,15 @@ erglm_fun <- function(object) {
         mean = stats::coef(object),
         sigma = stats::vcov(object)
       )
+      sim <- list()
+      for (ii in seq_len(nsim)) {
+        dd_sim <- newdata |> dplyr::mutate(row_id = dplyr::row_number(), sim_id = ii)
+        dd_sim$fit_resp <- fn(param = par[ii, ], dd_sim)
+        dd_sim$sim_resp <- .erglm_draw_response(family_name, fit = dd_sim$fit_resp, dispersion = dispersion)
+        sim[[ii]] <- dd_sim
+      }
     }
   )
-  sim <- list()
-  for (ii in seq_len(nsim)) {
-    dd_sim <- newdata |> dplyr::mutate(row_id = dplyr::row_number(), sim_id = ii)
-    dd_sim$fit_resp <- fn(param = par[ii, ], dd_sim)
-    sim[[ii]] <- dd_sim
-  }
   dplyr::bind_rows(sim)
 }
 

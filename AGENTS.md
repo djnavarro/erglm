@@ -60,6 +60,23 @@ references the old package/function names (`erlr::lr_model()`,
 vignette article -- it needs a corresponding update once this rename is
 published, or its `erlr`-dependent tests/vignette will break.
 
+**`sim_resp` addition (this branch, not yet merged).** erplots'
+`er_vpc_plot()` used to require a bespoke, model-package-specific
+simulation helper (`erglm_vpc_sim()`) rather than going through the
+shared `er_predict()`/`er_simulate()`/`er_summary()` interface -- a
+design gap on the erplots side. It was closed by widening erplots'
+`er_simulate()` contract (additively: a method may now return an
+optional `sim_resp` column alongside `fit_resp`) rather than adding a
+new generic, since `.erglm_simulate_draws()` and
+`.erglm_draw_response()` already had everything needed to compute a
+full response-level draw -- see erplots'
+`?erplots::er_model_interface` for the contract this satisfies.
+`er_simulate.erglm_model()` (`R/er-methods.R`) needed no change itself;
+only its `.erglm_simulate_draws()` engine did.
+`erglm_vpc_sim()`/`simulate.erglm_model()`/`.erglm_resample()` are
+unaffected and still work exactly as before -- they're a separate code
+path, not a caller of `.erglm_simulate_draws()`.
+
 ## Planned work
 
 See [PLAN.md](PLAN.md) for the history of this generalisation/rename
@@ -78,13 +95,24 @@ Started" stub are all now done. One item remains: the companion
 
 - `R/erglm-core.R` -- `erglm_model()`, `erglm_predict()`, the
   `erglm_fun()` closure factory, and the shared
-  `.erglm_simulate_draws()` helper (used by both `erglm_vpc_sim()` and,
-  via erplots, spaghetti-style plots). When `.erglm_simulate_draws()`
-  auto-picks a seed (`seed = NULL`, via `.pick_seed()`), it reports
-  this via `rlang::inform()` -- e.g. `"Using seed = 1234. Pass \`seed =
+  `.erglm_simulate_draws()` helper (used directly by
+  `er_simulate.erglm_model()`, and indirectly -- via
+  `simulate.erglm_model()`/`.erglm_resample()` in `R/erglm-simulate.R`
+  -- by `erglm_vpc_sim()`). Its output carries both `fit_resp` (the
+  expected response at a sampled parameter vector -- parameter
+  uncertainty only, used by erplots' spaghetti-style plots) and
+  `sim_resp` (that same `fit_resp` plus family-appropriate residual
+  noise, via `.erglm_draw_response()` -- used by erplots'
+  `er_vpc_plot(model = ...)`), matching erplots' `er_simulate()`
+  contract (see `?erplots::er_model_interface`): a method may supply
+  `fit_resp` alone, or both columns from one call, and this package now
+  does the latter, computing both from the same sampled coefficient
+  draws for consistency. When `.erglm_simulate_draws()` auto-picks a
+  seed (`seed = NULL`, via `.pick_seed()`), it reports this via
+  `rlang::inform()` -- e.g. `"Using seed = 1234. Pass \`seed =
   1234\` to reproduce this result."` -- because the seed genuinely
-  determines the random coefficient draws returned, unlike the SCM
-  functions below.
+  determines the random coefficient *and* response draws returned,
+  unlike the SCM functions below.
 - `R/erglm-scm.R` -- forward/backward stepwise covariate modelling
   (`erglm_scm_forward()`/`erglm_scm_backward()`/`erglm_scm_history()`),
   and the single-term `erglm_add_term()`/`erglm_remove_term()` helpers
