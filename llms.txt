@@ -63,7 +63,6 @@ mod
 
 mod1 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 mod2 <- erglm_scm_backward(mod1, candidates = c("sex", "dose"))
-#> Using seed = 9353
 erglm_scm_history(mod2)
 #> # A tibble: 4 × 11
 #>   iteration attempt step       action term_tested model_tested   model_converged
@@ -76,32 +75,35 @@ erglm_scm_history(mod2)
 #> #   model_updated <int>
 ```
 
-## VPC/Simulation
+## Simulation
 
 ``` r
 
 mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
-sim <- erglm_vpc_sim(mod, seed = 1234)
+sim <- simulate(mod, nsim = 5, seed = 1234)
 sim
-#> # A tibble: 30,000 × 5
-#>      ae1 aucss sex    row_id sim_id
-#>    <int> <dbl> <fct>   <int>  <int>
-#>  1     1  673. Male        1      1
-#>  2     1 2806. Female      2      1
-#>  3     0    0  Female      3      1
-#>  4     1 1169. Female      4      1
-#>  5     1  377. Male        5      1
-#>  6     0  327. Female      6      1
-#>  7     0    0  Male        7      1
-#>  8     1 1208. Female      8      1
-#>  9     0    0  Male        9      1
-#> 10     0  254. Female     10      1
-#> # ℹ 29,990 more rows
+#> # A tibble: 1,500 × 9
+#>    dat_id sim_id    mu   val `coef_(Intercept)` coef_aucss coef_sexMale aucss
+#>     <int>  <int> <dbl> <int>              <dbl>      <dbl>        <dbl> <dbl>
+#>  1      1      1 0.894     1              -2.09    0.00601        0.179  673.
+#>  2      2      1 1.000     1              -2.09    0.00601        0.179 2806.
+#>  3      3      1 0.110     0              -2.09    0.00601        0.179    0 
+#>  4      4      1 0.993     1              -2.09    0.00601        0.179 1169.
+#>  5      5      1 0.588     1              -2.09    0.00601        0.179  377.
+#>  6      6      1 0.468     1              -2.09    0.00601        0.179  327.
+#>  7      7      1 0.129     0              -2.09    0.00601        0.179    0 
+#>  8      8      1 0.994     1              -2.09    0.00601        0.179 1208.
+#>  9      9      1 0.129     1              -2.09    0.00601        0.179    0 
+#> 10     10      1 0.362     1              -2.09    0.00601        0.179  254.
+#> # ℹ 1,490 more rows
+#> # ℹ 1 more variable: sex <fct>
 ```
 
 To visualise the simulations against the observed data (e.g. as a
 VPC-style plot), see
-[`erplots::er_vpc_plot()`](https://erplots.djnavarro.net/reference/er_vpc_plot.html).
+[`erplots::er_vpc_plot()`](https://erplots.djnavarro.net/reference/er_vpc_plot.html),
+which can build its own simulated replicates directly from a fitted
+`erglm_model` (`er_vpc_plot(model = mod)`).
 
 # Package index
 
@@ -138,8 +140,6 @@ Simulation tools for exposure-response glm() models
   Prediction function for an exposure-response model
 - [`simulate(`*`<erglm_model>`*`)`](https://erglm.djnavarro.net/reference/simulate.erglm_model.md)
   : Simulate responses from an exposure-response model
-- [`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
-  : VPC simulations for exposure-response models
 
 ## Other
 

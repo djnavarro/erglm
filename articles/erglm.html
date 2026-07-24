@@ -184,24 +184,25 @@ audit log (<code><a href="../reference/erglm_scm.html">erglm_scm_history()</a></
 <h2 id="simulation">Simulation<a class="anchor" aria-label="anchor" href="#simulation"></a>
 </h2>
 <p><code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> generates replicate datasets from a fitted
-model, and <code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> reshapes those replicates into a
-data set ready for a visual predictive check:</p>
+model, capturing both parameter uncertainty and observation-level
+noise:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">2048</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,500 × 5</span></span></span>
-<span><span class="co">#&gt;      ae1 aucss sex    row_id sim_id</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0  673. Male        1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1 <span style="text-decoration: underline;">2</span>806. Female      2      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     0    0  Female      3      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1 <span style="text-decoration: underline;">1</span>169. Female      4      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1  377. Male        5      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1  327. Female      6      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     0    0  Male        7      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1 <span style="text-decoration: underline;">1</span>208. Female      8      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     0    0  Male        9      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1  254. Female     10      1</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,490 more rows</span></span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">2048</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,500 × 9</span></span></span>
+<span><span class="co">#&gt;    dat_id sim_id     mu   val `coef_(Intercept)` coef_aucss coef_sexMale aucss</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>      1      1 0.841      0              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span>  673.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>      2      1 1.000      1              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span> <span style="text-decoration: underline;">2</span>806.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>      3      1 0.135      0              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span>    0 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>      4      1 0.993      1              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span> <span style="text-decoration: underline;">1</span>169.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>      5      1 0.489      1              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span>  377.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>      6      1 0.507      1              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span>  327.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>      7      1 0.098<span style="text-decoration: underline;">0</span>     0              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span>    0 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>      8      1 0.994      1              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span> <span style="text-decoration: underline;">1</span>208.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>      9      1 0.098<span style="text-decoration: underline;">0</span>     0              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span>    0 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     10      1 0.402      1              -<span style="color: #BB0000;">1.86</span>    0.005<span style="text-decoration: underline;">77</span>       -<span style="color: #BB0000;">0.361</span>  254.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,490 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: sex &lt;fct&gt;</span></span></span></code></pre></div>
 <p>See the <a href="simulate.html">“Simulation”</a> article for details,
 including the lower-level <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> building block.</p>
 </div>
@@ -233,8 +234,8 @@ forward/backward SCM workflow in full.</li>
 <a href="methods.html">“Using base R model methods”</a> – the
 <code>glm</code>/<code>lm</code> methods that come for free.</li>
 <li>
-<a href="simulate.html">“Simulation”</a> – <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code>,
-<code><a href="../reference/erglm_fun.html">erglm_fun()</a></code>, and <code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code>.</li>
+<a href="simulate.html">“Simulation”</a> – <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code>
+and <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code>.</li>
 <li>the companion <a href="https://github.com/djnavarro/erplots" class="external-link">erplots</a> package, for
 visualising exposure-response models fitted with erglm.</li>
 </ul>

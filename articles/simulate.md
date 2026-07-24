@@ -308,39 +308,14 @@ carries over exactly as in the gaussian case.
 
 ## Visual predictive checks
 
-[`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
-is a thin, VPC-shaped wrapper around
-[`simulate()`](https://rdrr.io/r/stats/simulate.html): it drops the
-sampled coefficients and the `mu` column, and splices the simulated
-response back into a column with the response variable’s own name,
-producing the data frame shape expected by
-[`erplots::er_vpc_plot()`](https://erplots.djnavarro.net/reference/er_vpc_plot.html):
-
-``` r
-
-sim <- erglm_vpc_sim(mod_b, nsim = 20, seed = 1234)
-sim
-#> # A tibble: 6,000 × 5
-#>      ae1 aucss sex    row_id sim_id
-#>    <int> <dbl> <fct>   <int>  <int>
-#>  1     1  673. Male        1      1
-#>  2     1 2806. Female      2      1
-#>  3     1    0  Female      3      1
-#>  4     1 1169. Female      4      1
-#>  5     1  377. Male        5      1
-#>  6     0  327. Female      6      1
-#>  7     0    0  Male        7      1
-#>  8     1 1208. Female      8      1
-#>  9     0    0  Male        9      1
-#> 10     0  254. Female     10      1
-#> # ℹ 5,990 more rows
-```
-
-Reach for [`simulate()`](https://rdrr.io/r/stats/simulate.html) when you
-want the full simulation detail (sampled parameters, expected and
-simulated response); reach for
-[`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
-when you just want a VPC-ready data set to hand to a plotting function.
+For a VPC-style plot comparing observed and simulated response rates,
+see the companion `erplots` package’s `er_vpc_plot()`. Passing a fitted
+erglm model directly (`er_vpc_plot(data, ..., model = mod_b)`) builds
+the necessary simulated replicates internally via
+[`erplots::er_simulate()`](https://erplots.djnavarro.net/reference/er_model_interface.html)
+– which erglm implements on top of the same parameter-sampling/noise
+machinery [`simulate()`](https://rdrr.io/r/stats/simulate.html) uses –
+so no separate erglm-side VPC helper is needed.
 
 ## Notes
 
@@ -364,6 +339,6 @@ when you just want a VPC-ready data set to hand to a plotting function.
   when you need replicate datasets or bespoke simulation logic.
 - Other [`glm()`](https://rdrr.io/r/stats/glm.html) families are not
   currently supported by
-  [`simulate()`](https://rdrr.io/r/stats/simulate.html)/[`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
-  and will raise an informative error rather than silently falling back
-  to an expectation-only draw.
+  [`simulate()`](https://rdrr.io/r/stats/simulate.html) and will raise
+  an informative error rather than silently falling back to an
+  expectation-only draw.

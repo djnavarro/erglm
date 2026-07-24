@@ -353,32 +353,14 @@ carries over exactly as in the gaussian case.</p>
 <div class="section level2">
 <h2 id="visual-predictive-checks">Visual predictive checks<a class="anchor" aria-label="anchor" href="#visual-predictive-checks"></a>
 </h2>
-<p><code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> is a thin, VPC-shaped wrapper around
-<code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code>: it drops the sampled coefficients and the
-<code>mu</code> column, and splices the simulated response back into a
-column with the response variable’s own name, producing the data frame
-shape expected by <code><a href="https://erplots.djnavarro.net/reference/er_vpc_plot.html" class="external-link">erplots::er_vpc_plot()</a></code>:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim</a></span><span class="op">(</span><span class="va">mod_b</span>, nsim <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
-<span><span class="va">sim</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6,000 × 5</span></span></span>
-<span><span class="co">#&gt;      ae1 aucss sex    row_id sim_id</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1  673. Male        1      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1 <span style="text-decoration: underline;">2</span>806. Female      2      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1    0  Female      3      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1 <span style="text-decoration: underline;">1</span>169. Female      4      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1  377. Male        5      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     0  327. Female      6      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     0    0  Male        7      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1 <span style="text-decoration: underline;">1</span>208. Female      8      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     0    0  Male        9      1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     0  254. Female     10      1</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5,990 more rows</span></span></span></code></pre></div>
-<p>Reach for <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> when you want the full simulation
-detail (sampled parameters, expected and simulated response); reach for
-<code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> when you just want a VPC-ready data set to
-hand to a plotting function.</p>
+<p>For a VPC-style plot comparing observed and simulated response rates,
+see the companion <code>erplots</code> package’s
+<code>er_vpc_plot()</code>. Passing a fitted erglm model directly
+(<code>er_vpc_plot(data, ..., model = mod_b)</code>) builds the
+necessary simulated replicates internally via
+<code><a href="https://erplots.djnavarro.net/reference/er_model_interface.html" class="external-link">erplots::er_simulate()</a></code> – which erglm implements on top of
+the same parameter-sampling/noise machinery <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> uses
+– so no separate erglm-side VPC helper is needed.</p>
 </div>
 <div class="section level2">
 <h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
@@ -400,9 +382,8 @@ methods articles. Reach for <code><a href="https://rdrr.io/r/stats/simulate.html
 <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> when you need replicate datasets or bespoke
 simulation logic.</li>
 <li>Other <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> families are not currently supported by
-<code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code>/<code><a href="../reference/erglm_vpc_sim.html">erglm_vpc_sim()</a></code> and will raise an
-informative error rather than silently falling back to an
-expectation-only draw.</li>
+<code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> and will raise an informative error rather than
+silently falling back to an expectation-only draw.</li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

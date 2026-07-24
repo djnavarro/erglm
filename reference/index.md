@@ -33,8 +33,6 @@ Simulation tools for exposure-response glm() models
   Prediction function for an exposure-response model
 - [`simulate(`*`<erglm_model>`*`)`](https://erglm.djnavarro.net/reference/simulate.erglm_model.md)
   : Simulate responses from an exposure-response model
-- [`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
-  : VPC simulations for exposure-response models
 
 ## Other
 

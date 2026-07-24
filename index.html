@@ -121,7 +121,6 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dose</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">mod1</span>, candidates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sex"</span>, <span class="st">"dose"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Using seed = 9353</span></span>
 <span><span class="fu"><a href="reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 4 × 11</span></span>
 <span><span class="co">#&gt;   iteration attempt step       action term_tested model_tested   model_converged</span></span>
@@ -134,27 +133,28 @@
 <span><span class="co">#&gt; #   model_updated &lt;int&gt;</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="vpcsimulation">VPC/Simulation<a class="anchor" aria-label="anchor" href="#vpcsimulation"></a>
+<h2 id="simulation">Simulation<a class="anchor" aria-label="anchor" href="#simulation"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_vpc_sim.html">erglm_vpc_sim</a></span><span class="op">(</span><span class="va">mod</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
+<span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
 <span><span class="va">sim</span></span>
-<span><span class="co">#&gt; # A tibble: 30,000 × 5</span></span>
-<span><span class="co">#&gt;      ae1 aucss sex    row_id sim_id</span></span>
-<span><span class="co">#&gt;    &lt;int&gt; &lt;dbl&gt; &lt;fct&gt;   &lt;int&gt;  &lt;int&gt;</span></span>
-<span><span class="co">#&gt;  1     1  673. Male        1      1</span></span>
-<span><span class="co">#&gt;  2     1 2806. Female      2      1</span></span>
-<span><span class="co">#&gt;  3     0    0  Female      3      1</span></span>
-<span><span class="co">#&gt;  4     1 1169. Female      4      1</span></span>
-<span><span class="co">#&gt;  5     1  377. Male        5      1</span></span>
-<span><span class="co">#&gt;  6     0  327. Female      6      1</span></span>
-<span><span class="co">#&gt;  7     0    0  Male        7      1</span></span>
-<span><span class="co">#&gt;  8     1 1208. Female      8      1</span></span>
-<span><span class="co">#&gt;  9     0    0  Male        9      1</span></span>
-<span><span class="co">#&gt; 10     0  254. Female     10      1</span></span>
-<span><span class="co">#&gt; # ℹ 29,990 more rows</span></span></code></pre></div>
-<p>To visualise the simulations against the observed data (e.g. as a VPC-style plot), see <code><a href="https://erplots.djnavarro.net/reference/er_vpc_plot.html" class="external-link">erplots::er_vpc_plot()</a></code>.</p>
+<span><span class="co">#&gt; # A tibble: 1,500 × 9</span></span>
+<span><span class="co">#&gt;    dat_id sim_id    mu   val `coef_(Intercept)` coef_aucss coef_sexMale aucss</span></span>
+<span><span class="co">#&gt;     &lt;int&gt;  &lt;int&gt; &lt;dbl&gt; &lt;int&gt;              &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1      1      1 0.894     1              -2.09    0.00601        0.179  673.</span></span>
+<span><span class="co">#&gt;  2      2      1 1.000     1              -2.09    0.00601        0.179 2806.</span></span>
+<span><span class="co">#&gt;  3      3      1 0.110     0              -2.09    0.00601        0.179    0 </span></span>
+<span><span class="co">#&gt;  4      4      1 0.993     1              -2.09    0.00601        0.179 1169.</span></span>
+<span><span class="co">#&gt;  5      5      1 0.588     1              -2.09    0.00601        0.179  377.</span></span>
+<span><span class="co">#&gt;  6      6      1 0.468     1              -2.09    0.00601        0.179  327.</span></span>
+<span><span class="co">#&gt;  7      7      1 0.129     0              -2.09    0.00601        0.179    0 </span></span>
+<span><span class="co">#&gt;  8      8      1 0.994     1              -2.09    0.00601        0.179 1208.</span></span>
+<span><span class="co">#&gt;  9      9      1 0.129     1              -2.09    0.00601        0.179    0 </span></span>
+<span><span class="co">#&gt; 10     10      1 0.362     1              -2.09    0.00601        0.179  254.</span></span>
+<span><span class="co">#&gt; # ℹ 1,490 more rows</span></span>
+<span><span class="co">#&gt; # ℹ 1 more variable: sex &lt;fct&gt;</span></span></code></pre></div>
+<p>To visualise the simulations against the observed data (e.g. as a VPC-style plot), see <code><a href="https://erplots.djnavarro.net/reference/er_vpc_plot.html" class="external-link">erplots::er_vpc_plot()</a></code>, which can build its own simulated replicates directly from a fitted <code>erglm_model</code> (<code>er_vpc_plot(model = mod)</code>).</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

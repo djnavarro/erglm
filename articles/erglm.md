@@ -122,28 +122,27 @@ log
 ## Simulation
 
 [`simulate()`](https://rdrr.io/r/stats/simulate.html) generates
-replicate datasets from a fitted model, and
-[`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
-reshapes those replicates into a data set ready for a visual predictive
-check:
+replicate datasets from a fitted model, capturing both parameter
+uncertainty and observation-level noise:
 
 ``` r
 
-erglm_vpc_sim(mod, nsim = 5, seed = 2048)
-#> # A tibble: 1,500 × 5
-#>      ae1 aucss sex    row_id sim_id
-#>    <int> <dbl> <fct>   <int>  <int>
-#>  1     0  673. Male        1      1
-#>  2     1 2806. Female      2      1
-#>  3     0    0  Female      3      1
-#>  4     1 1169. Female      4      1
-#>  5     1  377. Male        5      1
-#>  6     1  327. Female      6      1
-#>  7     0    0  Male        7      1
-#>  8     1 1208. Female      8      1
-#>  9     0    0  Male        9      1
-#> 10     1  254. Female     10      1
+simulate(mod, nsim = 5, seed = 2048)
+#> # A tibble: 1,500 × 9
+#>    dat_id sim_id     mu   val `coef_(Intercept)` coef_aucss coef_sexMale aucss
+#>     <int>  <int>  <dbl> <int>              <dbl>      <dbl>        <dbl> <dbl>
+#>  1      1      1 0.841      0              -1.86    0.00577       -0.361  673.
+#>  2      2      1 1.000      1              -1.86    0.00577       -0.361 2806.
+#>  3      3      1 0.135      0              -1.86    0.00577       -0.361    0 
+#>  4      4      1 0.993      1              -1.86    0.00577       -0.361 1169.
+#>  5      5      1 0.489      1              -1.86    0.00577       -0.361  377.
+#>  6      6      1 0.507      1              -1.86    0.00577       -0.361  327.
+#>  7      7      1 0.0980     0              -1.86    0.00577       -0.361    0 
+#>  8      8      1 0.994      1              -1.86    0.00577       -0.361 1208.
+#>  9      9      1 0.0980     0              -1.86    0.00577       -0.361    0 
+#> 10     10      1 0.402      1              -1.86    0.00577       -0.361  254.
 #> # ℹ 1,490 more rows
+#> # ℹ 1 more variable: sex <fct>
 ```
 
 See the [“Simulation”](https://erglm.djnavarro.net/articles/simulate.md)
@@ -178,9 +177,7 @@ article for a worked-through tour of these.
   methods”](https://erglm.djnavarro.net/articles/methods.md) – the
   `glm`/`lm` methods that come for free.
 - [“Simulation”](https://erglm.djnavarro.net/articles/simulate.md) –
-  [`simulate()`](https://rdrr.io/r/stats/simulate.html),
-  [`erglm_fun()`](https://erglm.djnavarro.net/reference/erglm_fun.md),
-  and
-  [`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md).
+  [`simulate()`](https://rdrr.io/r/stats/simulate.html) and
+  [`erglm_fun()`](https://erglm.djnavarro.net/reference/erglm_fun.md).
 - the companion [erplots](https://github.com/djnavarro/erplots) package,
   for visualising exposure-response models fitted with erglm.

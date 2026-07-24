@@ -65,26 +65,19 @@ evaluates the expected response at each sampled parameter vector using
 [`erglm_fun()`](https://erglm.djnavarro.net/reference/erglm_fun.md),
 then draws a simulated response at each prediction using
 family-appropriate residual noise (the same `.erglm_draw_response()`
-mechanism used by
-[`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md):
-Bernoulli draws for `binomial`, Poisson draws for `poisson`, normal
-draws for `gaussian`, gamma draws for `Gamma`). The dispersion parameter
-used for that noise is a single point estimate
-(`summary(object)$dispersion`), not resampled per replicate. Other
-[`glm()`](https://rdrr.io/r/stats/glm.html) families are not currently
-supported and will raise an informative error.
+mechanism used elsewhere in the package: Bernoulli draws for `binomial`,
+Poisson draws for `poisson`, normal draws for `gaussian`, gamma draws
+for `Gamma`). The dispersion parameter used for that noise is a single
+point estimate (`summary(object)$dispersion`), not resampled per
+replicate. Other [`glm()`](https://rdrr.io/r/stats/glm.html) families
+are not currently supported and will raise an informative error.
 
-[`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
-is a thin wrapper around this method: it calls
-[`simulate()`](https://rdrr.io/r/stats/simulate.html) internally, then
-drops the sampled coefficients and `mu` and splices the simulated
-response (`val`) back into the response column's original name, to
-produce a VPC-ready data set. Use
-[`simulate()`](https://rdrr.io/r/stats/simulate.html) directly when you
-want the full simulation detail (sampled parameters, expected and
-simulated response, one row per observation per replicate); use
-[`erglm_vpc_sim()`](https://erglm.djnavarro.net/reference/erglm_vpc_sim.md)
-when you just want a VPC-shaped data set.
+For a VPC-style plot comparing observed and simulated response rates,
+see the companion `erplots` package's `er_vpc_plot()`, which can build
+its simulated replicates directly from a fitted model (`model =`
+argument) via the same `.erglm_draw_response()` noise mechanism this
+method uses, without needing to call
+[`simulate()`](https://rdrr.io/r/stats/simulate.html) yourself.
 
 ## Examples
 
