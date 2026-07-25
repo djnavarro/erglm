@@ -413,23 +413,36 @@ accurate *development* history.
    that is currently run locally or in CI (the CI workflow checks on
    its own runner matrix, but a manual as-cran pass before submission
    is still standard practice).
-   - ~~`devtools::check(remote = TRUE, manual = TRUE)`.~~ Done -- 0
-     errors, 0 warnings, 2 notes: (a) the standard CRAN-incoming
-     feasibility note for a first submission (new submission, the dev
-     version's four-component number -- resolves once bumped to
-     `0.1.0` at submission time -- misspelled-word flags now fixed via
-     `inst/WORDLIST` below, the non-standard `Remotes` field, and
-     `erplots` not being in a mainstream repository, all already
-     tracked); (b) a local-only note that HTML manual validation was
-     skipped because `tidy` isn't installed on this machine (not
-     expected to reproduce on CRAN's own check machines).
+   - ~~`devtools::check(remote = TRUE, manual = TRUE)`.~~ Done, at both
+     the `0.0.0.9000` dev version and again after the `0.1.0` bump. At
+     `0.1.0`: 0 errors, 0 warnings, 1 note (the dev version's
+     four-component-number sub-item is gone now that the version is
+     well-formed; the local-only "`tidy` not found" HTML-manual note
+     from the `0.0.0.9000` run didn't reproduce here either). The
+     remaining note bundles "new submission" (expected), possibly-
+     misspelled `erglm`/`poisson` in `DESCRIPTION`, the non-standard
+     `Remotes` field, and `erplots` not being in a mainstream
+     repository -- all explained in `cran-comments.md`.
    - ~~Misspelled-word flags from CRAN-incoming feasibility
-     (`erglm`, `poisson`).~~ Done -- ran
+     (`erglm`, `poisson`).~~ Investigated, and the fix attempted below
+     turned out not to address this specific flag -- corrected in
+     `cran-comments.md` instead. Ran
      `spelling::update_wordlist(confirm = FALSE)`, which added 34
      words (including `erglm's`, `poisson`, and various
      British-spelling/jargon terms already used throughout the
-     roxygen docs and vignettes) to a new `inst/WORDLIST`.
-     `spelling::spell_check_package()` now reports no spelling errors.
+     roxygen docs and vignettes) to a new `inst/WORDLIST`;
+     `spelling::spell_check_package()` (which scans Rd files and
+     vignettes) now reports no errors. That's a genuinely different
+     check from the one producing this NOTE, though: "CRAN incoming
+     feasibility" runs its own `aspell`-based scan of `DESCRIPTION`'s
+     `Title`/`Description` fields with no `WORDLIST`/ignore-list
+     mechanism, so `erglm` (the package's own name) and `poisson` (a
+     genuine, correctly-spelled family name) still get flagged there
+     regardless -- confirmed by re-running `devtools::check(remote =
+     TRUE)` after the `WORDLIST` fix, which still showed both words.
+     Since there's no mechanism to suppress this specific check,
+     `cran-comments.md` now explains it as an expected false positive
+     rather than claiming it's fixed.
    - ~~`urlchecker::url_check()`.~~ Done -- all 7 URLs in the package
      check out fine.
    - ~~Confirm the package checks cleanly with `erplots` uninstalled
@@ -461,14 +474,15 @@ accurate *development* history.
      installed (3)` skips in `test-er-methods.R`, showing the gating
      works as designed rather than accidentally passing some other
      way.
-6. **`cran-comments.md`.** Standard practice for a first submission:
-   note this is a new package, summarise `R CMD check` results (0
-   errors/warnings, any NOTEs explained), and flag the `erplots`
-   Suggests relationship.
+6. ~~**`cran-comments.md`.**~~ Done -- drafted, covering both
+   remaining NOTEs (`Remotes`, `Suggests: erplots`) with explanations
+   backed by the local and R-hub `erplots`-free verification above,
+   and listing R-hub's four-platform run alongside the local
+   `devtools::check()` under "Test environments".
 7. ~~**Version number for release.**~~ Decided -- `0.1.0`, per the
    framing decision above (new package, conventional first-release
-   version). `DESCRIPTION`'s dev version is `0.0.0.9000` in the
-   meantime; bump to `0.1.0` at actual submission time.
+   version). `DESCRIPTION`'s version has been bumped from the dev
+   value `0.0.0.9000` to `0.1.0` for submission.
 
 ### Suggested step ordering
 
@@ -477,9 +491,14 @@ accurate *development* history.
    (item 7).~~ Done -- see the framing decision above.
 3. ~~Audit roxygen `@return`/`@examples` coverage across all exported
    functions (item 4).~~ Done -- see item 4 above.
-4. Run the full pre-submission check suite (item 5), including a
+4. ~~Run the full pre-submission check suite (item 5), including a
    check with `erplots` uninstalled (item 3), and fix anything it
-   surfaces.
-5. Draft `cran-comments.md` (item 6) and do a final review pass before
-   `devtools::release()` -- bump `DESCRIPTION`'s version to `0.1.0` at
-   that point.
+   surfaces.~~ Done -- see item 5 above (local `devtools::check()`,
+   spelling/URL checks, local and R-hub `erplots`-free runs).
+5. ~~Draft `cran-comments.md` (item 6) and do a final review pass
+   before `devtools::release()` -- bump `DESCRIPTION`'s version to
+   `0.1.0` at that point.~~ Done -- `cran-comments.md` drafted,
+   version bumped to `0.1.0`. Remaining before actually calling
+   `devtools::release()`: a final `devtools::check()` at the bumped
+   version to confirm nothing regressed, and the maintainer's own
+   read-through of `cran-comments.md`/`NEWS.md`.

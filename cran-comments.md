@@ -4,19 +4,52 @@ This is a new package.
 
 ## Test environments
 
-* local Ubuntu 24.04, R 4.6.1
-* `devtools::check(remote = TRUE, manual = TRUE)`
+* local Ubuntu 24.04, R 4.6.1, `devtools::check(remote = TRUE, manual = TRUE)`
+* R-hub v2 (`rhub::rhub_check()`): linux, macos-arm64, windows, and
+  nosuggests, all R-devel -- all `Status: OK`
 
 ## R CMD check results
 
-0 errors | 0 warnings | 2 notes
+0 errors | 0 warnings | 1 note
 
-### NOTE: unknown field `Remotes`
+The note bundles four sub-items from the CRAN incoming feasibility
+check, addressed in turn below: expected new-submission housekeeping,
+two DESCRIPTION words that are correct but not dictionary words, an
+unrecognised-but-harmless DESCRIPTION field, and an optional Suggests
+dependency that isn't on CRAN.
 
 ```
+New submission
+
+Possibly misspelled words in DESCRIPTION:
+  erglm (12:41)
+  poisson (10:33)
+
 Unknown, possibly misspelled, fields in DESCRIPTION:
   'Remotes'
+
+Suggests or Enhances not in mainstream repositories:
+  erplots
 ```
+
+### "New submission"
+
+Expected and accurate -- this is erglm's first CRAN submission.
+
+### Possibly misspelled words: `erglm`, `poisson`
+
+Both are correct as written: `erglm` is the package's own name, and
+`poisson` is the standard (lowercase, as used generically rather than
+as the proper noun `Poisson`) name of the Poisson family/distribution
+supported by `erglm_model()`. This is R's own `aspell`-based scan of
+the `DESCRIPTION` file's `Title`/`Description` fields as part of the
+incoming-feasibility check; it has no ignore-list mechanism (unlike
+`spelling::spell_check_package()`'s `inst/WORDLIST`, which covers Rd
+files and vignettes and reports no errors here), so a domain-specific
+term or the package's own name reliably triggers it for most new
+packages. Not actionable beyond confirming both words are intentional.
+
+### Unknown field `Remotes`
 
 `Remotes: djnavarro/erplots` is used only by our GitHub Actions CI
 (via `r-lib/actions/setup-r-dependencies`/`pak`) to install the
@@ -25,12 +58,7 @@ exercise the optional interoperability tests. It is not read by
 `R CMD build`/`check` and has no effect on the CRAN build; it is
 retained purely for our own CI convenience.
 
-### NOTE: Suggests not in mainstream repositories
-
-```
-Suggests or Enhances not in mainstream repositories:
-  erplots
-```
+### Suggests not in mainstream repositories
 
 `erplots` (<https://github.com/djnavarro/erplots>) is a companion
 visualisation package that erglm optionally interoperates with via a
