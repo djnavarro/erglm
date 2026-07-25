@@ -211,3 +211,27 @@ test_that("erglm_scm_backward skips (with a warning) a candidate aliased with an
   expect_true(sum(grepl("aliased", warnings_seen)) >= 2L)
   expect_equal(deparse(mod2$formula), deparse(mod1$formula))
 })
+
+test_that("erglm_scm_forward/backward validate candidates up front", {
+  mod1 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
+  mod2 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
+
+  # multi-term entry
+  expect_error(erglm_scm_forward(mod1, candidates = c("sex + dose", "weight")), "sex \\+ dose")
+  expect_error(erglm_scm_backward(mod2, candidates = c("sex + dose", "weight")), "sex \\+ dose")
+
+  # zero-term entry
+  expect_error(erglm_scm_forward(mod1, candidates = c("1", "sex")), "1")
+
+  # unparseable entry
+  expect_error(erglm_scm_forward(mod1, candidates = c("not a formula!", "sex")), "not a formula!")
+
+  # not a character vector, empty, or containing NA
+  expect_error(erglm_scm_forward(mod1, candidates = NULL), "candidates")
+  expect_error(erglm_scm_forward(mod1, candidates = character(0)), "candidates")
+  expect_error(erglm_scm_forward(mod1, candidates = c("sex", NA)), "candidates")
+  expect_error(erglm_scm_forward(mod1, candidates = list("sex")), "candidates")
+
+  # valid candidates still work, unaffected
+  expect_no_error(erglm_scm_forward(mod1, candidates = c("sex", "dose"), seed = 111))
+})

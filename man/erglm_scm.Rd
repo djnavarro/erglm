@@ -84,6 +84,13 @@ skipped for the step (with a warning) rather than being selected or
 crashing the search -- comparisons against \code{NA} aren't meaningful,
 and the candidate can never improve the fit anyway once it's
 aliased.
+
+\code{candidates} is validated up front: every element must be parseable
+as a formula and name exactly one covariate term (e.g. \code{"sex"}, not
+\code{"sex + dose"} or \code{"not a formula"}). This errors immediately, before
+any model fitting, naming the offending element -- rather than
+surfacing only once the search happens to test that candidate, many
+steps into what might be a long, expensive search.
 }
 \examples{
 mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())

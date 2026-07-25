@@ -71,6 +71,44 @@
   }
 }
 
+# `candidates` (as passed to `erglm_scm_forward()`/`erglm_scm_backward()`)
+# must be a non-empty character vector where every element names exactly
+# one covariate term, e.g. `c("sex", "dose")`. Each element is turned into
+# a one-sided formula (`~ <element>`) and only actually tested deep inside
+# `.erglm_once_forward()`/`.erglm_once_backward()`, many steps into a
+# potentially long search -- so a malformed element (e.g. `"sex + dose"`,
+# which parses as two terms; or something that isn't parseable as a
+# formula at all) used to only surface once the search reached it,
+# aborting the whole search with no indication of which candidate was at
+# fault. Validating every element up front catches this before any
+# fitting happens.
+.erglm_check_candidates <- function(candidates) {
+  if (!is.character(candidates) || length(candidates) == 0L || anyNA(candidates)) {
+    rlang::abort(paste0(
+      "`candidates` must be a non-empty character vector with no missing ",
+      "values, not ", .fmt_bad_value(candidates), "."
+    ))
+  }
+  for (cc in candidates) {
+    add <- tryCatch(stats::as.formula(paste("~", cc)), error = function(e) NULL)
+    if (is.null(add)) {
+      rlang::abort(paste0(
+        "`candidates` contains an invalid entry: \"", cc, "\" could not ",
+        "be parsed as a formula term."
+      ))
+    }
+    trm_lab <- attr(stats::terms(add), "term.labels")
+    if (length(trm_lab) != 1L) {
+      rlang::abort(paste0(
+        "`candidates` contains an invalid entry: \"", cc, "\" names ",
+        length(trm_lab), " terms, not exactly one. Each element of ",
+        "`candidates` must name a single covariate term (e.g. \"sex\", ",
+        "not \"sex + dose\")."
+      ))
+    }
+  }
+}
+
 # `nsim` must be a single positive whole number -- used by
 # `simulate.erglm_model()`/`.erglm_resample()` and `.erglm_simulate_draws()`
 # to size the loop of simulation replicates. Invalid values (0, negative,

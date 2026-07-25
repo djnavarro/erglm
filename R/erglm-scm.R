@@ -51,6 +51,13 @@
 #' and the candidate can never improve the fit anyway once it's
 #' aliased.
 #'
+#' `candidates` is validated up front: every element must be parseable
+#' as a formula and name exactly one covariate term (e.g. `"sex"`, not
+#' `"sex + dose"` or `"not a formula"`). This errors immediately, before
+#' any model fitting, naming the offending element -- rather than
+#' surfacing only once the search happens to test that candidate, many
+#' steps into what might be a long, expensive search.
+#'
 #' @name erglm_scm
 #' @examples
 #' mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
@@ -66,6 +73,7 @@ NULL
 #' @export
 erglm_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto", "Chisq", "F"), seed = NULL) {
   test <- match.arg(test)
+  .erglm_check_candidates(candidates)
   if (is.null(seed)) {
     seed <- .pick_seed()
   }
@@ -105,6 +113,7 @@ erglm_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto"
 #' @export
 erglm_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("auto", "Chisq", "F"), seed = NULL) {
   test <- match.arg(test)
+  .erglm_check_candidates(candidates)
   if (is.null(seed)) {
     seed <- .pick_seed()
   }
