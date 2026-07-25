@@ -7,14 +7,13 @@ This is a new package.
 * local Ubuntu 24.04, R 4.6.1, `devtools::check(remote = TRUE, manual = TRUE)`
 * R-hub v2 (`rhub::rhub_check()`): linux, macos-arm64, windows, and
   nosuggests, all R-devel -- all `Status: OK`
-* win-builder, R-devel and R-release (`devtools::check_win_devel()`/
-  `check_win_release()`) -- both `Status: 1 NOTE`, re-run after the
-  `Remotes` field fix to confirm it's gone: R-release
-  (<https://win-builder.r-project.org/MZQKR10g1a71/00check.log>) and
-  R-devel
-  (<https://win-builder.r-project.org/pRgEup4LhLH8/00check.log>) both
-  show the 3-item note described below with no `Remotes` mention and
-  no platform-specific issues
+* win-builder, R-devel
+  (<https://win-builder.r-project.org/pRgEup4LhLH8/00check.log>) and
+  R-release
+  (<https://win-builder.r-project.org/MZQKR10g1a71/00check.log>)
+  (`devtools::check_win_devel()`/`check_win_release()`) -- both
+  `Status: 1 NOTE`, matching the note described below, with no
+  platform-specific issues
 * `devtools::check_mac_release()` was attempted but not obtained --
   mac.r-project.org returned repeated HTTP 502s at submission time.
   Not otherwise substituted, since R-hub's `macos-arm64` platform
@@ -55,7 +54,7 @@ incoming-feasibility check; it has no ignore-list mechanism (unlike
 `spelling::spell_check_package()`'s `inst/WORDLIST`, which covers Rd
 files and vignettes and reports no errors here), so a domain-specific
 term or the package's own name reliably triggers it for most new
-packages. Not actionable beyond confirming both words are intentional.
+packages. Not a concern, beyond confirming both words are intentional.
 
 ### Suggests not in mainstream repositories
 
