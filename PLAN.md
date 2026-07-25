@@ -374,18 +374,30 @@ accurate *development* history.
 2. ~~**`LICENSE.md` copyright holder doesn't match `DESCRIPTION`.**~~
    Done -- `LICENSE`/`LICENSE.md` now read "Danielle Navarro", matching
    the `cph` role in `Authors@R`.
-3. **`Suggests: erplots` + `Remotes: djnavarro/erplots`.** `erplots`
-   isn't on CRAN. `Remotes` is ignored by CRAN's own build (it's a
-   `remotes`/`pak`-only convenience field), so it isn't itself a
-   blocker, but every use of `erplots` in tests/vignettes must be
-   properly gated (`requireNamespace("erplots", quietly = TRUE)` /
+3. ~~**`Suggests: erplots` + `Remotes: djnavarro/erplots`.**~~ Done,
+   with a correction along the way. `erplots` isn't on CRAN, so every
+   use of it in tests/vignettes must be properly gated
+   (`requireNamespace("erplots", quietly = TRUE)` /
    `testthat::skip_if_not_installed("erplots")`) so the package builds
-   and checks cleanly with `erplots` absent, which AGENTS.md says is
-   already the case for tests. Worth a final `R CMD check --as-cran`
-   run with `erplots` *not* installed to confirm the vignette article
-   build and examples don't implicitly depend on it too (articles
-   aren't shipped, so this mainly matters for `R/er-methods.R`'s
-   lazy-registration path and any `\dontrun`/example code).
+   and checks cleanly with `erplots` absent -- verified locally and via
+   R-hub's `nosuggests` container (see item 5 below). `Remotes` itself
+   was initially judged harmless to keep (CRAN's own build ignores it;
+   it was load-bearing for CI, letting `r-lib/actions/setup-r-
+   dependencies`/`pak` resolve `erplots` from GitHub) -- but
+   `devtools::release()`'s own checklist explicitly warns `Remotes`
+   should be removed before CRAN submission, a stronger and more
+   specific signal than the plain `R CMD check` NOTE. Rather than just
+   deleting it and losing CI's ability to install `erplots`, moved that
+   responsibility into each workflow file directly: `R-CMD-check.yaml`,
+   `test-coverage.yaml`, and `pkgdown.yaml`'s `setup-r-dependencies`
+   steps now list `github::djnavarro/erplots` in `extra-packages`
+   alongside their existing packages, so `pak` resolves it the same way
+   without `DESCRIPTION` needing a `Remotes` field at all. `Remotes`
+   removed from `DESCRIPTION`; confirmed via `devtools::check(remote =
+   TRUE, manual = TRUE)` that the "Unknown, possibly misspelled, fields
+   in DESCRIPTION: 'Remotes'" NOTE is gone, with no other regressions
+   (down to the same 3-item incoming-feasibility note as before, minus
+   `Remotes`).
 4. ~~**Roxygen/Rd completeness for CRAN.**~~ Effectively done. Every
    exported function needs a `@return`/`\value` tag (CRAN now enforces
    this) and a runnable `@examples` block without gratuitous
@@ -422,7 +434,8 @@ accurate *development* history.
      remaining note bundles "new submission" (expected), possibly-
      misspelled `erglm`/`poisson` in `DESCRIPTION`, the non-standard
      `Remotes` field, and `erplots` not being in a mainstream
-     repository -- all explained in `cran-comments.md`.
+     repository -- all explained in `cran-comments.md` (the `Remotes`
+     field was later removed entirely; see item 3 above).
    - ~~Misspelled-word flags from CRAN-incoming feasibility
      (`erglm`, `poisson`).~~ Investigated, and the fix attempted below
      turned out not to address this specific flag -- corrected in
@@ -489,12 +502,13 @@ accurate *development* history.
      rather than keep retrying a service that appears to be down, since
      R-hub's `macos-arm64` platform above already exercises macOS and
      came back clean.
-6. ~~**`cran-comments.md`.**~~ Done -- drafted, covering both
-   remaining NOTEs (`Remotes`, `Suggests: erplots`) with explanations
-   backed by the local and R-hub `erplots`-free verification above,
-   and listing R-hub's four-platform run and both win-builder runs
-   under "Test environments", with a note on the unobtained
-   `mac.r-project.org` result.
+6. ~~**`cran-comments.md`.**~~ Done -- drafted, covering the
+   `Suggests: erplots` NOTE (and, until it was removed per item 3
+   above, the `Remotes` field) with explanations backed by the local
+   and R-hub `erplots`-free verification above, and listing R-hub's
+   four-platform run and both win-builder runs under "Test
+   environments", with a note on the unobtained `mac.r-project.org`
+   result.
 7. ~~**Version number for release.**~~ Decided -- `0.1.0`, per the
    framing decision above (new package, conventional first-release
    version). `DESCRIPTION`'s version has been bumped from the dev

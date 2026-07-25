@@ -8,8 +8,10 @@ This is a new package.
 * R-hub v2 (`rhub::rhub_check()`): linux, macos-arm64, windows, and
   nosuggests, all R-devel -- all `Status: OK`
 * win-builder, R-devel and R-release (`devtools::check_win_devel()`/
-  `check_win_release()`) -- both `Status: 1 NOTE` (the same note
-  described below; no platform-specific issues)
+  `check_win_release()`) -- both `Status: 1 NOTE` (no platform-specific
+  issues; run before the `Remotes` field below was removed, so their
+  notes also listed it -- the local check below confirms it's now
+  gone)
 * `devtools::check_mac_release()` was attempted but not obtained --
   mac.r-project.org returned repeated HTTP 502s at submission time.
   Not otherwise substituted, since R-hub's `macos-arm64` platform
@@ -19,11 +21,10 @@ This is a new package.
 
 0 errors | 0 warnings | 1 note
 
-The note bundles four sub-items from the CRAN incoming feasibility
+The note bundles three sub-items from the CRAN incoming feasibility
 check, addressed in turn below: expected new-submission housekeeping,
-two DESCRIPTION words that are correct but not dictionary words, an
-unrecognised-but-harmless DESCRIPTION field, and an optional Suggests
-dependency that isn't on CRAN.
+two DESCRIPTION words that are correct but not dictionary words, and
+an optional Suggests dependency that isn't on CRAN.
 
 ```
 New submission
@@ -31,9 +32,6 @@ New submission
 Possibly misspelled words in DESCRIPTION:
   erglm (12:41)
   poisson (10:33)
-
-Unknown, possibly misspelled, fields in DESCRIPTION:
-  'Remotes'
 
 Suggests or Enhances not in mainstream repositories:
   erplots
@@ -55,15 +53,6 @@ incoming-feasibility check; it has no ignore-list mechanism (unlike
 files and vignettes and reports no errors here), so a domain-specific
 term or the package's own name reliably triggers it for most new
 packages. Not actionable beyond confirming both words are intentional.
-
-### Unknown field `Remotes`
-
-`Remotes: djnavarro/erplots` is used only by our GitHub Actions CI
-(via `r-lib/actions/setup-r-dependencies`/`pak`) to install the
-companion `erplots` package -- which isn't on CRAN -- so CI can
-exercise the optional interoperability tests. It is not read by
-`R CMD build`/`check` and has no effect on the CRAN build; it is
-retained purely for our own CI convenience.
 
 ### Suggests not in mainstream repositories
 
