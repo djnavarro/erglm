@@ -47,7 +47,12 @@ Named and shaped to match the companion `emaxnls` package's
 parameter, whereas erglm's terms are plain one-sided
 [`glm()`](https://rdrr.io/r/stats/glm.html) formula terms (e.g.
 `~ sex`), since erglm has no equivalent parameter-level structure to
-attach covariates to.
+attach covariates to. `term` must be a one-sided formula naming exactly
+one covariate; passing `NULL`, a non-formula, a two-sided formula, or a
+multi-term formula (e.g. `~ weight + age`) errors informatively rather
+than failing with a low-level error (`NULL`/non-formula) or being
+silently misinterpreted (two-sided formulas; multi-term formulas, which
+used to add/attempt every term at once with no warning).
 
 ## Examples
 

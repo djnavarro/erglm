@@ -35,7 +35,9 @@ Computes intervals on the link scale and back-transforms with
 binomial/logistic models. See also
 [`erglm_fun()`](https://erglm.djnavarro.net/reference/erglm_fun.md) for
 generating predictions at arbitrary (possibly counterfactual) parameters
-or data.
+or data. `conf_level` must be a single number between 0 and 1
+(inclusive); other values error rather than silently producing a
+reversed or `NaN` interval.
 
 This is a tidy, opinionated alternative to calling base R's
 [`predict()`](https://rdrr.io/r/stats/predict.html) directly on `object`

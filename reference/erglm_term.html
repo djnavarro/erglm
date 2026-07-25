@@ -96,7 +96,13 @@ difference: <code>emaxnls</code>'s terms are two-sided formulas naming a
 structural parameter (e.g. <code>E0 ~ AGE</code>), since covariates there attach
 to a specific Emax parameter, whereas erglm's terms are plain
 one-sided <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> formula terms (e.g. <code>~ sex</code>), since erglm has no
-equivalent parameter-level structure to attach covariates to.</p>
+equivalent parameter-level structure to attach covariates to. <code>term</code>
+must be a one-sided formula naming exactly one covariate; passing
+<code>NULL</code>, a non-formula, a two-sided formula, or a multi-term formula
+(e.g. <code>~ weight + age</code>) errors informatively rather than failing with
+a low-level error (<code>NULL</code>/non-formula) or being silently
+misinterpreted (two-sided formulas; multi-term formulas, which used
+to add/attempt every term at once with no warning).</p>
     </div>
 
     <div class="section level2">

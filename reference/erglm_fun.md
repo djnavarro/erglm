@@ -36,7 +36,10 @@ Uses `stats::family(object)$linkinv`, so this works for any
 binomial/logistic models; tested for binomial, poisson, gaussian, and
 gamma families. Named `erglm_fun()` for consistency with the companion
 `emaxnls` package's `emax_fun()`, which serves the same purpose for
-`emaxnls`/`emaxlogistic` models.
+`emaxnls`/`emaxlogistic` models. The returned function checks that
+`param` is numeric and has one entry per column of the model matrix
+implied by `data`, erroring informatively rather than failing with a
+cryptic "non-conformable arguments" error from matrix multiplication.
 
 ## Examples
 

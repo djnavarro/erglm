@@ -24,7 +24,7 @@ simulate(object, nsim = 1, seed = NULL, ...)
 
 - nsim:
 
-  Number of replicates
+  Number of replicates. Must be a single positive whole number.
 
 - seed:
 

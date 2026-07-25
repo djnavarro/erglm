@@ -89,6 +89,21 @@ against future refactors reintroducing genuine seed-sensitivity (e.g. if
 candidate order were ever used as an early-stopping rule rather than
 exhaustively tested every step).
 
+If a candidate term is aliased (perfectly collinear) with a term already
+in the model, [`stats::anova()`](https://rdrr.io/r/stats/anova.html)
+reports zero additional degrees of freedom and an `NA` p-value for it.
+That candidate is skipped for the step (with a warning) rather than
+being selected or crashing the search – comparisons against `NA` aren't
+meaningful, and the candidate can never improve the fit anyway once it's
+aliased.
+
+`candidates` is validated up front: every element must be parseable as a
+formula and name exactly one covariate term (e.g. `"sex"`, not
+`"sex + dose"` or `"not a formula"`). This errors immediately, before
+any model fitting, naming the offending element – rather than surfacing
+only once the search happens to test that candidate, many steps into
+what might be a long, expensive search.
+
 ## Examples
 
 ``` r

@@ -77,7 +77,8 @@ work through the same generic mechanisms but are untested.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Other arguments passed to <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code></p></dd>
+<dd><p>Other arguments passed to <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>. Note that <code>weights</code>,
+<code>subset</code>, and <code>offset</code> don't work reliably here – see Details below.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -95,6 +96,22 @@ needing an erglm-specific equivalent – e.g. <code><a href="https://rdrr.io/r/b
 is a separate, erglm-specific alternative to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> that
 returns confidence intervals on the response scale in a tidy data
 frame; the two are complementary, not competing.</p>
+<p><code>weights</code>, <code>subset</code>, and <code>offset</code> can't currently be passed through
+<code>...</code> to <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">stats::glm()</a></code>: <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> resolves these non-standard-evaluation
+arguments via <code><a href="https://rdrr.io/r/base/match.call.html" class="external-link">match.call()</a></code>, which breaks once they've been forwarded
+through another function's <code>...</code> rather than named directly in the
+call <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> itself sees. This reproduces with a trivial wrapper
+(<code>function(formula, data, family, ...) glm(formula, data, family, ...)</code>) and is a limitation of <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>/<code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code>'s NSE, not something
+specific to erglm's <code>family</code> generalisation – see e.g. the "Note"
+in <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">?lm</a></code> about wrapping <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code>. Attempting it currently fails with a
+low-level error (<code>"..1 used in an incorrect context, no ... to look in"</code>). Two workarounds: fold an offset into the formula itself (e.g.
+<code>y ~ x + offset(z)</code>) rather than passing <code>offset =</code>, and pre-filter
+<code>data</code> yourself rather than passing <code>subset =</code>. There's no similar
+formula-level workaround for <code>weights</code>; call <code>stats::glm(formula, data, family, weights = ...)</code> directly instead, then (if you want
+the <code>erglm_model</code> class for consistency, e.g. for <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code>'s S3
+dispatch) run <code>class(mod) &lt;- c("erglm_model", class(mod))</code> on the
+result – every other erglm function works on a plain <code>glm</code> object
+just as well, since none of them require the class specifically.</p>
     </div>
 
     <div class="section level2">

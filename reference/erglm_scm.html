@@ -135,6 +135,19 @@ attempts recorded in <code>erglm_scm_history()</code>) – it's retained mainly
 as a guard against future refactors reintroducing genuine
 seed-sensitivity (e.g. if candidate order were ever used as an
 early-stopping rule rather than exhaustively tested every step).</p>
+<p>If a candidate term is aliased (perfectly collinear) with a term
+already in the model, <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">stats::anova()</a></code> reports zero additional
+degrees of freedom and an <code>NA</code> p-value for it. That candidate is
+skipped for the step (with a warning) rather than being selected or
+crashing the search – comparisons against <code>NA</code> aren't meaningful,
+and the candidate can never improve the fit anyway once it's
+aliased.</p>
+<p><code>candidates</code> is validated up front: every element must be parseable
+as a formula and name exactly one covariate term (e.g. <code>"sex"</code>, not
+<code>"sex + dose"</code> or <code>"not a formula"</code>). This errors immediately, before
+any model fitting, naming the offending element – rather than
+surfacing only once the search happens to test that candidate, many
+steps into what might be a long, expensive search.</p>
     </div>
 
     <div class="section level2">
