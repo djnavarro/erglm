@@ -43,6 +43,14 @@
 #' seed-sensitivity (e.g. if candidate order were ever used as an
 #' early-stopping rule rather than exhaustively tested every step).
 #'
+#' If a candidate term is aliased (perfectly collinear) with a term
+#' already in the model, `stats::anova()` reports zero additional
+#' degrees of freedom and an `NA` p-value for it. That candidate is
+#' skipped for the step (with a warning) rather than being selected or
+#' crashing the search -- comparisons against `NA` aren't meaningful,
+#' and the candidate can never improve the fit anyway once it's
+#' aliased.
+#'
 #' @name erglm_scm
 #' @examples
 #' mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
@@ -181,7 +189,14 @@ erglm_scm_history <- function(mod) {
         model_updated = NA
       )
       history <- tibble::add_row(history, history_row)
-      if (p_val < lowest_p) {
+      if (is.na(p_val)) {
+        rlang::warn(paste0(
+          "Skipping candidate term `", deparse(add), "` in forward step ",
+          iter, ": comparison p-value is NA (often caused by a candidate ",
+          "that's aliased/collinear with a term already in the model, ",
+          "giving zero additional degrees of freedom)."
+        ))
+      } else if (p_val < lowest_p) {
         update_ind <- attm
         lowest_p <- p_val
         best_mod <- mod_new
@@ -232,7 +247,14 @@ erglm_scm_history <- function(mod) {
         model_updated = NA
       )
       history <- tibble::add_row(history, history_row)
-      if (p_val > highest_p) {
+      if (is.na(p_val)) {
+        rlang::warn(paste0(
+          "Skipping candidate term `", deparse(del), "` in backward step ",
+          iter, ": comparison p-value is NA (often caused by a candidate ",
+          "that's aliased/collinear with another term in the model, ",
+          "giving zero degrees of freedom for the comparison)."
+        ))
+      } else if (p_val > highest_p) {
         update_ind <- attm
         highest_p <- p_val
         best_mod <- mod_new

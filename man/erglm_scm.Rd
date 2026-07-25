@@ -76,6 +76,14 @@ attempts recorded in \code{\link[=erglm_scm_history]{erglm_scm_history()}}) -- i
 as a guard against future refactors reintroducing genuine
 seed-sensitivity (e.g. if candidate order were ever used as an
 early-stopping rule rather than exhaustively tested every step).
+
+If a candidate term is aliased (perfectly collinear) with a term
+already in the model, \code{stats::anova()} reports zero additional
+degrees of freedom and an \code{NA} p-value for it. That candidate is
+skipped for the step (with a warning) rather than being selected or
+crashing the search -- comparisons against \code{NA} aren't meaningful,
+and the candidate can never improve the fit anyway once it's
+aliased.
 }
 \examples{
 mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())

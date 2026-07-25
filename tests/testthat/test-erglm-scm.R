@@ -169,3 +169,45 @@ test_that("erglm_add_term and erglm_remove_term preserve the model's family", {
   mod4 <- erglm_remove_term(mod3, ~sex, quiet = TRUE)
   expect_equal(family(mod4)$family, "poisson")
 })
+
+test_that("erglm_scm_forward skips (with a warning) a candidate aliased with an existing term", {
+  dat <- erglm_data
+  dat$aucss2 <- dat$aucss # perfectly collinear with aucss, already in the model
+  mod1 <- erglm_model(biomarker_change ~ aucss, dat)
+
+  # multiple warnings can fire (one per forward step that re-tests the
+  # aliased candidate) -- capture all of them rather than relying on
+  # expect_warning(), which only matches the first
+  warnings_seen <- character()
+  mod2 <- withCallingHandlers(
+    erglm_scm_forward(mod1, candidates = c("aucss2", "sex"), threshold = 1, seed = 909),
+    warning = function(w) {
+      warnings_seen <<- c(warnings_seen, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_true(any(grepl("aliased", warnings_seen)))
+  # the aliased candidate is never selected, but a genuine candidate still can be
+  expect_false("aucss2" %in% attr(stats::terms(mod2), "term.labels"))
+  expect_true("sex" %in% attr(stats::terms(mod2), "term.labels"))
+})
+
+test_that("erglm_scm_backward skips (with a warning) a candidate aliased with another model term", {
+  dat <- erglm_data
+  dat$aucss2 <- dat$aucss # perfectly collinear with aucss
+  mod1 <- erglm_model(biomarker_change ~ aucss + aucss2 + sex, dat)
+
+  # removing either half of an aliased pair leaves the fit unchanged (the
+  # other half absorbs the same information), so both give a Df = 0, NA
+  # p-value comparison -- both should warn and be skipped rather than crash
+  warnings_seen <- character()
+  mod2 <- withCallingHandlers(
+    erglm_scm_backward(mod1, candidates = c("aucss", "aucss2", "sex"), threshold = 1, seed = 909),
+    warning = function(w) {
+      warnings_seen <<- c(warnings_seen, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_true(sum(grepl("aliased", warnings_seen)) >= 2L)
+  expect_equal(deparse(mod2$formula), deparse(mod1$formula))
+})
