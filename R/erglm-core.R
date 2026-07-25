@@ -51,7 +51,9 @@ erglm_model <- function(formula, data, family = stats::gaussian(), ...) {
 #' `stats::family(object)$linkinv`, so this works for any `glm()` family,
 #' not just binomial/logistic models. See also [erglm_fun()] for
 #' generating predictions at arbitrary (possibly counterfactual)
-#' parameters or data.
+#' parameters or data. `conf_level` must be a single number between 0
+#' and 1 (inclusive); other values error rather than silently producing
+#' a reversed or `NaN` interval.
 #'
 #' This is a tidy, opinionated alternative to calling base R's
 #' `predict()` directly on `object` -- since `object` is a genuine
@@ -72,6 +74,7 @@ erglm_model <- function(formula, data, family = stats::gaussian(), ...) {
 #' erglm_predict(mod_gauss, erglm_data)
 #' 
 erglm_predict <- function(object, newdata = NULL, conf_level = .95) {
+  .erglm_check_conf_level(conf_level)
   if (is.null(newdata)) newdata <- object$data
   inverse_link <- stats::family(object)$linkinv
   z_scale <- -stats::qnorm((1 - conf_level)/2)
@@ -111,6 +114,10 @@ erglm_predict <- function(object, newdata = NULL, conf_level = .95) {
 #' binomial, poisson, gaussian, and gamma families. Named `erglm_fun()`
 #' for consistency with the companion `emaxnls` package's `emax_fun()`,
 #' which serves the same purpose for `emaxnls`/`emaxlogistic` models.
+#' The returned function checks that `param` is numeric and has one
+#' entry per column of the model matrix implied by `data`, erroring
+#' informatively rather than failing with a cryptic "non-conformable
+#' arguments" error from matrix multiplication.
 #'  
 #' @examples
 #' mod1 <- erglm_model(ae2 ~ aucss + sex, erglm_data, family = binomial())
@@ -140,6 +147,14 @@ erglm_fun <- function(object) {
     if (is.null(param)) param <- stats::coef(object)
     if (is.null(data)) data <- object$data
     mm <- stats::model.matrix(ff, data)
+    if (!is.numeric(param) || length(param) != ncol(mm)) {
+      rlang::abort(paste0(
+        "`param` must be a numeric vector of length ", ncol(mm),
+        " (one entry per column of the model matrix: ",
+        paste(colnames(mm), collapse = ", "), "), not length ",
+        length(param), "."
+      ))
+    }
     pred <- as.vector(mm %*% param)
     if (type == "response") pred <- stats::family(object)$linkinv(pred)
     return(pred)
@@ -158,6 +173,7 @@ erglm_fun <- function(object) {
 # the same `.erglm_draw_response()` helper `.erglm_resample()` itself
 # uses, so both simulation entry points share one noise model.
 .erglm_simulate_draws <- function(object, newdata, nsim = 100, seed = NULL) {
+  .erglm_check_nsim(nsim)
   if (is.null(seed)) {
     seed <- .pick_seed()
     rlang::inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))

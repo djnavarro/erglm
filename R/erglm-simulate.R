@@ -10,7 +10,8 @@
 #' an erglm-specific function name.
 #'
 #' @param object An erglm model, as returned by [erglm_model()]
-#' @param nsim Number of replicates
+#' @param nsim Number of replicates. Must be a single positive whole
+#' number.
 #' @param seed Used to set the RNG seed. If `NULL`, a random seed is
 #' chosen and reported.
 #' @param ... Ignored
@@ -64,6 +65,7 @@ simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
 # in a single call, and also returns the sampled coefficients, mirroring
 # emaxnls's `simulate()` output shape.
 .erglm_resample <- function(mod, nsim, seed = NULL) {
+  .erglm_check_nsim(nsim)
   if (is.null(seed)) {
     seed <- .pick_seed()
     rlang::inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))

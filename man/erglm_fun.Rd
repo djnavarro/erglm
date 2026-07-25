@@ -29,6 +29,10 @@ family, not just binomial/logistic models; tested for
 binomial, poisson, gaussian, and gamma families. Named \code{erglm_fun()}
 for consistency with the companion \code{emaxnls} package's \code{emax_fun()},
 which serves the same purpose for \code{emaxnls}/\code{emaxlogistic} models.
+The returned function checks that \code{param} is numeric and has one
+entry per column of the model matrix implied by \code{data}, erroring
+informatively rather than failing with a cryptic "non-conformable
+arguments" error from matrix multiplication.
 }
 \description{
 Prediction function for an exposure-response model

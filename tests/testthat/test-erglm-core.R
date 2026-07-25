@@ -96,6 +96,26 @@ test_that("erglm_predict can adjust confidence level", {
   expect_equal(prd0$ci_upper, prd0$fit_resp)
 })
 
+test_that("erglm_predict rejects invalid conf_level", {
+  mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+  expect_error(erglm_predict(mod, conf_level = -0.5), "conf_level")
+  expect_error(erglm_predict(mod, conf_level = 1.5), "conf_level")
+  expect_error(erglm_predict(mod, conf_level = NA), "conf_level")
+  expect_error(erglm_predict(mod, conf_level = c(0.9, 0.95)), "conf_level")
+  expect_error(erglm_predict(mod, conf_level = "0.95"), "conf_level")
+  # 0 and 1 are legitimate (degenerate) endpoints, not errors
+  expect_no_error(erglm_predict(mod, conf_level = 0))
+  expect_no_error(erglm_predict(mod, conf_level = 1))
+})
+
+test_that("erglm_fun's returned function rejects mismatched param length", {
+  mod1 <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+  mod1_fun <- erglm_fun(mod1)
+  expect_error(mod1_fun(param = c(1, 2)), "param")
+  expect_error(mod1_fun(param = c(1, 2, 3, 4, 5)), "param")
+  expect_error(mod1_fun(param = "not numeric"), "param")
+})
+
 test_that("erglm_model supports non-binomial glm families", {
   mod_pois <- erglm_model(ae_count ~ aucss + sex, erglm_data, family = poisson())
   expect_s3_class(mod_pois, "glm")

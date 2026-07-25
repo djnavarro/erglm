@@ -9,7 +9,8 @@
 \arguments{
 \item{object}{An erglm model, as returned by \code{\link[=erglm_model]{erglm_model()}}}
 
-\item{nsim}{Number of replicates}
+\item{nsim}{Number of replicates. Must be a single positive whole
+number.}
 
 \item{seed}{Used to set the RNG seed. If \code{NULL}, a random seed is
 chosen and reported.}

@@ -24,7 +24,9 @@ Computes intervals on the link scale and back-transforms with
 \code{stats::family(object)$linkinv}, so this works for any \code{glm()} family,
 not just binomial/logistic models. See also \code{\link[=erglm_fun]{erglm_fun()}} for
 generating predictions at arbitrary (possibly counterfactual)
-parameters or data.
+parameters or data. \code{conf_level} must be a single number between 0
+and 1 (inclusive); other values error rather than silently producing
+a reversed or \code{NaN} interval.
 
 This is a tidy, opinionated alternative to calling base R's
 \code{predict()} directly on \code{object} -- since \code{object} is a genuine

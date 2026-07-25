@@ -49,3 +49,13 @@ test_that("simulate.erglm_model reports a random seed when none is supplied", {
   mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
   expect_message(simulate(mod, nsim = 2), "Using seed")
 })
+
+test_that("simulate.erglm_model rejects invalid nsim", {
+  mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+  expect_error(simulate(mod, nsim = 0, seed = 111), "nsim")
+  expect_error(simulate(mod, nsim = -1, seed = 111), "nsim")
+  expect_error(simulate(mod, nsim = 1.7, seed = 111), "nsim")
+  expect_error(simulate(mod, nsim = NA, seed = 111), "nsim")
+  expect_error(simulate(mod, nsim = c(2, 3), seed = 111), "nsim")
+  expect_error(simulate(mod, nsim = "2", seed = 111), "nsim")
+})
