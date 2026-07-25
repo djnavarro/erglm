@@ -12,6 +12,7 @@ Description:
     models (including those fitted with erglm), see the companion
     package 'erplots'.
 License: MIT + file LICENSE
+Language: en-GB
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Imports: 

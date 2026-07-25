@@ -1,7 +1,7 @@
 
 # Interoperability with erplots ------------------------------------------
 #
-# erglm has no hard dependency on erplots (a modeling package shouldn't need
+# erglm has no hard dependency on erplots (a modelling package shouldn't need
 # to pull in ggplot2/patchwork). But if erplots *is* installed and loaded,
 # erglm's model objects should work seamlessly with erplots' model-agnostic
 # plotting API (`er_plot_show_model()`, `er_vpc_plot()`, etc.), which relies
@@ -10,7 +10,7 @@
 #
 # These methods are registered lazily at load time (via `.onLoad()` below),
 # so that neither erplots nor its dependencies need to be installed for
-# erglm's modeling functions to work standalone.
+# erglm's modelling functions to work standalone.
 
 er_predict.erglm_model <- function(model, newdata, conf_level = 0.95, ...) {
   erglm_predict(object = model, newdata = newdata, conf_level = conf_level)

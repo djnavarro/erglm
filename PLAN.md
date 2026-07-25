@@ -413,6 +413,54 @@ accurate *development* history.
    that is currently run locally or in CI (the CI workflow checks on
    its own runner matrix, but a manual as-cran pass before submission
    is still standard practice).
+   - ~~`devtools::check(remote = TRUE, manual = TRUE)`.~~ Done -- 0
+     errors, 0 warnings, 2 notes: (a) the standard CRAN-incoming
+     feasibility note for a first submission (new submission, the dev
+     version's four-component number -- resolves once bumped to
+     `0.1.0` at submission time -- misspelled-word flags now fixed via
+     `inst/WORDLIST` below, the non-standard `Remotes` field, and
+     `erplots` not being in a mainstream repository, all already
+     tracked); (b) a local-only note that HTML manual validation was
+     skipped because `tidy` isn't installed on this machine (not
+     expected to reproduce on CRAN's own check machines).
+   - ~~Misspelled-word flags from CRAN-incoming feasibility
+     (`erglm`, `poisson`).~~ Done -- ran
+     `spelling::update_wordlist(confirm = FALSE)`, which added 34
+     words (including `erglm's`, `poisson`, and various
+     British-spelling/jargon terms already used throughout the
+     roxygen docs and vignettes) to a new `inst/WORDLIST`.
+     `spelling::spell_check_package()` now reports no spelling errors.
+   - ~~`urlchecker::url_check()`.~~ Done -- all 7 URLs in the package
+     check out fine.
+   - ~~Confirm the package checks cleanly with `erplots` uninstalled
+     (item 3).~~ Done -- built the tarball and ran `R CMD check
+     --as-cran` against a throwaway library (symlinked copy of the
+     real library, minus `erplots`), with
+     `_R_CHECK_FORCE_SUGGESTS_=false` set to match CRAN's/
+     `devtools::check()`'s own incoming-check environment (plain `R
+     CMD check` treats `Suggests` as required by default, which isn't
+     representative of how CRAN itself checks incoming submissions).
+     Result: 0 errors, 0 warnings, `erplots`'s unavailability
+     downgraded to an `INFO`, all tests pass. This confirms the claim
+     in `cran-comments.md`. One unrelated, genuine finding from this
+     run: `cran-comments.md` itself wasn't in `.Rbuildignore`, so it
+     was being bundled into the tarball (flagged as a "non-standard
+     top-level file" NOTE) -- fixed by adding it alongside
+     `AGENTS.md`/`PLAN.md`.
+   - ~~R-hub v2 checks on a representative platform set (linux,
+     macos-arm64, windows, nosuggests -- R-devel on each).~~ Done.
+     `rhub::rhub_setup()` added `.github/workflows/rhub.yaml`
+     (committed/pushed); `rhub::rhub_check()` ran all four and every
+     one reported `Status: OK` (see run
+     <https://github.com/djnavarro/erglm/actions/runs/30158512877>).
+     The `nosuggests` container (R-devel on Fedora, `erplots` genuinely
+     absent rather than merely check-excluded) is the strongest
+     available confirmation of the `Suggests: erplots` NOTE's
+     explanation in `cran-comments.md`: `checking package dependencies
+     ... OK`, and the testthat run explicitly logs `{erplots} is not
+     installed (3)` skips in `test-er-methods.R`, showing the gating
+     works as designed rather than accidentally passing some other
+     way.
 6. **`cran-comments.md`.** Standard practice for a first submission:
    note this is a new package, summarise `R CMD check` results (0
    errors/warnings, any NOTEs explained), and flag the `erplots`
