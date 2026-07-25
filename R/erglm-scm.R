@@ -290,10 +290,12 @@ erglm_scm_history <- function(mod) {
 #' to a specific Emax parameter, whereas erglm's terms are plain
 #' one-sided `glm()` formula terms (e.g. `~ sex`), since erglm has no
 #' equivalent parameter-level structure to attach covariates to. `term`
-#' must be a one-sided formula; passing `NULL`, a non-formula, or a
-#' two-sided formula errors informatively rather than failing with a
-#' low-level error (`NULL`/non-formula) or being silently misinterpreted
-#' (two-sided).
+#' must be a one-sided formula naming exactly one covariate; passing
+#' `NULL`, a non-formula, a two-sided formula, or a multi-term formula
+#' (e.g. `~ weight + age`) errors informatively rather than failing with
+#' a low-level error (`NULL`/non-formula) or being silently
+#' misinterpreted (two-sided formulas; multi-term formulas, which used
+#' to add/attempt every term at once with no warning).
 #'
 #' @returns An erglm model object. If the term can't be added/removed
 #' (see `quiet`), the original `mod` is returned unchanged.

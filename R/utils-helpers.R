@@ -33,7 +33,7 @@
 }
 
 # `term` (as passed to `erglm_add_term()`/`erglm_remove_term()`) must be
-# a one-sided formula naming a single covariate, e.g. `~ sex`. `NULL`
+# a one-sided formula naming exactly one covariate, e.g. `~ sex`. `NULL`
 # (or any non-formula) previously reached `stats::terms(term)` directly
 # and failed with a cryptic low-level error ("no terms component nor
 # attribute", or "$ operator is invalid for atomic vectors"); a
@@ -42,6 +42,11 @@
 # (`erglm_add_term()`, since the response was checked as if it were a
 # predictor) or was tolerated by discarding the response entirely
 # (`erglm_remove_term()`) -- neither of which reflects what happened.
+# A multi-term formula (e.g. `~ weight + age`) also previously slipped
+# past silently in `erglm_add_term()`: the "already in the model" check
+# compares term labels elementwise (`==`), which never matches a
+# multi-element vector against the model's single-element one, so every
+# term in `term` got added at once with no warning.
 .erglm_check_term <- function(term) {
   if (is.null(term) || !inherits(term, "formula")) {
     rlang::abort(paste0(
@@ -55,6 +60,13 @@
       "two-sided formula `", deparse(term), "`. erglm_add_term()/",
       "erglm_remove_term() work on plain covariate terms and don't use ",
       "a response."
+    ))
+  }
+  trm_lab <- attr(stats::terms(term), "term.labels")
+  if (length(trm_lab) != 1L) {
+    rlang::abort(paste0(
+      "`term` must name exactly one covariate (e.g. `~ sex`), not ",
+      length(trm_lab), ": `", deparse(term), "`."
     ))
   }
 }

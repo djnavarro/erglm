@@ -39,10 +39,12 @@ structural parameter (e.g. \code{E0 ~ AGE}), since covariates there attach
 to a specific Emax parameter, whereas erglm's terms are plain
 one-sided \code{glm()} formula terms (e.g. \code{~ sex}), since erglm has no
 equivalent parameter-level structure to attach covariates to. \code{term}
-must be a one-sided formula; passing \code{NULL}, a non-formula, or a
-two-sided formula errors informatively rather than failing with a
-low-level error (\code{NULL}/non-formula) or being silently misinterpreted
-(two-sided).
+must be a one-sided formula naming exactly one covariate; passing
+\code{NULL}, a non-formula, a two-sided formula, or a multi-term formula
+(e.g. \code{~ weight + age}) errors informatively rather than failing with
+a low-level error (\code{NULL}/non-formula) or being silently
+misinterpreted (two-sided formulas; multi-term formulas, which used
+to add/attempt every term at once with no warning).
 }
 \examples{
 mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
