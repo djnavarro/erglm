@@ -289,7 +289,11 @@ erglm_scm_history <- function(mod) {
 #' structural parameter (e.g. `E0 ~ AGE`), since covariates there attach
 #' to a specific Emax parameter, whereas erglm's terms are plain
 #' one-sided `glm()` formula terms (e.g. `~ sex`), since erglm has no
-#' equivalent parameter-level structure to attach covariates to.
+#' equivalent parameter-level structure to attach covariates to. `term`
+#' must be a one-sided formula; passing `NULL`, a non-formula, or a
+#' two-sided formula errors informatively rather than failing with a
+#' low-level error (`NULL`/non-formula) or being silently misinterpreted
+#' (two-sided).
 #'
 #' @returns An erglm model object. If the term can't be added/removed
 #' (see `quiet`), the original `mod` is returned unchanged.
@@ -304,6 +308,7 @@ NULL
 #' @rdname erglm_term
 #' @export
 erglm_add_term <- function(mod, term, quiet = FALSE) {
+  .erglm_check_term(term)
   trm_mod <- stats::terms(mod)
   trm_add <- stats::terms(term)
   trm_mod_lab <- attr(trm_mod, "term.labels")
@@ -329,6 +334,7 @@ erglm_add_term <- function(mod, term, quiet = FALSE) {
 #' @rdname erglm_term
 #' @export
 erglm_remove_term <- function(mod, term, quiet = FALSE) {
+  .erglm_check_term(term)
   trm_mod <- stats::terms(mod)
   trm_del <- stats::terms(term)
   trm_mod_lab <- attr(trm_mod, "term.labels")

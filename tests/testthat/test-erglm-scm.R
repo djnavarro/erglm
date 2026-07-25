@@ -28,6 +28,20 @@ test_that("erglm_remove_term warns (unless quiet) when the term isn't in the mod
   expect_equal(deparse(mod2$formula), deparse(mod1$formula))
 })
 
+test_that("erglm_add_term errors informatively for NULL, non-formula, or two-sided term", {
+  mod1 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
+  expect_error(erglm_add_term(mod1, NULL), "term")
+  expect_error(erglm_add_term(mod1, "sex"), "term")
+  expect_error(erglm_add_term(mod1, ae1 ~ sex), "two-sided")
+})
+
+test_that("erglm_remove_term errors informatively for NULL, non-formula, or two-sided term", {
+  mod2 <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
+  expect_error(erglm_remove_term(mod2, NULL), "term")
+  expect_error(erglm_remove_term(mod2, "sex"), "term")
+  expect_error(erglm_remove_term(mod2, ae1 ~ sex), "two-sided")
+})
+
 test_that("erglm_scm_history works when no scm called", {
   mod1 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
   expect_no_error(erglm_scm_history(mod1))

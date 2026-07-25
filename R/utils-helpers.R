@@ -9,10 +9,8 @@
 # Renders a bad argument value for an error message without risking a
 # second error from an unprintable/zero-length/weird-class input.
 .fmt_bad_value <- function(x) {
-  if (is.null(x)) return("NULL")
-  if (length(x) == 0L) return(paste0(class(x)[1], "(0)"))
   tryCatch(
-    paste(format(x), collapse = ", "),
+    paste(deparse(x), collapse = " "),
     error = function(e) paste0("<", class(x)[1], ">")
   )
 }
@@ -30,6 +28,33 @@
     rlang::abort(paste0(
       "`conf_level` must be a single number between 0 and 1 (inclusive), not ",
       .fmt_bad_value(conf_level), "."
+    ))
+  }
+}
+
+# `term` (as passed to `erglm_add_term()`/`erglm_remove_term()`) must be
+# a one-sided formula naming a single covariate, e.g. `~ sex`. `NULL`
+# (or any non-formula) previously reached `stats::terms(term)` directly
+# and failed with a cryptic low-level error ("no terms component nor
+# attribute", or "$ operator is invalid for atomic vectors"); a
+# two-sided formula (e.g. `y ~ x`) previously slipped past silently and
+# either produced a misleading "uses variables not in the data" warning
+# (`erglm_add_term()`, since the response was checked as if it were a
+# predictor) or was tolerated by discarding the response entirely
+# (`erglm_remove_term()`) -- neither of which reflects what happened.
+.erglm_check_term <- function(term) {
+  if (is.null(term) || !inherits(term, "formula")) {
+    rlang::abort(paste0(
+      "`term` must be a one-sided formula naming a single covariate ",
+      "(e.g. `~ sex`), not ", .fmt_bad_value(term), "."
+    ))
+  }
+  if (length(term) != 2L) {
+    rlang::abort(paste0(
+      "`term` must be a one-sided formula (e.g. `~ sex`), not the ",
+      "two-sided formula `", deparse(term), "`. erglm_add_term()/",
+      "erglm_remove_term() work on plain covariate terms and don't use ",
+      "a response."
     ))
   }
 }
