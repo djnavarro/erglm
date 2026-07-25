@@ -348,13 +348,29 @@ to prepare for a first CRAN submission.
   `usethis::use_mit_license()` format.
 - `URL`/`BugReports` fields point at the renamed repo and pkgdown site.
 
+### Framing decision: erglm is a new package, not a renamed `erlr`
+
+Decided: since `erlr` was never released on CRAN and was only briefly
+public on GitHub, and erglm's functionality (arbitrary `glm()`
+families, SCM, simulation, erplots interop) differs substantially from
+`erlr`'s binomial-only scope, CRAN-facing artefacts (`NEWS.md`, the
+release version number) treat erglm as an entirely new package with no
+migration story to tell, rather than as `erlr`'s second act. This is a
+framing decision only — it doesn't undo any of the rename work already
+recorded elsewhere in this file or in `AGENTS.md`, which remain the
+accurate *development* history.
+
+- `NEWS.md` now describes erglm 0.1.0 as an initial release, listing
+  its feature set with no mention of `erlr`.
+- The dev version was reset from `0.2.0.9000` to `0.0.0.9000`
+  (`DESCRIPTION`), matching the usual convention for a package that
+  hasn't had its first CRAN release yet; item 7 below is resolved as
+  `0.1.0` for that release.
+
 ### Gaps to close before submitting
 
-1. **No `NEWS.md`.** CRAN doesn't require one, but reviewers and users
-   benefit from a top-level entry documenting the `erlr` → `erglm`
-   rename and family generalisation, since anyone who used `erlr`
-   needs a migration note. Should be added regardless of submission
-   timing.
+1. ~~**No `NEWS.md`.**~~ Done -- see the framing decision above;
+   `NEWS.md` documents erglm 0.1.0 as an initial release.
 2. ~~**`LICENSE.md` copyright holder doesn't match `DESCRIPTION`.**~~
    Done -- `LICENSE`/`LICENSE.md` now read "Danielle Navarro", matching
    the `cph` role in `Authors@R`.
@@ -401,30 +417,21 @@ to prepare for a first CRAN submission.
    note this is a new package, summarise `R CMD check` results (0
    errors/warnings, any NOTEs explained), and flag the `erplots`
    Suggests relationship.
-7. **Version number for release.** Decide whether the first CRAN
-   release ships as `0.2.0` (dropping the `.9000` dev suffix, keeping
-   the version that reflects "second design," post-rename) or `1.0.0`
-   (signalling API stability now that the family generalisation and
-   rename are both behind it). Open question — no strong convention
-   either way for a first release; flagging for a decision rather than
-   picking one.
+7. ~~**Version number for release.**~~ Decided -- `0.1.0`, per the
+   framing decision above (new package, conventional first-release
+   version). `DESCRIPTION`'s dev version is `0.0.0.9000` in the
+   meantime; bump to `0.1.0` at actual submission time.
 
 ### Suggested step ordering
 
 1. ~~Fix the `LICENSE.md` copyright holder mismatch (item 2).~~ Done.
-2. Write `NEWS.md` covering the `erlr` → `erglm` history (item 1) --
-   worth mentioning the `erglm_vpc_sim()` removal here too, alongside
-   the rename/generalisation, since it's a second user-visible breaking
-   change relative to any pre-CRAN `erlr`/early-`erglm` usage.
+2. ~~Write `NEWS.md` (item 1) and decide the release version number
+   (item 7).~~ Done -- see the framing decision above.
 3. ~~Audit roxygen `@return`/`@examples` coverage across all exported
    functions (item 4).~~ Done -- see item 4 above.
-4. Decide the release version number (item 7) — needs user input.
-5. Run the full pre-submission check suite (item 5), including a
+4. Run the full pre-submission check suite (item 5), including a
    check with `erplots` uninstalled (item 3), and fix anything it
    surfaces.
-6. Draft `cran-comments.md` (item 6) and do a final review pass before
-   `devtools::release()`.
-
-This ordering isn't committed — step 2 has no open design questions;
-step 4 blocks tagging a release but not the mechanical cleanup in
-step 2.
+5. Draft `cran-comments.md` (item 6) and do a final review pass before
+   `devtools::release()` -- bump `DESCRIPTION`'s version to `0.1.0` at
+   that point.
