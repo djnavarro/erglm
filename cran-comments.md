@@ -9,10 +9,12 @@ This is a new package.
   nosuggests, all R-devel -- all `Status: OK`
 * win-builder, R-devel and R-release (`devtools::check_win_devel()`/
   `check_win_release()`) -- both `Status: 1 NOTE`, re-run after the
-  `Remotes` field fix below to confirm: the R-release result
-  (<https://win-builder.r-project.org/MZQKR10g1a71/00check.log>)
-  already shows the note without `Remotes`, matching the 3-item note
-  described below; no platform-specific issues
+  `Remotes` field fix to confirm it's gone: R-release
+  (<https://win-builder.r-project.org/MZQKR10g1a71/00check.log>) and
+  R-devel
+  (<https://win-builder.r-project.org/pRgEup4LhLH8/00check.log>) both
+  show the 3-item note described below with no `Remotes` mention and
+  no platform-specific issues
 * `devtools::check_mac_release()` was attempted but not obtained --
   mac.r-project.org returned repeated HTTP 502s at submission time.
   Not otherwise substituted, since R-hub's `macos-arm64` platform
