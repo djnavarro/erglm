@@ -7,6 +7,13 @@ This is a new package.
 * local Ubuntu 24.04, R 4.6.1, `devtools::check(remote = TRUE, manual = TRUE)`
 * R-hub v2 (`rhub::rhub_check()`): linux, macos-arm64, windows, and
   nosuggests, all R-devel -- all `Status: OK`
+* win-builder, R-devel and R-release (`devtools::check_win_devel()`/
+  `check_win_release()`) -- both `Status: 1 NOTE` (the same note
+  described below; no platform-specific issues)
+* `devtools::check_mac_release()` was attempted but not obtained --
+  mac.r-project.org returned repeated HTTP 502s at submission time.
+  Not otherwise substituted, since R-hub's `macos-arm64` platform
+  above already exercises macOS.
 
 ## R CMD check results
 

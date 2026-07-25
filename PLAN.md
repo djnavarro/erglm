@@ -474,11 +474,27 @@ accurate *development* history.
      installed (3)` skips in `test-er-methods.R`, showing the gating
      works as designed rather than accidentally passing some other
      way.
+   - ~~CRAN's own pre-submission build services
+     (`devtools::check_win_devel()`/`check_win_release()`/
+     `check_mac_release()`).~~ Done, with one platform unobtained.
+     Both win-builder runs came back `Status: 1 NOTE` -- the same
+     single note described above, with `erplots` correctly surfacing
+     as an `INFO` rather than an error -- with no platform-specific
+     issues on either R-devel
+     (<https://win-builder.r-project.org/uON2S1dVeDBB/00check.log>) or
+     R-release
+     (<https://win-builder.r-project.org/J3BD5uJRlZuS/00check.log>).
+     `check_mac_release()` was attempted three times and each attempt
+     returned an HTTP 502 from `mac.r-project.org`; decided to skip it
+     rather than keep retrying a service that appears to be down, since
+     R-hub's `macos-arm64` platform above already exercises macOS and
+     came back clean.
 6. ~~**`cran-comments.md`.**~~ Done -- drafted, covering both
    remaining NOTEs (`Remotes`, `Suggests: erplots`) with explanations
    backed by the local and R-hub `erplots`-free verification above,
-   and listing R-hub's four-platform run alongside the local
-   `devtools::check()` under "Test environments".
+   and listing R-hub's four-platform run and both win-builder runs
+   under "Test environments", with a note on the unobtained
+   `mac.r-project.org` result.
 7. ~~**Version number for release.**~~ Decided -- `0.1.0`, per the
    framing decision above (new package, conventional first-release
    version). `DESCRIPTION`'s version has been bumped from the dev
