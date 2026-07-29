@@ -161,10 +161,10 @@ default it returns predictions on the link scale; use
 <span><span class="co">#&gt; 0.8554138 0.9999984 0.1567379 0.9900114 0.5274632</span></span></code></pre></div>
 <p><code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> can also return standard errors
 (<code>se.fit = TRUE</code>), which is the basis for erglm’s own
-[erglm_predict()] – that function is a thin, opinionated wrapper that
-back-transforms the link-scale standard errors into a confidence
-interval on the response scale and returns everything as a tidy data
-frame bound to <code>newdata</code>:</p>
+<code><a href="../reference/erglm_predict.html">erglm_predict()</a></code> – that function is a thin, opinionated
+wrapper that back-transforms the link-scale standard errors into a
+confidence interval on the response scale and returns everything as a
+tidy data frame bound to <code>newdata</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span><span class="va">mod</span>, newdata <span class="op">=</span> <span class="va">erglm_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 18</span></span></span>

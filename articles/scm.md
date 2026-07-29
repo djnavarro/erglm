@@ -103,9 +103,7 @@ erglm_scm_history(fwd_mod)[, c("term_tested", "term_p_value", "model_updated")]
 data-generating process behind `erglm_data`, but once `aucss` is already
 in the model that effect isn’t strong enough, at this sample size, to
 clear a $`0.01`$ threshold – so the search correctly leaves it out
-rather than adding a covariate that doesn’t earn its place. This is a
-feature, not a limitation: SCM is exactly the tool that should stop you
-from including underpowered terms.
+rather than adding a covariate that doesn’t earn its place.
 
 ## Backward elimination
 
