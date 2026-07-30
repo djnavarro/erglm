@@ -73,10 +73,21 @@ dependency on it. Every use is conditional:
 
 This has been verified directly: the package passes `R CMD check`
 cleanly (`Status: OK`) on R-hub's `nosuggests` container (R-devel on
-Fedora, where `erplots` is genuinely absent), and locally against a
-throwaway library with `erplots` removed. In both cases the
-`test-er-methods.R` skips are reported explicitly rather than the
-package silently working some other way.
+Fedora, where `erplots` is genuinely absent) for the 0.1.0 submission,
+and, for this 0.1.1 resubmission, against a local `nosuggests`-equivalent
+simulation -- a throwaway library mirroring the real one but with
+`erplots` removed, checked with `_R_CHECK_FORCE_SUGGESTS_=false` (`R CMD
+check --as-cran` on the built tarball). The local route was used instead
+of re-running R-hub's `nosuggests` container via its GitHub Actions
+workflow, because that workflow's `setup-deps` step (`pak::lockfile_create()`)
+doesn't consult a package's own `Additional_repositories` field when
+resolving `deps::.` references -- a known upstream `pak` limitation
+(<https://github.com/r-lib/pak/issues/424>), unrelated to `erglm` and
+orthogonal to CRAN's own incoming-feasibility check (which does read
+`Additional_repositories` correctly, as shown above). In both the
+0.1.0 R-hub run and the 0.1.1 local simulation, the `test-er-methods.R`
+skips are reported explicitly rather than the package silently working
+some other way.
 
 ## Downstream dependencies
 
