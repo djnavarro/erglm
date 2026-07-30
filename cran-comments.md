@@ -32,13 +32,22 @@ No other changes since 0.1.0.
 * R-hub v2 (`rhub::rhub_check()`): linux, macos-arm64, windows, and
   nosuggests, all R-devel -- all `Status: OK`
 * win-builder, R-release (`devtools::check_win_release()`), resubmitted
-  after the `Poisson`/`Gaussian` capitalisation fix above. R-devel was
-  also attempted but its FTP upload repeatedly failed
-  (`Failed FTP upload: 550`) even after a delay and retries, while an
-  identical build uploaded to R-release without issue -- pointing to a
-  transient win-builder-side problem specific to the R-devel endpoint
-  rather than anything in the package. R-devel will be resubmitted
-  separately once win-builder's upload issue clears.
+  after the `Poisson`/`Gaussian` capitalisation fix above:
+  `Status: 1 NOTE` (the expected new-submission/`erplots`-availability
+  note; see below), 0 errors, 0 warnings
+  (<https://win-builder.r-project.org/Uq48u332N0R1/00check.log> --
+  note this particular log is from the submission just before the
+  `Poisson`/`Gaussian` fix, since it still flags `poisson`; the
+  fix itself is otherwise verified locally, see below). R-devel's FTP
+  upload (`devtools::check_win_devel()`) failed repeatedly with
+  `Failed FTP upload: 550` across five attempts over two sessions
+  (including a 3-minute wait in between), while an identical build
+  uploaded to R-release without issue each time -- pointing to a
+  problem specific to win-builder's R-devel endpoint rather than
+  anything in the package. Not pursued further for this submission;
+  R-hub's `windows` platform (`Status: OK`, part of the R-hub run
+  above) and the local Windows-independent checks already give
+  reasonable Windows-relevant coverage in R-devel's absence.
 
 ## R CMD check results
 
