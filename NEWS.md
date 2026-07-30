@@ -9,6 +9,10 @@ CRAN resubmission, addressing reviewer feedback on the 0.1.0 submission:
   optional `Suggests` dependency 'erplots' (not on CRAN) can be
   installed, per CRAN policy on declaring where to obtain such
   packages.
+* `DESCRIPTION`'s `Description` field now capitalises `Poisson` and
+  `Gaussian` (they name the eponymous distributions/families), per
+  further reviewer feedback; `binomial` and `gamma` are left
+  lowercase, as neither is an eponym.
 
 # erglm 0.1.0
 

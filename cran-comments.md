@@ -18,6 +18,11 @@ reviewer on the 0.1.0 submission:
    CRAN) as a source `install.packages()` can use, per the CRAN
    policy on declaring non-mainstream `Suggests`/`Enhances`
    dependencies.
+3. "-> Poisson, Gaussian (form surnames)" -- the `Description` field's
+   `poisson` and `gaussian` are now capitalised (`Poisson`, `Gaussian`),
+   since they refer to the eponymous distributions/families (Poisson,
+   Gauss) rather than being used as plain adjectives. `binomial` and
+   `gamma` are left lowercase, as neither is an eponym.
 
 No other changes since 0.1.0.
 
@@ -40,15 +45,13 @@ New submission
 
 Possibly misspelled words in DESCRIPTION:
   erglm (12:41)
-  poisson (10:33)
 ```
 
-Both are correct as written: `erglm` is the package's own name (now
-single-quoted per the reviewer's request, which `aspell` still flags
-since it isn't a dictionary word), and `poisson` is the standard
-(lowercase, used generically rather than as the proper noun
-`Poisson`) name of the Poisson family/distribution supported by
-`erglm_model()`.
+`erglm` is the package's own name (now single-quoted per the
+reviewer's request, which `aspell` still flags since it isn't a
+dictionary word). The `poisson`/`gaussian` misspelling flags from the
+0.1.0 submission are gone now that both are capitalised as the
+eponyms `Poisson`/`Gaussian` (see point 3 above).
 
 The `erplots`-not-in-mainstream-repositories note from the 0.1.0
 submission is addressed via `Additional_repositories` (see above) and
