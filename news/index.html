@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">erglm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,13 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.1" id="erglm-011">erglm 0.1.1<a class="anchor" aria-label="anchor" href="#erglm-011"></a></h2>
+<p>CRAN resubmission, addressing reviewer feedback on the 0.1.0 submission:</p>
+<ul><li>Self-references to ‘erglm’ in the <code>DESCRIPTION</code> <code>Description</code> field are now single-quoted, per CRAN’s software-name convention.</li>
+<li>
+<code>DESCRIPTION</code> now declares <code>Additional_repositories: https://djnavarro.r-universe.dev</code>, the repository from which the optional <code>Suggests</code> dependency ‘erplots’ (not on CRAN) can be installed, per CRAN policy on declaring where to obtain such packages.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="erglm-010">erglm 0.1.0<a class="anchor" aria-label="anchor" href="#erglm-010"></a></h2>
 <p>Initial CRAN release.</p>
 <ul><li>Model fitting and prediction for exposure-response models based on <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> (<code><a href="../reference/erglm_model.html">erglm_model()</a></code>, <code><a href="../reference/erglm_predict.html">erglm_predict()</a></code>), supporting arbitrary <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> families; binomial, poisson, gaussian, and gamma are tested and officially supported end to end (fitting, prediction, SCM significance testing, and simulation).</li>
@@ -57,7 +64,8 @@
 <code><a href="../reference/erglm_link.html">erglm_link()</a></code>/<code><a href="../reference/erglm_link.html">erglm_invlink()</a></code>, discoverable wrappers around a fitted model’s link and inverse-link functions.</li>
 <li>An example dataset, <code>erglm_data</code>, with binary, count, and continuous/right-skewed continuous response columns for demonstrating each supported family.</li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

@@ -1,5 +1,17 @@
 # Changelog
 
+## erglm 0.1.1
+
+CRAN resubmission, addressing reviewer feedback on the 0.1.0 submission:
+
+- Self-references to ‘erglm’ in the `DESCRIPTION` `Description` field
+  are now single-quoted, per CRAN’s software-name convention.
+- `DESCRIPTION` now declares
+  `Additional_repositories: https://djnavarro.r-universe.dev`, the
+  repository from which the optional `Suggests` dependency ‘erplots’
+  (not on CRAN) can be installed, per CRAN policy on declaring where to
+  obtain such packages.
+
 ## erglm 0.1.0
 
 Initial CRAN release.
