@@ -31,8 +31,14 @@ No other changes since 0.1.0.
 * local Ubuntu 24.04, R 4.6.1, `devtools::check(remote = TRUE, manual = TRUE)`
 * R-hub v2 (`rhub::rhub_check()`): linux, macos-arm64, windows, and
   nosuggests, all R-devel -- all `Status: OK`
-* win-builder, R-devel and R-release
-  (`devtools::check_win_devel()`/`check_win_release()`)
+* win-builder, R-release (`devtools::check_win_release()`), resubmitted
+  after the `Poisson`/`Gaussian` capitalisation fix above. R-devel was
+  also attempted but its FTP upload repeatedly failed
+  (`Failed FTP upload: 550`) even after a delay and retries, while an
+  identical build uploaded to R-release without issue -- pointing to a
+  transient win-builder-side problem specific to the R-devel endpoint
+  rather than anything in the package. R-devel will be resubmitted
+  separately once win-builder's upload issue clears.
 
 ## R CMD check results
 
