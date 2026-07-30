@@ -35,10 +35,11 @@ No other changes since 0.1.0.
   after the `Poisson`/`Gaussian` capitalisation fix above:
   `Status: 1 NOTE` (the expected new-submission/`erplots`-availability
   note; see below), 0 errors, 0 warnings
-  (<https://win-builder.r-project.org/Uq48u332N0R1/00check.log> --
-  note this particular log is from the submission just before the
-  `Poisson`/`Gaussian` fix, since it still flags `poisson`; the
-  fix itself is otherwise verified locally, see below). R-devel's FTP
+  (<https://win-builder.r-project.org/C0J7C6r2LG3N/00check.log> --
+  no misspelled-words flag at all here, confirming the
+  `Poisson`/`Gaussian` fix; an earlier log from the submission just
+  before that fix, <https://win-builder.r-project.org/Uq48u332N0R1/00check.log>,
+  still flagged `poisson`, for reference). R-devel's FTP
   upload (`devtools::check_win_devel()`) failed repeatedly with
   `Failed FTP upload: 550` across five attempts over two sessions
   (including a 3-minute wait in between), while an identical build
