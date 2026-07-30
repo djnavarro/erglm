@@ -39,16 +39,17 @@ No other changes since 0.1.0.
   no misspelled-words flag at all here, confirming the
   `Poisson`/`Gaussian` fix; an earlier log from the submission just
   before that fix, <https://win-builder.r-project.org/Uq48u332N0R1/00check.log>,
-  still flagged `poisson`, for reference). R-devel's FTP
-  upload (`devtools::check_win_devel()`) failed repeatedly with
-  `Failed FTP upload: 550` across five attempts over two sessions
-  (including a 3-minute wait in between), while an identical build
-  uploaded to R-release without issue each time -- pointing to a
-  problem specific to win-builder's R-devel endpoint rather than
-  anything in the package. Not pursued further for this submission;
-  R-hub's `windows` platform (`Status: OK`, part of the R-hub run
-  above) and the local Windows-independent checks already give
-  reasonable Windows-relevant coverage in R-devel's absence.
+  still flagged `poisson`, for reference).
+* win-builder, R-devel (`devtools::check_win_devel()`):
+  `Status: 1 NOTE` (the same expected note), 0 errors, 0 warnings, no
+  misspelled-words flag
+  (<https://win-builder.r-project.org/2bNIuS069iDx/00check.log>). The
+  FTP upload initially failed repeatedly with `Failed FTP upload: 550`
+  across five attempts over two sessions (including a 3-minute wait
+  in between), while an identical build uploaded to R-release without
+  issue each time -- confirming that was a transient problem specific
+  to win-builder's R-devel endpoint rather than anything in the
+  package, since a later retry succeeded cleanly.
 
 ## R CMD check results
 
