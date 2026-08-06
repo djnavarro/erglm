@@ -12,9 +12,9 @@ simulation (`erglm_fun()`, `simulate.erglm_model()`).
 defaulting to `stats::gaussian()` (matching `glm()`'s own default);
 binomial, poisson, gaussian, and gamma are tested and officially
 supported end to end (fitting, prediction, SCM significance testing,
-and simulation). Other `glm()` families work through the same
-generic mechanisms in `erglm_predict()`/`erglm_fun()` but aren't
-covered by SCM's test selection or `simulate()`'s noise draws.
+and simulation). Other `glm()` families work through the same generic
+mechanisms in `erglm_predict()`/`erglm_fun()` but aren't covered by
+SCM's test selection or `simulate()`'s noise draws.
 
 The package's design is deliberately harmonised with the companion
 `emaxnls` package (nonlinear-least-squares Emax models, also by this
@@ -34,13 +34,12 @@ parameter-name convention), and `erglm_add_term()`/`erglm_remove_term()`
 take one-sided formula terms (e.g. `~ sex`) rather than `emaxnls`'s
 two-sided, parameter-attached terms (e.g. `E0 ~ AGE`), since erglm's
 `glm()`-based covariates have no structural-parameter distinction
-(no E0/Emax/etc.) to attach to.
-
-This package was previously called `erlr` (logistic-regression-only,
-`lr_*`-prefixed functions); it was renamed to `erglm` and generalised to
-arbitrary `glm()` families, per [PLAN.md](PLAN.md) step 6. There are no
-`lr_*` deprecated aliases -- this was a clean-break rename, since the
-package predates any CRAN release or external users.
+(no E0/Emax/etc.) to attach to. See
+[.agents/HISTORY.md](.agents/HISTORY.md) for how this harmonisation,
+and the package's earlier `erlr` -> `erglm` rename and generalisation
+from logistic-regression-only to arbitrary `glm()` families, came
+about -- there are no `lr_*` deprecated aliases from that rename, since
+it was a clean break predating any CRAN release or external users.
 
 It deliberately contains **no plotting code**. For a model-agnostic
 mini-language to visualise exposure-response models (including those
@@ -53,53 +52,6 @@ plotting packages (ggplot2, patchwork) in package code. `ggplot2` is a
 `Suggests`-only dependency used exclusively inside
 `vignettes/articles/simulate.Rmd` for demonstration plots (a predictive
 check and a parameter-uncertainty band); no `R/` file uses it.
-
-**Known follow-up (not yet done):** the companion `erplots` repo still
-references the old package/function names (`erlr::lr_model()`,
-`erlr::lr_data`) in its `DESCRIPTION` `Suggests`, test helpers, and a
-vignette article -- it needs a corresponding update once this rename is
-published, or its `erlr`-dependent tests/vignette will break.
-
-**`erglm_vpc_sim()` removed.** erplots' `er_vpc_plot()` used to require
-a bespoke, model-package-specific simulation helper (`erglm_vpc_sim()`)
-rather than going through the shared
-`er_predict()`/`er_simulate()`/`er_summary()` interface -- a design gap
-on the erplots side. That gap was closed by widening erplots'
-`er_simulate()` contract (additively: a method may now return an
-optional `sim_resp` column alongside `fit_resp`), since
-`.erglm_simulate_draws()` and `.erglm_draw_response()` already had
-everything needed to compute a full response-level draw -- see
-erplots' `?erplots::er_model_interface` for the contract this
-satisfies. `er_simulate.erglm_model()` (`R/er-methods.R`) needed no
-change itself; only its `.erglm_simulate_draws()` engine did (it now
-returns `sim_resp` as well as `fit_resp`). erplots then added
-`er_vpc_plot(model = ...)` as its preferred VPC entry point, calling
-`er_simulate()` internally rather than accepting a pre-built `sim`
-data frame. Once that path existed, `erglm_vpc_sim()` had no remaining
-purpose -- it was a thin wrapper around `simulate.erglm_model()`
-whose sole reason to exist was producing the `sim` data frame
-`er_vpc_plot()` used to require -- so it (and its file, tests, and
-docs references) were removed as a clean break, no deprecated alias,
-matching this package's established rename/removal convention.
-`simulate.erglm_model()`/`.erglm_resample()` are unaffected and remain
-the package's user-facing simulation entry point for anyone who wants
-full replicate detail (sampled coefficients, expected and simulated
-response) without going through erplots.
-
-## Planned work
-
-See [PLAN.md](PLAN.md) for the history of this generalisation/rename
-project. The family generalisation (steps 1-5), the `erglm` rename
-(step 6), its manual infrastructure follow-ups (renaming the GitHub
-repo `djnavarro/erlr` -> `djnavarro/erglm`, and repointing the
-`erglm.djnavarro.net` pkgdown domain/DNS), the emaxnls-harmonisation
-work (`simulate.erglm_model()`, `erglm_fun()`, exporting
-`erglm_add_term()`/`erglm_remove_term()`), the pkgdown site/vignette
-restructuring that followed it, the `glm`/`lm` method-inheritance
-documentation (`methods.Rmd`), fleshing out the `erglm.Rmd` "Getting
-Started" stub, and removing `erglm_vpc_sim()` (superseded by erplots'
-`er_vpc_plot(model = ...)`) are all now done. One item remains: the
-companion `erplots` repo update noted above (see PLAN.md).
 
 ## Structure
 
@@ -178,10 +130,7 @@ companion `erplots` repo update noted above (see PLAN.md).
   `mod$erglm$type`. `R/utils-helpers.R` also exports `erglm_link()` /
   `erglm_invlink()`, thin discoverable wrappers around a fitted model's
   `stats::family(mod)$linkfun` / `$linkinv` (link scale <-> response
-  scale). These replaced the earlier binomial-only `logit()`/`invlogit()`
-  helpers -- another clean-break rename (no deprecated aliases, same
-  rationale as the `erlr` -> `erglm` rename above) once the package
-  generalised beyond binomial families.
+  scale).
 
 ## Development workflow
 
@@ -219,10 +168,10 @@ companion `erplots` repo update noted above (see PLAN.md).
 - pkgdown renders every `*.md` file at the package root (and in
   `.github/`) into its own `docs/*.html` page -- hard-coded in
   `pkgdown:::package_mds()` and not configurable via `_pkgdown.yml`, so
-  `.Rbuildignore`-ing `AGENTS.md`/`PLAN.md` (needed to keep them out of
+  `.Rbuildignore`-ing `AGENTS.md`/`.agents/` (needed to keep them out of
   the built *package*) has no effect on the *pkgdown site*: unhandled,
-  they'd get published as `docs/AGENTS.html`/`docs/PLAN.html` and
-  indexed in `docs/search.json`/`docs/sitemap.xml`. `tools/pkgdown-postbuild.R`
+  they'd get published as `docs/AGENTS.html` and indexed in
+  `docs/search.json`/`docs/sitemap.xml`. `tools/pkgdown-postbuild.R`
   strips these pages (and their search/sitemap entries) back out;
   `.github/workflows/pkgdown.yaml` runs it right after
   `build_site_github_pages()`. Run it manually after any local
@@ -242,3 +191,22 @@ companion `erplots` repo update noted above (see PLAN.md).
   `$erglm` list for package-specific metadata (e.g. SCM history) -- see
   `.as_erglm()`.
 - Don't add plotting code here -- that belongs in erplots.
+
+## Keeping this documentation current
+
+This file (`AGENTS.md`) should stay a lean, current-state reference --
+if a change makes something above inaccurate, update it in place
+rather than appending a note about the change.
+
+Two companion files in `.agents/` (also excluded from the built package
+via `.Rbuildignore`) carry the parts that don't belong here:
+
+- **[.agents/HISTORY.md](.agents/HISTORY.md)** -- a condensed record of
+  completed design decisions and their rationale (what was tried,
+  rejected, and why), for context in future sessions. When you finish a
+  piece of nontrivial design work, add an entry here rather than
+  growing this file with "used to be X, now Y" narrative.
+- **[.agents/PLAN.md](.agents/PLAN.md)** -- scoped-out future work and
+  deferred/open items. When you finish something listed there, move its
+  write-up into `HISTORY.md` and remove it from `PLAN.md` rather than
+  marking it "done" in place.

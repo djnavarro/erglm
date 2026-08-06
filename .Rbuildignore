@@ -8,6 +8,6 @@
 ^\.github$
 ^vignettes/articles$
 ^AGENTS\.md$
-^PLAN\.md$
+^\.agents$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
