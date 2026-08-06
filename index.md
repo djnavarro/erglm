@@ -100,7 +100,6 @@ sim
 ```
 
 To visualise the simulations against the observed data (e.g. as a
-VPC-style plot), see
-[`erplots::er_vpc_plot()`](https://erplots.djnavarro.net/reference/er_vpc_plot.html),
-which can build its own simulated replicates directly from a fitted
-`erglm_model` (`er_vpc_plot(model = mod)`).
+VPC-style plot), see `erplots::er_vpc_plot()`, which can build its own
+simulated replicates directly from a fitted `erglm_model`
+(`er_vpc_plot(model = mod)`).
