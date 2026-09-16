@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">erglm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,7 @@
       <h1>Stepwise covariate modelling</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/djnavarro/erglm/blob/v0.1.1/vignettes/articles/scm.Rmd" class="external-link"><code>vignettes/articles/scm.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/djnavarro/erglm/blob/v0.1.0/vignettes/articles/scm.Rmd" class="external-link"><code>vignettes/articles/scm.Rmd</code></a></small>
       <div class="d-none name"><code>scm.Rmd</code></div>
     </div>
 
@@ -167,7 +167,9 @@ threshold here – inspecting the history shows why:</p>
 model that effect isn’t strong enough, at this sample size, to clear a
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.01</mn><annotation encoding="application/x-tex">0.01</annotation></semantics></math>
 threshold – so the search correctly leaves it out rather than adding a
-covariate that doesn’t earn its place.</p>
+covariate that doesn’t earn its place. This is a feature, not a
+limitation: SCM is exactly the tool that should stop you from including
+underpowered terms.</p>
 </div>
 <div class="section level2">
 <h2 id="backward-elimination">Backward elimination<a class="anchor" aria-label="anchor" href="#backward-elimination"></a>

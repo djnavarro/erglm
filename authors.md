@@ -8,15 +8,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/djnavarro/erglm/blob/v0.1.1/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/djnavarro/erglm/blob/v0.1.0/DESCRIPTION)
 
 Navarro D (2026). *erglm: Exposure-Response Tools for GLM-Based Models*.
-R package version 0.1.1, <https://github.com/djnavarro/erglm>.
+R package version 0.1.0, <https://github.com/djnavarro/erglm>.
 
     @Manual{,
       title = {erglm: Exposure-Response Tools for GLM-Based Models},
       author = {Danielle Navarro},
       year = {2026},
-      note = {R package version 0.1.1},
+      note = {R package version 0.1.0},
       url = {https://github.com/djnavarro/erglm},
     }
