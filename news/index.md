@@ -1,5 +1,23 @@
 # Changelog
 
+## erglm 0.1.1
+
+CRAN release: 2026-08-08
+
+CRAN resubmission, addressing reviewer feedback on the 0.1.0 submission:
+
+- Self-references to ‘erglm’ in the `DESCRIPTION` `Description` field
+  are now single-quoted, per CRAN’s software-name convention.
+- `DESCRIPTION` now declares
+  `Additional_repositories: https://djnavarro.r-universe.dev`, the
+  repository from which the optional `Suggests` dependency ‘erplots’
+  (not on CRAN) can be installed, per CRAN policy on declaring where to
+  obtain such packages.
+- `DESCRIPTION`’s `Description` field now capitalises `Poisson` and
+  `Gaussian` (they name the eponymous distributions/families), per
+  further reviewer feedback; `binomial` and `gamma` are left lowercase,
+  as neither is an eponym.
+
 ## erglm 0.1.0
 
 Initial CRAN release.

@@ -105,10 +105,10 @@ predict(mod, newdata = erglm_data[1:5, ], type = "response")
 
 [`predict()`](https://rdrr.io/r/stats/predict.html) can also return
 standard errors (`se.fit = TRUE`), which is the basis for erglm’s own
-\[erglm_predict()\] – that function is a thin, opinionated wrapper that
-back-transforms the link-scale standard errors into a confidence
-interval on the response scale and returns everything as a tidy data
-frame bound to `newdata`:
+[`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md)
+– that function is a thin, opinionated wrapper that back-transforms the
+link-scale standard errors into a confidence interval on the response
+scale and returns everything as a tidy data frame bound to `newdata`:
 
 ``` r
 
