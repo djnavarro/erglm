@@ -9,14 +9,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-This is the modelling article
-
 ```{r setup}
 library(erglm)
 library(tibble)
 ```
 
-
+Fitting a model and turning it into predictions are the two most basic tasks in erglm -- every other tool in the package (stepwise covariate selection, simulation) builds on `erglm_model()` and `erglm_predict()`. The ["Getting Started"](erglm.html) article gives a quick tour of both; this article goes into more depth, including how each one generalises unchanged across the other `glm()` families erglm supports.
 
 The core function is `erglm_model()`, a very thin wrapper around `glm()`. By default it fits a gaussian model (`family = gaussian()`, matching `glm()`'s own default), but any `glm()` family can be supplied explicitly -- `binomial`, `poisson`, and `Gamma` are also tested and supported. The package comes with a synthetic data set called `erglm_data` that we can use:
 
