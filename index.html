@@ -70,7 +70,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>Provides estimation tools for exposure-response models based on <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>. It is mostly intended as a convenience package: the core tools are wrappers around <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>, tested and supported for binomial, poisson, gaussian, and gamma families. For plotting exposure-response models (including those fitted with erglm), see the companion package <a href="https://github.com/djnavarro/erplots" class="external-link">erplots</a>, which supplies a model-agnostic mini-language for building exposure-response plots.</p>
+<p>Provides estimation tools for exposure-response models based on <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>. It is mostly intended as a convenience package: the core tools are wrappers around <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>, tested and supported for binomial, poisson, gaussian, and gamma families. For plotting exposure-response models (including those fitted with erglm), see the companion package <a href="https://erplots.djnavarro.net" class="external-link">erplots</a>, which supplies a model-agnostic mini-language for building exposure-response plots. For an analogous approach to time-to-event models see <a href="https://ertte.djnavarro.net" class="external-link">ertte</a>, and for Emax regression models see <a href="https://emaxnls.djnavarro.net" class="external-link">emaxnls</a>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -126,14 +126,14 @@
 <span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">mod1</span>, candidates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sex"</span>, <span class="st">"dose"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 4 × 12</span></span>
-<span><span class="co">#&gt;   iteration attempt step  criterion action term_tested model_tested model_converged</span></span>
-<span><span class="co">#&gt;       &lt;int&gt;   &lt;int&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;        &lt;lgl&gt;          </span></span>
-<span><span class="co">#&gt; 1         0       0 base… &lt;NA&gt;      &lt;NA&gt;   &lt;NA&gt;        ae1 ~ aucss… TRUE           </span></span>
-<span><span class="co">#&gt; 2         1       1 back… p-value   remove ~sex        ae1 ~ aucss… TRUE           </span></span>
-<span><span class="co">#&gt; 3         1       2 back… p-value   remove ~dose       ae1 ~ aucss… TRUE           </span></span>
-<span><span class="co">#&gt; 4         2       3 back… p-value   remove ~sex        ae1 ~ aucss  TRUE           </span></span>
-<span><span class="co">#&gt; # ℹ 4 more variables: term_p_value &lt;dbl&gt;, model_aic &lt;dbl&gt;, model_bic &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   model_updated &lt;int&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   iteration attempt step       criterion action term_tested model_tested        </span></span>
+<span><span class="co">#&gt;       &lt;int&gt;   &lt;int&gt; &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1         0       0 base model &lt;NA&gt;      &lt;NA&gt;   &lt;NA&gt;        ae1 ~ aucss + sex +…</span></span>
+<span><span class="co">#&gt; 2         1       1 backward   p-value   remove ~dose       ae1 ~ aucss + sex   </span></span>
+<span><span class="co">#&gt; 3         1       2 backward   p-value   remove ~sex        ae1 ~ aucss + dose  </span></span>
+<span><span class="co">#&gt; 4         2       3 backward   p-value   remove ~sex        ae1 ~ aucss         </span></span>
+<span><span class="co">#&gt; # ℹ 5 more variables: model_converged &lt;lgl&gt;, term_p_value &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   model_aic &lt;dbl&gt;, model_bic &lt;dbl&gt;, model_updated &lt;int&gt;</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="simulation">Simulation<a class="anchor" aria-label="anchor" href="#simulation"></a>
@@ -143,19 +143,20 @@
 <span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
 <span><span class="va">sim</span></span>
 <span><span class="co">#&gt; # A tibble: 1,500 × 9</span></span>
-<span><span class="co">#&gt;    dat_id sim_id    mu   val `coef_(Intercept)` coef_aucss coef_sexMale aucss sex  </span></span>
-<span><span class="co">#&gt;     &lt;int&gt;  &lt;int&gt; &lt;dbl&gt; &lt;int&gt;              &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;</span></span>
-<span><span class="co">#&gt;  1      1      1 0.894     1              -2.09    0.00601        0.179  673. Male </span></span>
-<span><span class="co">#&gt;  2      2      1 1.000     1              -2.09    0.00601        0.179 2806. Fema…</span></span>
-<span><span class="co">#&gt;  3      3      1 0.110     0              -2.09    0.00601        0.179    0  Fema…</span></span>
-<span><span class="co">#&gt;  4      4      1 0.993     1              -2.09    0.00601        0.179 1169. Fema…</span></span>
-<span><span class="co">#&gt;  5      5      1 0.588     1              -2.09    0.00601        0.179  377. Male </span></span>
-<span><span class="co">#&gt;  6      6      1 0.468     1              -2.09    0.00601        0.179  327. Fema…</span></span>
-<span><span class="co">#&gt;  7      7      1 0.129     0              -2.09    0.00601        0.179    0  Male </span></span>
-<span><span class="co">#&gt;  8      8      1 0.994     1              -2.09    0.00601        0.179 1208. Fema…</span></span>
-<span><span class="co">#&gt;  9      9      1 0.129     1              -2.09    0.00601        0.179    0  Male </span></span>
-<span><span class="co">#&gt; 10     10      1 0.362     1              -2.09    0.00601        0.179  254. Fema…</span></span>
-<span><span class="co">#&gt; # ℹ 1,490 more rows</span></span></code></pre></div>
+<span><span class="co">#&gt;    dat_id sim_id    mu   val `coef_(Intercept)` coef_aucss coef_sexMale aucss</span></span>
+<span><span class="co">#&gt;     &lt;int&gt;  &lt;int&gt; &lt;dbl&gt; &lt;int&gt;              &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1      1      1 0.894     1              -2.09    0.00601        0.179  673.</span></span>
+<span><span class="co">#&gt;  2      2      1 1.000     1              -2.09    0.00601        0.179 2806.</span></span>
+<span><span class="co">#&gt;  3      3      1 0.110     0              -2.09    0.00601        0.179    0 </span></span>
+<span><span class="co">#&gt;  4      4      1 0.993     1              -2.09    0.00601        0.179 1169.</span></span>
+<span><span class="co">#&gt;  5      5      1 0.588     1              -2.09    0.00601        0.179  377.</span></span>
+<span><span class="co">#&gt;  6      6      1 0.468     1              -2.09    0.00601        0.179  327.</span></span>
+<span><span class="co">#&gt;  7      7      1 0.129     0              -2.09    0.00601        0.179    0 </span></span>
+<span><span class="co">#&gt;  8      8      1 0.994     1              -2.09    0.00601        0.179 1208.</span></span>
+<span><span class="co">#&gt;  9      9      1 0.129     1              -2.09    0.00601        0.179    0 </span></span>
+<span><span class="co">#&gt; 10     10      1 0.362     1              -2.09    0.00601        0.179  254.</span></span>
+<span><span class="co">#&gt; # ℹ 1,490 more rows</span></span>
+<span><span class="co">#&gt; # ℹ 1 more variable: sex &lt;fct&gt;</span></span></code></pre></div>
 <p>To visualise the simulations against the observed data (e.g. as a VPC-style plot) see erplots’ <code>er_vpc()</code> mini-grammar – specifically <code><a href="https://erplots.djnavarro.net/reference/er_vpc_add_simulated.html" class="external-link">erplots::er_vpc_add_simulated()</a></code>, which can build its own simulated replicates directly from a fitted <code>erglm_model</code> (<code>er_vpc_add_simulated(model = mod)</code>).</p>
 </div>
 </div>
