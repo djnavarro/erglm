@@ -66,7 +66,8 @@ terms, \code{erglm_scm_backward()} greedily removes them, and
 \code{erglm_scm_history()} retrieves the audit log of every model considered
 along the way.
 }
-\details{
+\section{Reproducibility and the seed argument}{
+
 \code{seed} exists as a safety measure against two hypothetical
 sources of run-to-run variation: (a) the order in which candidate
 terms are tested within a step, and (b) some part of the model-fitting
@@ -91,6 +92,9 @@ attempts recorded in \code{\link[=erglm_scm_history]{erglm_scm_history()}}) -- i
 as a guard against future refactors reintroducing genuine
 seed-sensitivity (e.g. if candidate order were ever used as an
 early-stopping rule rather than exhaustively tested every step).
+}
+
+\section{Aliased or collinear candidates}{
 
 If a candidate term is aliased (perfectly collinear) with a term
 already in the model, \code{stats::anova()} reports zero additional
@@ -99,6 +103,9 @@ skipped for the step (with a warning) rather than being selected or
 crashing the search -- comparisons against \code{NA} aren't meaningful,
 and the candidate can never improve the fit anyway once it's
 aliased.
+}
+
+\section{Selection criteria}{
 
 Three model selection criteria are available via the \code{criterion}
 argument:
@@ -122,6 +129,9 @@ isn't computed, since it plays no role in selection). The \code{model_aic}
 and \code{model_bic} columns are always recorded regardless of which
 criterion drove selection, and the history's \code{criterion} column
 records which one was used for each forward/backward step.
+}
+
+\section{Candidate validation}{
 
 \code{candidates} is validated up front: every element must be parseable
 as a formula and name exactly one covariate term (e.g. \code{"sex"}, not
@@ -130,6 +140,7 @@ any model fitting, naming the offending element -- rather than
 surfacing only once the search happens to test that candidate, many
 steps into what might be a long, expensive search.
 }
+
 \examples{
 mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 mod1 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"))

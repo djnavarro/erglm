@@ -33,8 +33,8 @@ documentation and examples, with response columns illustrating each of
 erglm's supported \code{glm()} families.
 }
 \details{
-This simulated dataset is entirely synthetic
-You can find the data generating code in the package source code
+This simulated dataset is entirely synthetic. See the package source
+for the data-generating code.
 }
 \examples{
 erglm_data

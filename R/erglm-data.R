@@ -98,9 +98,8 @@
 #' response (for gamma models)}
 #' }
 #' @details
-#'
-#' This simulated dataset is entirely synthetic
-#' You can find the data generating code in the package source code
+#' This simulated dataset is entirely synthetic. See the package source
+#' for the data-generating code.
 #'
 #' @examples
 #' erglm_data

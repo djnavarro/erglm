@@ -32,7 +32,8 @@
 #' internally. For `erglm_scm_history()`, a data frame is returned
 #' containing the SCM history log
 #'
-#' @details `seed` exists as a safety measure against two hypothetical
+#' @section Reproducibility and the seed argument:
+#' `seed` exists as a safety measure against two hypothetical
 #' sources of run-to-run variation: (a) the order in which candidate
 #' terms are tested within a step, and (b) some part of the model-fitting
 #' machinery secretly depending on `.Random.seed`. As currently
@@ -57,6 +58,7 @@
 #' seed-sensitivity (e.g. if candidate order were ever used as an
 #' early-stopping rule rather than exhaustively tested every step).
 #'
+#' @section Aliased or collinear candidates:
 #' If a candidate term is aliased (perfectly collinear) with a term
 #' already in the model, `stats::anova()` reports zero additional
 #' degrees of freedom and an `NA` p-value for it. That candidate is
@@ -65,6 +67,7 @@
 #' and the candidate can never improve the fit anyway once it's
 #' aliased.
 #'
+#' @section Selection criteria:
 #' Three model selection criteria are available via the `criterion`
 #' argument:
 #'
@@ -87,6 +90,7 @@
 #' criterion drove selection, and the history's `criterion` column
 #' records which one was used for each forward/backward step.
 #'
+#' @section Candidate validation:
 #' `candidates` is validated up front: every element must be parseable
 #' as a formula and name exactly one covariate term (e.g. `"sex"`, not
 #' `"sex + dose"` or `"not a formula"`). This errors immediately, before
