@@ -26,7 +26,13 @@ Provides estimation tools for exposure-response models based on `glm()`. It is m
 
 ## Installation
 
-You can install the development version of erglm like so:
+You can install the latest CRAN release of erglm with this:
+
+``` r
+install.packages("erglm")
+```
+
+Alternatively you can install the development version of erglm like so:
 
 ``` r
 pak::pak("djnavarro/erglm")
