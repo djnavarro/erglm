@@ -74,14 +74,17 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of erglm like so:</p>
+<p>You can install the latest CRAN release of erglm with this:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"erglm"</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively you can install the development version of erglm like so:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"djnavarro/erglm"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="models">Models<a class="anchor" aria-label="anchor" href="#models"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span></span>
@@ -118,24 +121,24 @@
 <div class="section level2">
 <h2 id="stepwise-covariate-modelling">Stepwise covariate modelling<a class="anchor" aria-label="anchor" href="#stepwise-covariate-modelling"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dose</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">mod1</span>, candidates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sex"</span>, <span class="st">"dose"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 4 × 11</span></span>
-<span><span class="co">#&gt;   iteration attempt step       action term_tested model_tested   model_converged</span></span>
-<span><span class="co">#&gt;       &lt;int&gt;   &lt;int&gt; &lt;chr&gt;      &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;          &lt;lgl&gt;          </span></span>
-<span><span class="co">#&gt; 1         0       0 base model &lt;NA&gt;   &lt;NA&gt;        ae1 ~ aucss +… TRUE           </span></span>
-<span><span class="co">#&gt; 2         1       1 backward   remove ~dose       ae1 ~ aucss +… TRUE           </span></span>
-<span><span class="co">#&gt; 3         1       2 backward   remove ~sex        ae1 ~ aucss +… TRUE           </span></span>
-<span><span class="co">#&gt; 4         2       3 backward   remove ~sex        ae1 ~ aucss    TRUE           </span></span>
-<span><span class="co">#&gt; # ℹ 4 more variables: term_p_value &lt;dbl&gt;, model_aic &lt;dbl&gt;, model_bic &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   model_updated &lt;int&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 4 × 12</span></span>
+<span><span class="co">#&gt;   iteration attempt step       criterion action term_tested model_tested        </span></span>
+<span><span class="co">#&gt;       &lt;int&gt;   &lt;int&gt; &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;               </span></span>
+<span><span class="co">#&gt; 1         0       0 base model &lt;NA&gt;      &lt;NA&gt;   &lt;NA&gt;        ae1 ~ aucss + sex +…</span></span>
+<span><span class="co">#&gt; 2         1       1 backward   p-value   remove ~sex        ae1 ~ aucss + dose  </span></span>
+<span><span class="co">#&gt; 3         1       2 backward   p-value   remove ~dose       ae1 ~ aucss + sex   </span></span>
+<span><span class="co">#&gt; 4         2       3 backward   p-value   remove ~sex        ae1 ~ aucss         </span></span>
+<span><span class="co">#&gt; # ℹ 5 more variables: model_converged &lt;lgl&gt;, term_p_value &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   model_aic &lt;dbl&gt;, model_bic &lt;dbl&gt;, model_updated &lt;int&gt;</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="simulation">Simulation<a class="anchor" aria-label="anchor" href="#simulation"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
 <span><span class="va">sim</span></span>

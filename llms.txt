@@ -12,7 +12,14 @@ plots.
 
 ## Installation
 
-You can install the development version of erglm like so:
+You can install the latest CRAN release of erglm with this:
+
+``` r
+
+install.packages("erglm")
+```
+
+Alternatively you can install the development version of erglm like so:
 
 ``` r
 
@@ -64,15 +71,15 @@ mod
 mod1 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 mod2 <- erglm_scm_backward(mod1, candidates = c("sex", "dose"))
 erglm_scm_history(mod2)
-#> # A tibble: 4 × 11
-#>   iteration attempt step       action term_tested model_tested   model_converged
-#>       <int>   <int> <chr>      <chr>  <chr>       <chr>          <lgl>          
-#> 1         0       0 base model <NA>   <NA>        ae1 ~ aucss +… TRUE           
-#> 2         1       1 backward   remove ~dose       ae1 ~ aucss +… TRUE           
-#> 3         1       2 backward   remove ~sex        ae1 ~ aucss +… TRUE           
-#> 4         2       3 backward   remove ~sex        ae1 ~ aucss    TRUE           
-#> # ℹ 4 more variables: term_p_value <dbl>, model_aic <dbl>, model_bic <dbl>,
-#> #   model_updated <int>
+#> # A tibble: 4 × 12
+#>   iteration attempt step       criterion action term_tested model_tested        
+#>       <int>   <int> <chr>      <chr>     <chr>  <chr>       <chr>               
+#> 1         0       0 base model <NA>      <NA>   <NA>        ae1 ~ aucss + sex +…
+#> 2         1       1 backward   p-value   remove ~sex        ae1 ~ aucss + dose  
+#> 3         1       2 backward   p-value   remove ~dose       ae1 ~ aucss + sex   
+#> 4         2       3 backward   p-value   remove ~sex        ae1 ~ aucss         
+#> # ℹ 5 more variables: model_converged <lgl>, term_p_value <dbl>,
+#> #   model_aic <dbl>, model_bic <dbl>, model_updated <int>
 ```
 
 ## Simulation
