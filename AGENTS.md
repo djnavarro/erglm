@@ -176,6 +176,26 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   `.github/workflows/pkgdown.yaml` runs it right after
   `build_site_github_pages()`. Run it manually after any local
   `pkgdown::build_site()` too.
+- Three skills in `.agents/skills/` (also excluded from the built package
+  via `.Rbuildignore`) carry detailed, checklist-driven guidance for
+  specific recurring tasks -- load the matching one before doing that task
+  rather than relying on the summary here:
+  - **`.agents/skills/write-roxygen-docs/`** -- what goes in a title vs.
+    description vs. `@details` for erglm's two documentation shapes
+    (standalone function pages vs. shared `@name`/`@rdname` topics like
+    `erglm_scm`/`erglm_term`/`erglm_link`), how to calibrate documentation
+    density, and how to keep roxygen comments user-facing. Use before
+    adding a new exported function or editing an existing `@param`/
+    `@returns`/`@details`/`@examples` block.
+  - **`.agents/skills/write-news-entries/`** -- how to size and place a
+    `NEWS.md` bullet under erglm's `(development version)` heading
+    convention, and the same-development-cycle carve-out for bug-fix
+    entries. Use whenever adding or reviewing a `NEWS.md` entry.
+  - **`.agents/skills/write-vignettes/`** -- mechanics, cross-referencing,
+    and prose conventions for `vignettes/articles/*.Rmd`, including the
+    generalise-to-other-families closing section and pointing to `erplots`
+    instead of building plotting code inline. Use before drafting a new
+    article or reviewing one for consistency.
 
 ## Conventions
 
