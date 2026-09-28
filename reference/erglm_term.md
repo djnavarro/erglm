@@ -26,7 +26,7 @@ erglm_remove_term(mod, term, quiet = FALSE)
 
   If `TRUE`, suppress the warning issued when the term can't be
   added/removed (because it's already in the model / isn't in the model,
-  respectively)
+  respectively). Defaults to `FALSE`.
 
 ## Value
 
@@ -40,19 +40,20 @@ These functions are not typically called directly; they underpin
 and
 [`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md).
 Named and shaped to match the companion `emaxnls` package's
-`emax_add_term()`/`emax_remove_term()`, which serve the same purpose for
-`emaxnls`/`emaxlogistic` models – with one structural difference:
-`emaxnls`'s terms are two-sided formulas naming a structural parameter
-(e.g. `E0 ~ AGE`), since covariates there attach to a specific Emax
-parameter, whereas erglm's terms are plain one-sided
-[`glm()`](https://rdrr.io/r/stats/glm.html) formula terms (e.g.
-`~ sex`), since erglm has no equivalent parameter-level structure to
-attach covariates to. `term` must be a one-sided formula naming exactly
-one covariate; passing `NULL`, a non-formula, a two-sided formula, or a
-multi-term formula (e.g. `~ weight + age`) errors informatively rather
-than failing with a low-level error (`NULL`/non-formula) or being
-silently misinterpreted (two-sided formulas; multi-term formulas, which
-used to add/attempt every term at once with no warning).
+[`emaxnls::emax_add_term()`](https://emaxnls.djnavarro.net/reference/emax_update.html)/[`emaxnls::emax_remove_term()`](https://emaxnls.djnavarro.net/reference/emax_update.html),
+which serve the same purpose for `emaxnls`/`emaxlogistic` models – with
+one structural difference: `emaxnls`'s terms are two-sided formulas
+naming a structural parameter (e.g. `E0 ~ AGE`), since covariates there
+attach to a specific Emax parameter, whereas erglm's terms are plain
+one-sided [`glm()`](https://rdrr.io/r/stats/glm.html) formula terms
+(e.g. `~ sex`), since erglm has no equivalent parameter-level structure
+to attach covariates to. `term` must be a one-sided formula naming
+exactly one covariate; passing `NULL`, a non-formula, a two-sided
+formula, or a multi-term formula (e.g. `~ weight + age`) errors
+informatively rather than failing with a low-level error
+(`NULL`/non-formula) or being silently misinterpreted (two-sided
+formulas; multi-term formulas, which used to add/attempt every term at
+once with no warning).
 
 ## Examples
 

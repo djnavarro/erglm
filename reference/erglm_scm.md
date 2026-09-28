@@ -1,6 +1,9 @@
 # Stepwise covariate modelling for exposure-response models
 
-Stepwise covariate modelling for exposure-response models
+Automates the search for which covariates belong in an exposure-response
+model: `erglm_scm_forward()` greedily adds candidate terms,
+`erglm_scm_backward()` greedily removes them, and `erglm_scm_history()`
+retrieves the audit log of every model considered along the way.
 
 ## Usage
 
@@ -60,7 +63,12 @@ erglm_scm_history(mod)
 
 - seed:
 
-  Optional seed to control order of term tests
+  Optional seed controlling the order candidate terms are tested in
+  within a step. Defaults to `NULL`, in which case one is chosen
+  automatically and used silently – unlike
+  [`simulate.erglm_model()`](https://erglm.djnavarro.net/reference/simulate.erglm_model.md)'s
+  auto-picked seed, it is not reported, since (per Details below) it
+  essentially never changes the result.
 
 ## Value
 
@@ -69,7 +77,7 @@ model is returned, with the SCM history log updated internally. For
 `erglm_scm_history()`, a data frame is returned containing the SCM
 history log
 
-## Details
+## Reproducibility and the seed argument
 
 `seed` exists as a safety measure against two hypothetical sources of
 run-to-run variation: (a) the order in which candidate terms are tested
@@ -99,6 +107,8 @@ against future refactors reintroducing genuine seed-sensitivity (e.g. if
 candidate order were ever used as an early-stopping rule rather than
 exhaustively tested every step).
 
+## Aliased or collinear candidates
+
 If a candidate term is aliased (perfectly collinear) with a term already
 in the model, [`stats::anova()`](https://rdrr.io/r/stats/anova.html)
 reports zero additional degrees of freedom and an `NA` p-value for it.
@@ -106,6 +116,8 @@ That candidate is skipped for the step (with a warning) rather than
 being selected or crashing the search – comparisons against `NA` aren't
 meaningful, and the candidate can never improve the fit anyway once it's
 aliased.
+
+## Selection criteria
 
 Three model selection criteria are available via the `criterion`
 argument:
@@ -129,6 +141,8 @@ computed, since it plays no role in selection). The `model_aic` and
 `model_bic` columns are always recorded regardless of which criterion
 drove selection, and the history's `criterion` column records which one
 was used for each forward/backward step.
+
+## Candidate validation
 
 `candidates` is validated up front: every element must be parseable as a
 formula and name exactly one covariate term (e.g. `"sex"`, not

@@ -82,7 +82,7 @@ an erglm-specific function name.</p>
 
 <dt id="arg-nsim">nsim<a class="anchor" aria-label="anchor" href="#arg-nsim"></a></dt>
 <dd><p>Number of replicates. Must be a single positive whole
-number.</p></dd>
+number. Defaults to <code>1</code>.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -124,8 +124,9 @@ dispersion parameter used for that noise is a single point estimate
 <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> families are not currently supported and will raise an
 informative error.</p>
 <p>For a VPC-style plot comparing observed and simulated response rates,
-see the companion <code>erplots</code> package's <code>er_vpc_plot()</code>, which can build
-its simulated replicates directly from a fitted model (<code>model =</code>
+see the companion <code>erplots</code> package's <code>er_vpc()</code> mini-grammar –
+specifically <code><a href="https://erplots.djnavarro.net/reference/er_vpc_add_simulated.html" class="external-link">erplots::er_vpc_add_simulated()</a></code>, which can build its
+simulated replicates directly from a fitted model (its <code>model =</code>
 argument) via the same <code>.erglm_draw_response()</code> noise mechanism this
 method uses, without needing to call <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> yourself.</p>
     </div>

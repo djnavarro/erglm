@@ -72,14 +72,14 @@ mod1 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 mod2 <- erglm_scm_backward(mod1, candidates = c("sex", "dose"))
 erglm_scm_history(mod2)
 #> # A tibble: 4 × 12
-#>   iteration attempt step       criterion action term_tested model_tested        
-#>       <int>   <int> <chr>      <chr>     <chr>  <chr>       <chr>               
-#> 1         0       0 base model <NA>      <NA>   <NA>        ae1 ~ aucss + sex +…
-#> 2         1       1 backward   p-value   remove ~sex        ae1 ~ aucss + dose  
-#> 3         1       2 backward   p-value   remove ~dose       ae1 ~ aucss + sex   
-#> 4         2       3 backward   p-value   remove ~sex        ae1 ~ aucss         
-#> # ℹ 5 more variables: model_converged <lgl>, term_p_value <dbl>,
-#> #   model_aic <dbl>, model_bic <dbl>, model_updated <int>
+#>   iteration attempt step  criterion action term_tested model_tested model_converged
+#>       <int>   <int> <chr> <chr>     <chr>  <chr>       <chr>        <lgl>          
+#> 1         0       0 base… <NA>      <NA>   <NA>        ae1 ~ aucss… TRUE           
+#> 2         1       1 back… p-value   remove ~sex        ae1 ~ aucss… TRUE           
+#> 3         1       2 back… p-value   remove ~dose       ae1 ~ aucss… TRUE           
+#> 4         2       3 back… p-value   remove ~sex        ae1 ~ aucss  TRUE           
+#> # ℹ 4 more variables: term_p_value <dbl>, model_aic <dbl>, model_bic <dbl>,
+#> #   model_updated <int>
 ```
 
 ## Simulation
@@ -90,26 +90,26 @@ mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
 sim <- simulate(mod, nsim = 5, seed = 1234)
 sim
 #> # A tibble: 1,500 × 9
-#>    dat_id sim_id    mu   val `coef_(Intercept)` coef_aucss coef_sexMale aucss
-#>     <int>  <int> <dbl> <int>              <dbl>      <dbl>        <dbl> <dbl>
-#>  1      1      1 0.894     1              -2.09    0.00601        0.179  673.
-#>  2      2      1 1.000     1              -2.09    0.00601        0.179 2806.
-#>  3      3      1 0.110     0              -2.09    0.00601        0.179    0 
-#>  4      4      1 0.993     1              -2.09    0.00601        0.179 1169.
-#>  5      5      1 0.588     1              -2.09    0.00601        0.179  377.
-#>  6      6      1 0.468     1              -2.09    0.00601        0.179  327.
-#>  7      7      1 0.129     0              -2.09    0.00601        0.179    0 
-#>  8      8      1 0.994     1              -2.09    0.00601        0.179 1208.
-#>  9      9      1 0.129     1              -2.09    0.00601        0.179    0 
-#> 10     10      1 0.362     1              -2.09    0.00601        0.179  254.
+#>    dat_id sim_id    mu   val `coef_(Intercept)` coef_aucss coef_sexMale aucss sex  
+#>     <int>  <int> <dbl> <int>              <dbl>      <dbl>        <dbl> <dbl> <fct>
+#>  1      1      1 0.894     1              -2.09    0.00601        0.179  673. Male 
+#>  2      2      1 1.000     1              -2.09    0.00601        0.179 2806. Fema…
+#>  3      3      1 0.110     0              -2.09    0.00601        0.179    0  Fema…
+#>  4      4      1 0.993     1              -2.09    0.00601        0.179 1169. Fema…
+#>  5      5      1 0.588     1              -2.09    0.00601        0.179  377. Male 
+#>  6      6      1 0.468     1              -2.09    0.00601        0.179  327. Fema…
+#>  7      7      1 0.129     0              -2.09    0.00601        0.179    0  Male 
+#>  8      8      1 0.994     1              -2.09    0.00601        0.179 1208. Fema…
+#>  9      9      1 0.129     1              -2.09    0.00601        0.179    0  Male 
+#> 10     10      1 0.362     1              -2.09    0.00601        0.179  254. Fema…
 #> # ℹ 1,490 more rows
-#> # ℹ 1 more variable: sex <fct>
 ```
 
 To visualise the simulations against the observed data (e.g. as a
-VPC-style plot) see `erplots::er_vpc_plot()`, which can build its own
-simulated replicates directly from a fitted `erglm_model`
-(`er_vpc_plot(model = mod)`).
+VPC-style plot) see erplots’ `er_vpc()` mini-grammar – specifically
+[`erplots::er_vpc_add_simulated()`](https://erplots.djnavarro.net/reference/er_vpc_add_simulated.html),
+which can build its own simulated replicates directly from a fitted
+`erglm_model` (`er_vpc_add_simulated(model = mod)`).
 
 # Package index
 

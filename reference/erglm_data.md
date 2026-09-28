@@ -1,6 +1,8 @@
 # Sample simulated data for exposure-response models with covariates
 
-Sample simulated data for exposure-response models with covariates
+A synthetic dataset bundled with the package and used throughout its
+documentation and examples, with response columns illustrating each of
+erglm's supported [`glm()`](https://rdrr.io/r/stats/glm.html) families.
 
 ## Usage
 
@@ -67,8 +69,8 @@ A data frame with columns:
 
 ## Details
 
-This simulated dataset is entirely synthetic You can find the data
-generating code in the package source code
+This simulated dataset is entirely synthetic. See the package source for
+the data-generating code.
 
 ## Examples
 

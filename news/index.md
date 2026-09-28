@@ -10,6 +10,10 @@
   gains a `criterion` column recording which selection rule was applied
   in each forward/backward step
   ([\#7](https://github.com/djnavarro/erglm/issues/7)).
+- Fixed several documentation gaps across help pages, vignettes, and the
+  README: missing descriptions, undocumented argument defaults, and
+  broken cross-references, including several references to erplots’
+  `er_vpc_plot()`, which has been replaced by `er_vpc_add_simulated()`.
 
 ## erglm 0.1.1
 

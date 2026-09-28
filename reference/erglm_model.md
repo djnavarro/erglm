@@ -1,7 +1,9 @@
 # Fit an exposure-response model based on `glm()`
 
-Fit an exposure-response model based on
-[`glm()`](https://rdrr.io/r/stats/glm.html)
+A thin wrapper around [`stats::glm()`](https://rdrr.io/r/stats/glm.html)
+that fits the model and tags the result with an extra `erglm_model`
+class, so downstream erglm functions (and the optional erplots
+interoperability layer) can recognise it.
 
 ## Usage
 

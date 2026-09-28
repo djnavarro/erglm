@@ -1,6 +1,7 @@
 # Predictions and confidence intervals for exposure-response models
 
-Predictions and confidence intervals for exposure-response models
+Computes model-based predictions and confidence intervals on the
+response scale, returned as a tidy data frame bound to `newdata`.
 
 ## Usage
 
@@ -17,11 +18,13 @@ erglm_predict(object, newdata = NULL, conf_level = 0.95)
 
 - newdata:
 
-  Data frame containing cases to be predicted
+  Data frame containing cases to be predicted. Defaults to `NULL`, in
+  which case the data the model was originally fitted to (`object$data`)
+  is used.
 
 - conf_level:
 
-  Confidence level for the intervals
+  Confidence level for the intervals. Defaults to `0.95`.
 
 ## Value
 

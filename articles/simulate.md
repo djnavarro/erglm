@@ -309,13 +309,17 @@ carries over exactly as in the gaussian case.
 ## Visual predictive checks
 
 For a VPC-style plot comparing observed and simulated response rates,
-see the companion `erplots` package’s `er_vpc_plot()`. Passing a fitted
-erglm model directly (`er_vpc_plot(data, ..., model = mod_b)`) builds
-the necessary simulated replicates internally via
+see the companion `erplots` package’s `er_vpc()` mini-grammar. Passing a
+fitted erglm model directly to `er_vpc_add_simulated()`
+(`er_vpc_add_simulated(model = mod_b)`) builds the necessary simulated
+replicates internally via
 [`erplots::er_simulate()`](https://erplots.djnavarro.net/reference/er_model_interface.html)
 – which erglm implements on top of the same parameter-sampling/noise
 machinery [`simulate()`](https://rdrr.io/r/stats/simulate.html) uses –
-so no separate erglm-side VPC helper is needed.
+so no separate erglm-side VPC helper is needed. See erplots’ [Visual
+predictive checks](https://erplots.djnavarro.net/articles/plot-vpc.html)
+article for the full pipeline
+(`er_vpc() |> er_vpc_add_observed() |> er_vpc_add_simulated(model = ...) |> plot()`).
 
 ## Notes
 

@@ -354,13 +354,16 @@ carries over exactly as in the gaussian case.</p>
 <h2 id="visual-predictive-checks">Visual predictive checks<a class="anchor" aria-label="anchor" href="#visual-predictive-checks"></a>
 </h2>
 <p>For a VPC-style plot comparing observed and simulated response rates,
-see the companion <code>erplots</code> package’s
-<code>er_vpc_plot()</code>. Passing a fitted erglm model directly
-(<code>er_vpc_plot(data, ..., model = mod_b)</code>) builds the
-necessary simulated replicates internally via
-<code><a href="https://erplots.djnavarro.net/reference/er_model_interface.html" class="external-link">erplots::er_simulate()</a></code> – which erglm implements on top of
-the same parameter-sampling/noise machinery <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> uses
-– so no separate erglm-side VPC helper is needed.</p>
+see the companion <code>erplots</code> package’s <code>er_vpc()</code>
+mini-grammar. Passing a fitted erglm model directly to
+<code>er_vpc_add_simulated()</code>
+(<code>er_vpc_add_simulated(model = mod_b)</code>) builds the necessary
+simulated replicates internally via <code><a href="https://erplots.djnavarro.net/reference/er_model_interface.html" class="external-link">erplots::er_simulate()</a></code>
+– which erglm implements on top of the same parameter-sampling/noise
+machinery <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> uses – so no separate erglm-side VPC
+helper is needed. See erplots’ <a href="https://erplots.djnavarro.net/articles/plot-vpc.html" class="external-link">Visual
+predictive checks</a> article for the full pipeline
+(<code>er_vpc() |&gt; er_vpc_add_observed() |&gt; er_vpc_add_simulated(model = ...) |&gt; plot()</code>).</p>
 </div>
 <div class="section level2">
 <h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>

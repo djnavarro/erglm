@@ -1,6 +1,8 @@
 # Prediction function for an exposure-response model
 
-Prediction function for an exposure-response model
+Takes a fitted glm object as input and returns a function that evaluates
+the underlying structural model at user-specified parameters or data
+(e.g., for VPCs or other counterfactual simulation scenarios).
 
 ## Usage
 
@@ -28,18 +30,19 @@ A function with arguments `param`, `data`, and `type`.
 - The `type` argument should be a string indicating the type of
   prediction to generate (defaults to `"response"`)
 
-Takes a fitted glm object as input and returns a function that will
-evaluate the underlying structural model with user-specified parameters
-or data (e.g., for VPCs or other counterfactual simulation scenarios).
+## Details
+
 Uses `stats::family(object)$linkinv`, so this works for any
 [`glm()`](https://rdrr.io/r/stats/glm.html) family, not just
 binomial/logistic models; tested for binomial, poisson, gaussian, and
 gamma families. Named `erglm_fun()` for consistency with the companion
-`emaxnls` package's `emax_fun()`, which serves the same purpose for
-`emaxnls`/`emaxlogistic` models. The returned function checks that
-`param` is numeric and has one entry per column of the model matrix
-implied by `data`, erroring informatively rather than failing with a
-cryptic "non-conformable arguments" error from matrix multiplication.
+`emaxnls` package's
+[`emaxnls::emax_fun()`](https://emaxnls.djnavarro.net/reference/emax_fun.html),
+which serves the same purpose for `emaxnls`/`emaxlogistic` models. The
+returned function checks that `param` is numeric and has one entry per
+column of the model matrix implied by `data`, erroring informatively
+rather than failing with a cryptic "non-conformable arguments" error
+from matrix multiplication.
 
 ## Examples
 

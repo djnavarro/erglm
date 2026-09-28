@@ -1,12 +1,21 @@
 # Modelling
 
-This is the modelling article
-
 ``` r
 
 library(erglm)
 library(tibble)
 ```
+
+Fitting a model and turning it into predictions are the two most basic
+tasks in erglm – every other tool in the package (stepwise covariate
+selection, simulation) builds on
+[`erglm_model()`](https://erglm.djnavarro.net/reference/erglm_model.md)
+and
+[`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md).
+The [“Getting Started”](https://erglm.djnavarro.net/articles/erglm.md)
+article gives a quick tour of both; this article goes into more depth,
+including how each one generalises unchanged across the other
+[`glm()`](https://rdrr.io/r/stats/glm.html) families erglm supports.
 
 The core function is
 [`erglm_model()`](https://erglm.djnavarro.net/reference/erglm_model.md),

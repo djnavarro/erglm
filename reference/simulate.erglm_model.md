@@ -24,7 +24,8 @@ simulate(object, nsim = 1, seed = NULL, ...)
 
 - nsim:
 
-  Number of replicates. Must be a single positive whole number.
+  Number of replicates. Must be a single positive whole number. Defaults
+  to `1`.
 
 - seed:
 
@@ -73,10 +74,12 @@ replicate. Other [`glm()`](https://rdrr.io/r/stats/glm.html) families
 are not currently supported and will raise an informative error.
 
 For a VPC-style plot comparing observed and simulated response rates,
-see the companion `erplots` package's `er_vpc_plot()`, which can build
-its simulated replicates directly from a fitted model (`model =`
-argument) via the same `.erglm_draw_response()` noise mechanism this
-method uses, without needing to call
+see the companion `erplots` package's `er_vpc()` mini-grammar –
+specifically
+[`erplots::er_vpc_add_simulated()`](https://erplots.djnavarro.net/reference/er_vpc_add_simulated.html),
+which can build its simulated replicates directly from a fitted model
+(its `model =` argument) via the same `.erglm_draw_response()` noise
+mechanism this method uses, without needing to call
 [`simulate()`](https://rdrr.io/r/stats/simulate.html) yourself.
 
 ## Examples
