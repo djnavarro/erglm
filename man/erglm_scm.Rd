@@ -11,6 +11,7 @@ erglm_scm_forward(
   mod,
   candidates,
   threshold = 0.01,
+  criterion = "p-value",
   test = c("auto", "Chisq", "F"),
   seed = NULL
 )
@@ -19,6 +20,7 @@ erglm_scm_backward(
   mod,
   candidates,
   threshold = 0.001,
+  criterion = "p-value",
   test = c("auto", "Chisq", "F"),
   seed = NULL
 )
@@ -30,15 +32,20 @@ erglm_scm_history(mod)
 
 \item{candidates}{Character vector with list of candidate terms}
 
-\item{threshold}{Threshold to test against}
+\item{threshold}{Threshold to test against. Used only when
+\code{criterion = "p-value"} (the default); ignored otherwise. Defaults to
+\code{0.01} for \code{erglm_scm_forward()} and \code{0.001} for \code{erglm_scm_backward()}.}
+
+\item{criterion}{Model selection criterion. One of \code{"p-value"}
+(default), \code{"aic"}, or \code{"bic"}.}
 
 \item{test}{Which significance test to use when comparing nested
-models. \code{"auto"} (the default) picks a likelihood-ratio chi-squared
-test (\code{"Chisq"}) for families with known dispersion (binomial,
-poisson) and an F-test (\code{"F"}) for families with an estimated
-dispersion parameter (gaussian, gamma, inverse.gaussian, quasi*),
-matching \code{stats::anova()}'s own \code{test} argument. Set explicitly to
-override.}
+models. Only used when \code{criterion = "p-value"}. \code{"auto"} (the default)
+picks a likelihood-ratio chi-squared test (\code{"Chisq"}) for families
+with known dispersion (binomial, poisson) and an F-test (\code{"F"}) for
+families with an estimated dispersion parameter (gaussian, gamma,
+inverse.gaussian, quasi*), matching \code{stats::anova()}'s own \code{test}
+argument. Set explicitly to override.}
 
 \item{seed}{Optional seed to control order of term tests}
 }
@@ -85,6 +92,29 @@ crashing the search -- comparisons against \code{NA} aren't meaningful,
 and the candidate can never improve the fit anyway once it's
 aliased.
 
+Three model selection criteria are available via the \code{criterion}
+argument:
+\itemize{
+\item \code{"p-value"} (default): Models are compared with the significance
+test named by \code{test}. A term is added if its p-value falls below
+\code{threshold} (forward) or removed if its p-value exceeds \code{threshold}
+(backward). When multiple candidates satisfy the threshold within a
+step, the one with the most extreme p-value is chosen.
+\item \code{"aic"}: A term is added (forward) or removed (backward) if doing
+so strictly decreases AIC relative to the current model. When
+multiple candidates improve AIC, the one yielding the lowest AIC is
+chosen.
+\item \code{"bic"}: Same as \code{"aic"}, but using BIC as the criterion.
+}
+
+When \code{criterion} is \code{"aic"} or \code{"bic"}, the \code{threshold} and \code{test}
+arguments have no effect, and \code{term_p_value} is left \code{NA} in the
+history for every candidate tested that step (the significance test
+isn't computed, since it plays no role in selection). The \code{model_aic}
+and \code{model_bic} columns are always recorded regardless of which
+criterion drove selection, and the history's \code{criterion} column
+records which one was used for each forward/backward step.
+
 \code{candidates} is validated up front: every element must be parseable
 as a formula and name exactly one covariate term (e.g. \code{"sex"}, not
 \code{"sex + dose"} or \code{"not a formula"}). This errors immediately, before
@@ -100,4 +130,9 @@ erglm_scm_history(mod1)
 mod2 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 mod3 <- erglm_scm_backward(mod2, candidates = c("sex", "dose"))
 erglm_scm_history(mod3)
+
+# AIC-based forward addition/backward elimination instead of p-value
+mod4 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"), criterion = "aic")
+mod5 <- erglm_scm_backward(mod4, candidates = c("sex", "dose"), criterion = "bic")
+erglm_scm_history(mod5)
 }
