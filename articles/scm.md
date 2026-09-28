@@ -187,6 +187,84 @@ random order, so results can depend on the state of the random number
 generator; passing a `seed` makes a run reproducible. If `seed` is
 omitted, a random one is chosen and reported via a message.
 
+## Selecting by AIC or BIC
+
+By default, each step selects a term using the $`p`$-value approach
+described above. Pass `criterion = "aic"` or `criterion = "bic"` to
+select instead by strict improvement in an information criterion: a term
+is added (forward) or removed (backward) only if doing so strictly
+decreases AIC/BIC relative to the current model, and the candidate
+producing the largest improvement wins. `threshold` is ignored when
+`criterion` isn’t `"p-value"`, and `term_p_value` is left `NA` in the
+history, since the significance test plays no role in selection.
+
+Because AIC is more permissive than the default $`p`$-value threshold,
+forward addition with `criterion = "aic"` finds covariates worth adding
+where the $`p`$-value search above found none:
+
+``` r
+
+aic_mod <- erglm_scm_forward(base_mod, candidates, criterion = "aic", seed = 3425)
+aic_mod$formula
+#> ae1 ~ aucss + weight + age
+#> <environment: 0x559b1fdb1ec0>
+```
+
+``` r
+
+erglm_scm_history(aic_mod)[, c("term_tested", "criterion", "term_p_value", "model_aic", "model_updated")]
+#> # A tibble: 10 × 5
+#>    term_tested criterion term_p_value model_aic model_updated
+#>    <chr>       <chr>            <dbl>     <dbl>         <int>
+#>  1 NA          NA                  NA      197.            NA
+#>  2 ~sex        aic                 NA      199.             0
+#>  3 ~weight     aic                 NA      196.             1
+#>  4 ~age        aic                 NA      198.             0
+#>  5 ~dose       aic                 NA      199.             0
+#>  6 ~age        aic                 NA      195.             1
+#>  7 ~sex        aic                 NA      198.             0
+#>  8 ~dose       aic                 NA      198.             0
+#>  9 ~sex        aic                 NA      197.             0
+#> 10 ~dose       aic                 NA      197.             0
+```
+
+The history’s `criterion` column records which selection rule drove each
+step (`NA` for the base-model row), and `term_p_value` is `NA`
+throughout since it isn’t used here. `model_aic` and `model_bic` are
+always populated regardless of `criterion`, so a search driven by one
+criterion can still be audited against the other.
+
+The same `criterion` argument works for
+[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md):
+
+``` r
+
+bic_mod <- erglm_scm_backward(full_mod, candidates, criterion = "bic", seed = 9821)
+bic_mod$formula
+#> ae1 ~ aucss
+#> attr(,"variables")
+#> list(ae1, aucss)
+#> attr(,"factors")
+#>       aucss
+#> ae1       0
+#> aucss     1
+#> attr(,"term.labels")
+#> [1] "aucss"
+#> attr(,"order")
+#> [1] 1
+#> attr(,"intercept")
+#> [1] 1
+#> attr(,"response")
+#> [1] 1
+#> attr(,".Environment")
+#> <environment: R_GlobalEnv>
+#> attr(,"predvars")
+#> list(ae1, aucss)
+#> attr(,"dataClasses")
+#>       ae1     aucss 
+#> "numeric" "numeric"
+```
+
 ## Forward addition piped to backward elimination
 
 The typical workflow is a **forward-backward** run: forward addition to
@@ -240,10 +318,12 @@ matching [`stats::anova()`](https://rdrr.io/r/stats/anova.html)’s own
 
 ## Notes and caveats
 
-- **Selection criterion.** The current implementation selects on
-  $`p`$-values only. The history records `model_aic` and `model_bic` for
-  every candidate, so you can audit the search against information
-  criteria even though they aren’t used to drive it.
+- **Selection criterion.** The default is $`p`$-value selection
+  (`criterion = "p-value"`); pass `criterion = "aic"` or
+  `criterion = "bic"` to select by information criterion instead. The
+  history records `model_aic` and `model_bic` for every candidate
+  regardless of which criterion is active, so you can always audit the
+  search against the criteria you didn’t use to drive it.
 - **Threshold choice.** The forward and backward thresholds are the main
   levers you control. Stricter thresholds yield sparser models.
 - **Greediness.** Stepwise search is greedy and isn’t guaranteed to find

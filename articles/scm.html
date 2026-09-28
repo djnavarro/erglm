@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">erglm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -250,6 +250,80 @@ reproducible. If <code>seed</code> is omitted, a random one is chosen
 and reported via a message.</p>
 </div>
 <div class="section level2">
+<h2 id="selecting-by-aic-or-bic">Selecting by AIC or BIC<a class="anchor" aria-label="anchor" href="#selecting-by-aic-or-bic"></a>
+</h2>
+<p>By default, each step selects a term using the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-value
+approach described above. Pass <code>criterion = "aic"</code> or
+<code>criterion = "bic"</code> to select instead by strict improvement
+in an information criterion: a term is added (forward) or removed
+(backward) only if doing so strictly decreases AIC/BIC relative to the
+current model, and the candidate producing the largest improvement wins.
+<code>threshold</code> is ignored when <code>criterion</code> isn’t
+<code>"p-value"</code>, and <code>term_p_value</code> is left
+<code>NA</code> in the history, since the significance test plays no
+role in selection.</p>
+<p>Because AIC is more permissive than the default
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-value
+threshold, forward addition with <code>criterion = "aic"</code> finds
+covariates worth adding where the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-value
+search above found none:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">aic_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">base_mod</span>, <span class="va">candidates</span>, criterion <span class="op">=</span> <span class="st">"aic"</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span></span>
+<span><span class="va">aic_mod</span><span class="op">$</span><span class="va">formula</span></span>
+<span><span class="co">#&gt; ae1 ~ aucss + weight + age</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x559b1fdb1ec0&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">aic_mod</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term_tested"</span>, <span class="st">"criterion"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_aic"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 5</span></span></span>
+<span><span class="co">#&gt;    term_tested criterion term_p_value model_aic model_updated</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>                  <span style="color: #BB0000;">NA</span>      197.            <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> ~sex        aic                 <span style="color: #BB0000;">NA</span>      199.             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> ~weight     aic                 <span style="color: #BB0000;">NA</span>      196.             1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> ~age        aic                 <span style="color: #BB0000;">NA</span>      198.             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> ~dose       aic                 <span style="color: #BB0000;">NA</span>      199.             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> ~age        aic                 <span style="color: #BB0000;">NA</span>      195.             1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> ~sex        aic                 <span style="color: #BB0000;">NA</span>      198.             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> ~dose       aic                 <span style="color: #BB0000;">NA</span>      198.             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> ~sex        aic                 <span style="color: #BB0000;">NA</span>      197.             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> ~dose       aic                 <span style="color: #BB0000;">NA</span>      197.             0</span></span></code></pre></div>
+<p>The history’s <code>criterion</code> column records which selection
+rule drove each step (<code>NA</code> for the base-model row), and
+<code>term_p_value</code> is <code>NA</code> throughout since it isn’t
+used here. <code>model_aic</code> and <code>model_bic</code> are always
+populated regardless of <code>criterion</code>, so a search driven by
+one criterion can still be audited against the other.</p>
+<p>The same <code>criterion</code> argument works for
+<code><a href="../reference/erglm_scm.html">erglm_scm_backward()</a></code>:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bic_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">full_mod</span>, <span class="va">candidates</span>, criterion <span class="op">=</span> <span class="st">"bic"</span>, seed <span class="op">=</span> <span class="fl">9821</span><span class="op">)</span></span>
+<span><span class="va">bic_mod</span><span class="op">$</span><span class="va">formula</span></span>
+<span><span class="co">#&gt; ae1 ~ aucss</span></span>
+<span><span class="co">#&gt; attr(,"variables")</span></span>
+<span><span class="co">#&gt; list(ae1, aucss)</span></span>
+<span><span class="co">#&gt; attr(,"factors")</span></span>
+<span><span class="co">#&gt;       aucss</span></span>
+<span><span class="co">#&gt; ae1       0</span></span>
+<span><span class="co">#&gt; aucss     1</span></span>
+<span><span class="co">#&gt; attr(,"term.labels")</span></span>
+<span><span class="co">#&gt; [1] "aucss"</span></span>
+<span><span class="co">#&gt; attr(,"order")</span></span>
+<span><span class="co">#&gt; [1] 1</span></span>
+<span><span class="co">#&gt; attr(,"intercept")</span></span>
+<span><span class="co">#&gt; [1] 1</span></span>
+<span><span class="co">#&gt; attr(,"response")</span></span>
+<span><span class="co">#&gt; [1] 1</span></span>
+<span><span class="co">#&gt; attr(,".Environment")</span></span>
+<span><span class="co">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span>
+<span><span class="co">#&gt; attr(,"predvars")</span></span>
+<span><span class="co">#&gt; list(ae1, aucss)</span></span>
+<span><span class="co">#&gt; attr(,"dataClasses")</span></span>
+<span><span class="co">#&gt;       ae1     aucss </span></span>
+<span><span class="co">#&gt; "numeric" "numeric"</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="forward-addition-piped-to-backward-elimination">Forward addition piped to backward elimination<a class="anchor" aria-label="anchor" href="#forward-addition-piped-to-backward-elimination"></a>
 </h2>
 <p>The typical workflow is a <strong>forward-backward</strong> run:
@@ -257,7 +331,7 @@ forward addition to build the model up, immediately followed by backward
 elimination to prune it. Both functions take a fitted model as their
 first argument and return a fitted model, so they compose naturally with
 the pipe:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">final_mod</span> <span class="op">&lt;-</span> <span class="va">base_mod</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.01</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.001</span>, seed <span class="op">=</span> <span class="fl">9821</span><span class="op">)</span></span>
@@ -281,7 +355,7 @@ families. The same candidates, applied to the Poisson-distributed
 summary as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>≈</mo><mn>0.07</mn></mrow><annotation encoding="application/x-tex">p \approx 0.07</annotation></semantics></math>)
 that still doesn’t clear the default forward threshold:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae_count</span> <span class="op">~</span> <span class="va">aucss</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">fwd_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">base_pois</span>, <span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.01</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span></span>
 <span><span class="va">fwd_pois</span><span class="op">$</span><span class="va">formula</span></span>
@@ -300,13 +374,14 @@ F-test for families with an estimated dispersion parameter
 </h2>
 <ul>
 <li>
-<strong>Selection criterion.</strong> The current implementation
-selects on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-values
-only. The history records <code>model_aic</code> and
-<code>model_bic</code> for every candidate, so you can audit the search
-against information criteria even though they aren’t used to drive
-it.</li>
+<strong>Selection criterion.</strong> The default is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-value
+selection (<code>criterion = "p-value"</code>); pass
+<code>criterion = "aic"</code> or <code>criterion = "bic"</code> to
+select by information criterion instead. The history records
+<code>model_aic</code> and <code>model_bic</code> for every candidate
+regardless of which criterion is active, so you can always audit the
+search against the criteria you didn’t use to drive it.</li>
 <li>
 <strong>Threshold choice.</strong> The forward and backward
 thresholds are the main levers you control. Stricter thresholds yield

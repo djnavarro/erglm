@@ -9,6 +9,7 @@ erglm_scm_forward(
   mod,
   candidates,
   threshold = 0.01,
+  criterion = "p-value",
   test = c("auto", "Chisq", "F"),
   seed = NULL
 )
@@ -17,6 +18,7 @@ erglm_scm_backward(
   mod,
   candidates,
   threshold = 0.001,
+  criterion = "p-value",
   test = c("auto", "Chisq", "F"),
   seed = NULL
 )
@@ -36,15 +38,23 @@ erglm_scm_history(mod)
 
 - threshold:
 
-  Threshold to test against
+  Threshold to test against. Used only when `criterion = "p-value"` (the
+  default); ignored otherwise. Defaults to `0.01` for
+  `erglm_scm_forward()` and `0.001` for `erglm_scm_backward()`.
+
+- criterion:
+
+  Model selection criterion. One of `"p-value"` (default), `"aic"`, or
+  `"bic"`.
 
 - test:
 
-  Which significance test to use when comparing nested models. `"auto"`
-  (the default) picks a likelihood-ratio chi-squared test (`"Chisq"`)
-  for families with known dispersion (binomial, poisson) and an F-test
-  (`"F"`) for families with an estimated dispersion parameter (gaussian,
-  gamma, inverse.gaussian, quasi\*), matching
+  Which significance test to use when comparing nested models. Only used
+  when `criterion = "p-value"`. `"auto"` (the default) picks a
+  likelihood-ratio chi-squared test (`"Chisq"`) for families with known
+  dispersion (binomial, poisson) and an F-test (`"F"`) for families with
+  an estimated dispersion parameter (gaussian, gamma, inverse.gaussian,
+  quasi\*), matching
   [`stats::anova()`](https://rdrr.io/r/stats/anova.html)'s own `test`
   argument. Set explicitly to override.
 
@@ -97,6 +107,29 @@ being selected or crashing the search – comparisons against `NA` aren't
 meaningful, and the candidate can never improve the fit anyway once it's
 aliased.
 
+Three model selection criteria are available via the `criterion`
+argument:
+
+- `"p-value"` (default): Models are compared with the significance test
+  named by `test`. A term is added if its p-value falls below
+  `threshold` (forward) or removed if its p-value exceeds `threshold`
+  (backward). When multiple candidates satisfy the threshold within a
+  step, the one with the most extreme p-value is chosen.
+
+- `"aic"`: A term is added (forward) or removed (backward) if doing so
+  strictly decreases AIC relative to the current model. When multiple
+  candidates improve AIC, the one yielding the lowest AIC is chosen.
+
+- `"bic"`: Same as `"aic"`, but using BIC as the criterion.
+
+When `criterion` is `"aic"` or `"bic"`, the `threshold` and `test`
+arguments have no effect, and `term_p_value` is left `NA` in the history
+for every candidate tested that step (the significance test isn't
+computed, since it plays no role in selection). The `model_aic` and
+`model_bic` columns are always recorded regardless of which criterion
+drove selection, and the history's `criterion` column records which one
+was used for each forward/backward step.
+
 `candidates` is validated up front: every element must be parseable as a
 formula and name exactly one covariate term (e.g. `"sex"`, not
 `"sex + dose"` or `"not a formula"`). This errors immediately, before
@@ -110,25 +143,38 @@ what might be a long, expensive search.
 mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 mod1 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"))
 erglm_scm_history(mod1)
-#> # A tibble: 3 × 11
-#>   iteration attempt step       action term_tested model_tested   model_converged
-#>       <int>   <int> <chr>      <chr>  <chr>       <chr>          <lgl>          
-#> 1         0       0 base model NA     NA          ae1 ~ aucss    TRUE           
-#> 2         1       1 forward    add    ~sex        ae1 ~ aucss +… TRUE           
-#> 3         1       2 forward    add    ~dose       ae1 ~ aucss +… TRUE           
-#> # ℹ 4 more variables: term_p_value <dbl>, model_aic <dbl>, model_bic <dbl>,
-#> #   model_updated <int>
+#> # A tibble: 3 × 12
+#>   iteration attempt step       criterion action term_tested model_tested      
+#>       <int>   <int> <chr>      <chr>     <chr>  <chr>       <chr>             
+#> 1         0       0 base model NA        NA     NA          ae1 ~ aucss       
+#> 2         1       1 forward    p-value   add    ~sex        ae1 ~ aucss + sex 
+#> 3         1       2 forward    p-value   add    ~dose       ae1 ~ aucss + dose
+#> # ℹ 5 more variables: model_converged <lgl>, term_p_value <dbl>,
+#> #   model_aic <dbl>, model_bic <dbl>, model_updated <int>
 
 mod2 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 mod3 <- erglm_scm_backward(mod2, candidates = c("sex", "dose"))
 erglm_scm_history(mod3)
-#> # A tibble: 4 × 11
-#>   iteration attempt step       action term_tested model_tested   model_converged
-#>       <int>   <int> <chr>      <chr>  <chr>       <chr>          <lgl>          
-#> 1         0       0 base model NA     NA          ae1 ~ aucss +… TRUE           
-#> 2         1       1 backward   remove ~dose       ae1 ~ aucss +… TRUE           
-#> 3         1       2 backward   remove ~sex        ae1 ~ aucss +… TRUE           
-#> 4         2       3 backward   remove ~sex        ae1 ~ aucss    TRUE           
-#> # ℹ 4 more variables: term_p_value <dbl>, model_aic <dbl>, model_bic <dbl>,
-#> #   model_updated <int>
+#> # A tibble: 4 × 12
+#>   iteration attempt step       criterion action term_tested model_tested        
+#>       <int>   <int> <chr>      <chr>     <chr>  <chr>       <chr>               
+#> 1         0       0 base model NA        NA     NA          ae1 ~ aucss + sex +…
+#> 2         1       1 backward   p-value   remove ~dose       ae1 ~ aucss + sex   
+#> 3         1       2 backward   p-value   remove ~sex        ae1 ~ aucss + dose  
+#> 4         2       3 backward   p-value   remove ~sex        ae1 ~ aucss         
+#> # ℹ 5 more variables: model_converged <lgl>, term_p_value <dbl>,
+#> #   model_aic <dbl>, model_bic <dbl>, model_updated <int>
+
+# AIC-based forward addition/backward elimination instead of p-value
+mod4 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"), criterion = "aic")
+mod5 <- erglm_scm_backward(mod4, candidates = c("sex", "dose"), criterion = "bic")
+erglm_scm_history(mod5)
+#> # A tibble: 3 × 12
+#>   iteration attempt step       criterion action term_tested model_tested      
+#>       <int>   <int> <chr>      <chr>     <chr>  <chr>       <chr>             
+#> 1         0       0 base model NA        NA     NA          ae1 ~ aucss       
+#> 2         1       1 forward    aic       add    ~dose       ae1 ~ aucss + dose
+#> 3         1       2 forward    aic       add    ~sex        ae1 ~ aucss + sex 
+#> # ℹ 5 more variables: model_converged <lgl>, term_p_value <dbl>,
+#> #   model_aic <dbl>, model_bic <dbl>, model_updated <int>
 ```
