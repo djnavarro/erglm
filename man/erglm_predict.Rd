@@ -9,15 +9,18 @@ erglm_predict(object, newdata = NULL, conf_level = 0.95)
 \arguments{
 \item{object}{An erglm model, as returned by \code{\link[=erglm_model]{erglm_model()}}}
 
-\item{newdata}{Data frame containing cases to be predicted}
+\item{newdata}{Data frame containing cases to be predicted. Defaults to
+\code{NULL}, in which case the data the model was originally fitted to
+(\code{object$data}) is used.}
 
-\item{conf_level}{Confidence level for the intervals}
+\item{conf_level}{Confidence level for the intervals. Defaults to \code{0.95}.}
 }
 \value{
 A tibble
 }
 \description{
-Predictions and confidence intervals for exposure-response models
+Computes model-based predictions and confidence intervals on the
+response scale, returned as a tidy data frame bound to \code{newdata}.
 }
 \details{
 Computes intervals on the link scale and back-transforms with

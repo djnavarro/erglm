@@ -11,7 +11,7 @@
 #'
 #' @param object An erglm model, as returned by [erglm_model()]
 #' @param nsim Number of replicates. Must be a single positive whole
-#' number.
+#' number. Defaults to `1`.
 #' @param seed Used to set the RNG seed. If `NULL`, a random seed is
 #' chosen and reported.
 #' @param ... Ignored
@@ -30,8 +30,9 @@
 #' informative error.
 #'
 #' For a VPC-style plot comparing observed and simulated response rates,
-#' see the companion `erplots` package's `er_vpc_plot()`, which can build
-#' its simulated replicates directly from a fitted model (`model =`
+#' see the companion `erplots` package's `er_vpc()` mini-grammar --
+#' specifically [erplots::er_vpc_add_simulated()], which can build its
+#' simulated replicates directly from a fitted model (its `model =`
 #' argument) via the same `.erglm_draw_response()` noise mechanism this
 #' method uses, without needing to call `simulate()` yourself.
 #'

@@ -63,7 +63,7 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   uncertainty only, used by erplots' spaghetti-style plots) and
   `sim_resp` (that same `fit_resp` plus family-appropriate residual
   noise, via `.erglm_draw_response()` -- used by erplots'
-  `er_vpc_plot(model = ...)`), matching erplots' `er_simulate()`
+  `er_vpc_add_simulated(model = ...)`), matching erplots' `er_simulate()`
   contract (see `?erplots::er_model_interface`): a method may supply
   `fit_resp` alone, or both columns from one call, and this package now
   does the latter, computing both from the same sampled coefficient
@@ -152,7 +152,7 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   `methods.Rmd` (base `glm`/`lm` method inheritance), and `simulate.Rmd`
   (`simulate()` and `erglm_fun()`, modelled on emaxnls's
   `simulating-from-emax-models.Rmd`; needs `ggplot2`, see above; points
-  to erplots' `er_vpc_plot(model = ...)` for VPC-style plots rather
+  to erplots' `er_vpc_add_simulated(model = ...)` for VPC-style plots rather
   than documenting an erglm-side VPC helper). `_pkgdown.yml`'s
   `reference:` index and `articles:` list must
   be kept in sync by hand when exports or articles are added/renamed --

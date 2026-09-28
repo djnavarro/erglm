@@ -1,6 +1,12 @@
 
 #' Stepwise covariate modelling for exposure-response models
 #'
+#' Automates the search for which covariates belong in an
+#' exposure-response model: `erglm_scm_forward()` greedily adds candidate
+#' terms, `erglm_scm_backward()` greedily removes them, and
+#' `erglm_scm_history()` retrieves the audit log of every model considered
+#' along the way.
+#'
 #' @param mod An erglm model object
 #' @param candidates Character vector with list of candidate terms
 #' @param threshold Threshold to test against. Used only when
@@ -15,7 +21,11 @@
 #' families with an estimated dispersion parameter (gaussian, gamma,
 #' inverse.gaussian, quasi*), matching `stats::anova()`'s own `test`
 #' argument. Set explicitly to override.
-#' @param seed Optional seed to control order of term tests
+#' @param seed Optional seed controlling the order candidate terms are
+#' tested in within a step. Defaults to `NULL`, in which case one is
+#' chosen automatically and used silently -- unlike
+#' [simulate.erglm_model()]'s auto-picked seed, it is not reported, since
+#' (per Details below) it essentially never changes the result.
 #'
 #' @returns For `erglm_scm_forward()` and `erglm_scm_backward()`, the
 #' updated erglm model is returned, with the SCM history log updated
@@ -372,12 +382,12 @@ erglm_scm_history <- function(mod) {
 #' `~ sex`
 #' @param quiet If `TRUE`, suppress the warning issued when the term
 #' can't be added/removed (because it's already in the model / isn't in
-#' the model, respectively)
+#' the model, respectively). Defaults to `FALSE`.
 #'
 #' @details These functions are not typically called directly; they
 #' underpin [erglm_scm_forward()] and [erglm_scm_backward()]. Named and
 #' shaped to match the companion `emaxnls` package's
-#' `emax_add_term()`/`emax_remove_term()`, which serve the same purpose
+#' [emaxnls::emax_add_term()]/[emaxnls::emax_remove_term()], which serve the same purpose
 #' for `emaxnls`/`emaxlogistic` models -- with one structural
 #' difference: `emaxnls`'s terms are two-sided formulas naming a
 #' structural parameter (e.g. `E0 ~ AGE`), since covariates there attach

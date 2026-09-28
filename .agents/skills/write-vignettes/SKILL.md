@@ -152,7 +152,7 @@ extend the placeholder.
   `simulate.Rmd`'s "Visual predictive checks" section and `methods.Rmd`'s "A
   note on diagnostic plots" section both handle this the same way: describe
   what's needed in one or two sentences, then link to the companion
-  `erplots` package (e.g. `er_vpc_plot()`) for the actual visualisation,
+  `erplots` package (e.g. `er_vpc_add_simulated()`) for the actual visualisation,
   rather than building a bespoke VPC-style plot inline in an erglm article.
 - **No agent-facing content in the rendered article body** -- no mention of
   skills, `AGENTS.md`, or `.agents/*.md`.

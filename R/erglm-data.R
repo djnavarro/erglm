@@ -74,6 +74,10 @@
 
 #' Sample simulated data for exposure-response models with covariates
 #'
+#' A synthetic dataset bundled with the package and used throughout its
+#' documentation and examples, with response columns illustrating each of
+#' erglm's supported `glm()` families.
+#'
 #' @name erglm_data
 #' @format A data frame with columns:
 #' \describe{

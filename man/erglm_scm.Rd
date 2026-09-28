@@ -47,7 +47,11 @@ families with an estimated dispersion parameter (gaussian, gamma,
 inverse.gaussian, quasi*), matching \code{stats::anova()}'s own \code{test}
 argument. Set explicitly to override.}
 
-\item{seed}{Optional seed to control order of term tests}
+\item{seed}{Optional seed controlling the order candidate terms are
+tested in within a step. Defaults to \code{NULL}, in which case one is
+chosen automatically and used silently -- unlike
+\code{\link[=simulate.erglm_model]{simulate.erglm_model()}}'s auto-picked seed, it is not reported, since
+(per Details below) it essentially never changes the result.}
 }
 \value{
 For \code{erglm_scm_forward()} and \code{erglm_scm_backward()}, the
@@ -56,7 +60,11 @@ internally. For \code{erglm_scm_history()}, a data frame is returned
 containing the SCM history log
 }
 \description{
-Stepwise covariate modelling for exposure-response models
+Automates the search for which covariates belong in an
+exposure-response model: \code{erglm_scm_forward()} greedily adds candidate
+terms, \code{erglm_scm_backward()} greedily removes them, and
+\code{erglm_scm_history()} retrieves the audit log of every model considered
+along the way.
 }
 \details{
 \code{seed} exists as a safety measure against two hypothetical

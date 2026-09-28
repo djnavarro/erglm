@@ -159,7 +159,7 @@ skill):
   to code, not prose already in the same doc).
 - **Cross-reference with square brackets, not just backticks.** Writing
   `` `erglm_fun()` `` renders as code but produces no link;
-  `[erglm_fun()]` (or `[erplots::er_vpc_plot()]` for another package) is
+  `[erglm_fun()]` (or `[erplots::er_vpc_add_simulated()]` for another package) is
   what roxygen2/pkgdown turn into an actual hyperlink. `erglm_predict()`'s
   own docs already do this correctly (`See also [erglm_fun()]`) -- match
   that pattern for any new cross-reference, whether in `@details`,

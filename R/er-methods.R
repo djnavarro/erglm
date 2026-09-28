@@ -4,7 +4,7 @@
 # erglm has no hard dependency on erplots (a modelling package shouldn't need
 # to pull in ggplot2/patchwork). But if erplots *is* installed and loaded,
 # erglm's model objects should work seamlessly with erplots' model-agnostic
-# plotting API (`er_plot_show_model()`, `er_vpc_plot()`, etc.), which relies
+# plotting API (`er_plot_add_model()`, `er_vpc_add_simulated()`, etc.), which relies
 # on the `er_predict()`/`er_simulate()`/`er_summary()` generics defined in
 # erplots (see `erplots::er_model_interface`).
 #
