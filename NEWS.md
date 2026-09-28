@@ -1,3 +1,11 @@
+# erglm (development version)
+
+* `erglm_scm_forward()`/`erglm_scm_backward()` gain a `criterion`
+  argument, supporting `"aic"`/`"bic"`-based term selection in addition
+  to the existing `"p-value"` default. The SCM history (`erglm_scm_history()`)
+  gains a `criterion` column recording which selection rule was applied
+  in each forward/backward step (#7).
+
 # erglm 0.1.1
 
 CRAN resubmission, addressing reviewer feedback on the 0.1.0 submission:

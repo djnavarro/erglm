@@ -3,14 +3,18 @@
 #'
 #' @param mod An erglm model object
 #' @param candidates Character vector with list of candidate terms
-#' @param threshold Threshold to test against
+#' @param threshold Threshold to test against. Used only when
+#' `criterion = "p-value"` (the default); ignored otherwise. Defaults to
+#' `0.01` for `erglm_scm_forward()` and `0.001` for `erglm_scm_backward()`.
+#' @param criterion Model selection criterion. One of `"p-value"`
+#' (default), `"aic"`, or `"bic"`.
 #' @param test Which significance test to use when comparing nested
-#' models. `"auto"` (the default) picks a likelihood-ratio chi-squared
-#' test (`"Chisq"`) for families with known dispersion (binomial,
-#' poisson) and an F-test (`"F"`) for families with an estimated
-#' dispersion parameter (gaussian, gamma, inverse.gaussian, quasi*),
-#' matching `stats::anova()`'s own `test` argument. Set explicitly to
-#' override.
+#' models. Only used when `criterion = "p-value"`. `"auto"` (the default)
+#' picks a likelihood-ratio chi-squared test (`"Chisq"`) for families
+#' with known dispersion (binomial, poisson) and an F-test (`"F"`) for
+#' families with an estimated dispersion parameter (gaussian, gamma,
+#' inverse.gaussian, quasi*), matching `stats::anova()`'s own `test`
+#' argument. Set explicitly to override.
 #' @param seed Optional seed to control order of term tests
 #'
 #' @returns For `erglm_scm_forward()` and `erglm_scm_backward()`, the
@@ -51,6 +55,28 @@
 #' and the candidate can never improve the fit anyway once it's
 #' aliased.
 #'
+#' Three model selection criteria are available via the `criterion`
+#' argument:
+#'
+#' - `"p-value"` (default): Models are compared with the significance
+#'   test named by `test`. A term is added if its p-value falls below
+#'   `threshold` (forward) or removed if its p-value exceeds `threshold`
+#'   (backward). When multiple candidates satisfy the threshold within a
+#'   step, the one with the most extreme p-value is chosen.
+#' - `"aic"`: A term is added (forward) or removed (backward) if doing
+#'   so strictly decreases AIC relative to the current model. When
+#'   multiple candidates improve AIC, the one yielding the lowest AIC is
+#'   chosen.
+#' - `"bic"`: Same as `"aic"`, but using BIC as the criterion.
+#'
+#' When `criterion` is `"aic"` or `"bic"`, the `threshold` and `test`
+#' arguments have no effect, and `term_p_value` is left `NA` in the
+#' history for every candidate tested that step (the significance test
+#' isn't computed, since it plays no role in selection). The `model_aic`
+#' and `model_bic` columns are always recorded regardless of which
+#' criterion drove selection, and the history's `criterion` column
+#' records which one was used for each forward/backward step.
+#'
 #' `candidates` is validated up front: every element must be parseable
 #' as a formula and name exactly one covariate term (e.g. `"sex"`, not
 #' `"sex + dose"` or `"not a formula"`). This errors immediately, before
@@ -67,13 +93,19 @@
 #' mod2 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 #' mod3 <- erglm_scm_backward(mod2, candidates = c("sex", "dose"))
 #' erglm_scm_history(mod3)
+#'
+#' # AIC-based forward addition/backward elimination instead of p-value
+#' mod4 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"), criterion = "aic")
+#' mod5 <- erglm_scm_backward(mod4, candidates = c("sex", "dose"), criterion = "bic")
+#' erglm_scm_history(mod5)
 NULL
 
 #' @rdname erglm_scm
 #' @export
-erglm_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto", "Chisq", "F"), seed = NULL) {
+erglm_scm_forward <- function(mod, candidates, threshold = 0.01, criterion = "p-value", test = c("auto", "Chisq", "F"), seed = NULL) {
   test <- match.arg(test)
   .erglm_check_candidates(candidates)
+  .erglm_check_criterion(criterion)
   if (is.null(seed)) {
     seed <- .pick_seed()
   }
@@ -84,6 +116,7 @@ erglm_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto"
         mod = mod,
         candidates = candidates,
         threshold = threshold,
+        criterion = criterion,
         test = test
       )
     }
@@ -91,11 +124,11 @@ erglm_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto"
   return(mod_out)
 }
 
-.erglm_scm_forward <- function(mod, candidates, threshold, test) {
+.erglm_scm_forward <- function(mod, candidates, threshold, criterion = "p-value", test) {
   history <- erglm_scm_history(mod)
   last_iter <- max(history$iteration)
   while (TRUE) {
-    mod_new <- .erglm_once_forward(mod, candidates, threshold, test)
+    mod_new <- .erglm_once_forward(mod, candidates, threshold, criterion, test)
     history_new <- erglm_scm_history(mod_new)
     this_iter <- max(history_new$iteration)
     if (this_iter == last_iter) return(mod)
@@ -111,9 +144,10 @@ erglm_scm_forward <- function(mod, candidates, threshold = 0.01, test = c("auto"
 
 #' @rdname erglm_scm
 #' @export
-erglm_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("auto", "Chisq", "F"), seed = NULL) {
+erglm_scm_backward <- function(mod, candidates, threshold = 0.001, criterion = "p-value", test = c("auto", "Chisq", "F"), seed = NULL) {
   test <- match.arg(test)
   .erglm_check_candidates(candidates)
+  .erglm_check_criterion(criterion)
   if (is.null(seed)) {
     seed <- .pick_seed()
   }
@@ -124,6 +158,7 @@ erglm_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("aut
         mod = mod,
         candidates = candidates,
         threshold = threshold,
+        criterion = criterion,
         test = test
       )
     }
@@ -131,11 +166,11 @@ erglm_scm_backward <- function(mod, candidates, threshold = 0.001, test = c("aut
   return(mod_out)
 }
 
-.erglm_scm_backward <- function(mod, candidates, threshold, test) {
+.erglm_scm_backward <- function(mod, candidates, threshold, criterion = "p-value", test) {
   history <- erglm_scm_history(mod)
   last_iter <- max(history$iteration)
   while (TRUE) {
-    mod_new <- .erglm_once_backward(mod, candidates, threshold, test)
+    mod_new <- .erglm_once_backward(mod, candidates, threshold, criterion, test)
     history_new <- erglm_scm_history(mod_new)
     this_iter <- max(history_new$iteration)
     if (this_iter == last_iter) return(mod)
@@ -158,6 +193,7 @@ erglm_scm_history <- function(mod) {
     iteration = 0L,
     attempt = 0L,
     step = "base model",
+    criterion = NA_character_,
     action = NA_character_,
     term_tested = NA_character_, 
     model_tested = deparse(mod$formula),
@@ -170,12 +206,21 @@ erglm_scm_history <- function(mod) {
   return(history_row)
 }
 
-.erglm_once_forward <- function(mod, candidates, threshold, test) {
+# `use_ic`/`ic_fn` implement the "aic"/"bic" branch of `criterion`: a
+# candidate is compared against `best_metric` (the *current* model's IC,
+# updated as better candidates are found within the step) rather than
+# against `threshold`, which only applies to `criterion = "p-value"`. The
+# significance test isn't computed at all in IC mode -- it plays no role
+# in selection there -- so `term_p_value` is left `NA` in the history for
+# every row tested under "aic"/"bic".
+.erglm_once_forward <- function(mod, candidates, threshold, criterion = "p-value", test) {
   candidates <- sample(candidates)
   history <- erglm_scm_history(mod)
   iter <- max(history$iteration) + 1L
   attm <- max(history$attempt)
-  lowest_p <- threshold
+  use_ic <- criterion %in% c("aic", "bic")
+  ic_fn <- if (criterion == "bic") stats::BIC else stats::AIC
+  best_metric <- if (use_ic) as.numeric(ic_fn(mod)) else threshold
   update_ind <- NA_integer_
   best_mod <- mod
   for (cc in candidates) {    
@@ -183,11 +228,12 @@ erglm_scm_history <- function(mod) {
     attm <- attm + 1L
     if (!.erglm_term_in_model(mod, add)) {
       mod_new <- erglm_add_term(mod, add, quiet = TRUE)
-      p_val <- .erglm_anova_p(mod, mod_new, test)
+      p_val <- if (use_ic) NA_real_ else .erglm_anova_p(mod, mod_new, test)
       history_row <- tibble::tibble(
         iteration = iter,
         attempt = attm,
         step = "forward",
+        criterion = criterion,
         action = "add",
         term_tested = deparse(add), 
         model_tested = deparse(mod_new$formula),
@@ -198,16 +244,23 @@ erglm_scm_history <- function(mod) {
         model_updated = NA
       )
       history <- tibble::add_row(history, history_row)
-      if (is.na(p_val)) {
+      if (use_ic) {
+        candidate_ic <- as.numeric(ic_fn(mod_new))
+        if (candidate_ic < best_metric) {
+          update_ind <- attm
+          best_metric <- candidate_ic
+          best_mod <- mod_new
+        }
+      } else if (is.na(p_val)) {
         rlang::warn(paste0(
           "Skipping candidate term `", deparse(add), "` in forward step ",
           iter, ": comparison p-value is NA (often caused by a candidate ",
           "that's aliased/collinear with a term already in the model, ",
           "giving zero additional degrees of freedom)."
         ))
-      } else if (p_val < lowest_p) {
+      } else if (p_val < best_metric) {
         update_ind <- attm
-        lowest_p <- p_val
+        best_metric <- p_val
         best_mod <- mod_new
       }
     }
@@ -224,7 +277,7 @@ erglm_scm_history <- function(mod) {
   return(best_mod)
 }
 
-.erglm_once_backward <- function(mod, candidates, threshold, test) {
+.erglm_once_backward <- function(mod, candidates, threshold, criterion = "p-value", test) {
   trm_mod <- stats::terms(mod)
   trm_lab <- attr(trm_mod, "term.labels")
   candidates <- intersect(trm_lab, candidates)
@@ -233,7 +286,9 @@ erglm_scm_history <- function(mod) {
   history <- erglm_scm_history(mod)
   iter <- max(history$iteration) + 1L
   attm <- max(history$attempt)
-  highest_p <- threshold
+  use_ic <- criterion %in% c("aic", "bic")
+  ic_fn <- if (criterion == "bic") stats::BIC else stats::AIC
+  best_metric <- if (use_ic) as.numeric(ic_fn(mod)) else threshold
   update_ind <- NA_integer_
   best_mod <- mod
   for (cc in candidates) {    
@@ -241,11 +296,12 @@ erglm_scm_history <- function(mod) {
     attm <- attm + 1L
     if (.erglm_term_in_model(mod, del)) {
       mod_new <- erglm_remove_term(mod, del, quiet = TRUE)
-      p_val <- .erglm_anova_p(mod, mod_new, test)
+      p_val <- if (use_ic) NA_real_ else .erglm_anova_p(mod, mod_new, test)
       history_row <- tibble::tibble(
         iteration = iter,
         attempt = attm,
         step = "backward",
+        criterion = criterion,
         action = "remove",
         term_tested = deparse(del), 
         model_tested = deparse(mod_new$formula),
@@ -256,16 +312,23 @@ erglm_scm_history <- function(mod) {
         model_updated = NA
       )
       history <- tibble::add_row(history, history_row)
-      if (is.na(p_val)) {
+      if (use_ic) {
+        candidate_ic <- as.numeric(ic_fn(mod_new))
+        if (candidate_ic < best_metric) {
+          update_ind <- attm
+          best_metric <- candidate_ic
+          best_mod <- mod_new
+        }
+      } else if (is.na(p_val)) {
         rlang::warn(paste0(
           "Skipping candidate term `", deparse(del), "` in backward step ",
           iter, ": comparison p-value is NA (often caused by a candidate ",
           "that's aliased/collinear with another term in the model, ",
           "giving zero degrees of freedom for the comparison)."
         ))
-      } else if (p_val > highest_p) {
+      } else if (p_val > best_metric) {
         update_ind <- attm
-        highest_p <- p_val
+        best_metric <- p_val
         best_mod <- mod_new
       }
     }

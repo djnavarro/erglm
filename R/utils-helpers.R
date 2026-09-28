@@ -109,6 +109,23 @@
   }
 }
 
+# `criterion` (as passed to `erglm_scm_forward()`/`erglm_scm_backward()`)
+# selects how a candidate term is judged: `"p-value"` (the historical
+# default -- a likelihood-ratio test compared against `threshold`) or
+# `"aic"`/`"bic"` (add/remove a term if doing so strictly improves the
+# chosen information criterion; `threshold` is then ignored). Mirrors the
+# equivalent check in the companion `emaxnls`/`ertte` packages.
+.erglm_check_criterion <- function(criterion) {
+  supported <- c("p-value", "aic", "bic")
+  if (!is.character(criterion) || length(criterion) != 1L || is.na(criterion) ||
+      !criterion %in% supported) {
+    rlang::abort(paste0(
+      "`criterion` must be one of \"", paste(supported, collapse = "\", \""),
+      "\", not ", .fmt_bad_value(criterion), "."
+    ))
+  }
+}
+
 # `nsim` must be a single positive whole number -- used by
 # `simulate.erglm_model()`/`.erglm_resample()` and `.erglm_simulate_draws()`
 # to size the loop of simulation replicates. Invalid values (0, negative,

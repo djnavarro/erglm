@@ -1,6 +1,6 @@
 Package: erglm
 Title: Exposure-Response Tools for GLM-Based Models
-Version: 0.1.1
+Version: 0.1.1.9000
 Authors@R: 
     person("Danielle", "Navarro", , "djnavarro@protonmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7648-6578"))
 Description:
@@ -36,4 +36,4 @@ Depends:
 LazyData: true
 Config/testthat/edition: 3
 Config/Needs/website: djnavarro/waeponwifestre, rmarkdown
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
