@@ -112,6 +112,6 @@
 #' for the data-generating code.
 #'
 #' @examples
-#' erglm_data
+#' head(erglm_data)
 "erglm_data"
 

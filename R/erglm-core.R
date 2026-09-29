@@ -98,10 +98,11 @@ erglm_model <- function(formula, data, family = stats::gaussian(), ...) {
 #' @examples
 #' mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 #' prd <- erglm_predict(mod, erglm_data)
-#' prd
+#' head(prd)
 #'
 #' mod_gauss <- erglm_model(biomarker_change ~ aucss, erglm_data, family = gaussian())
-#' erglm_predict(mod_gauss, erglm_data)
+#' prd_gauss <- erglm_predict(mod_gauss, erglm_data)
+#' head(prd_gauss)
 #' 
 erglm_predict <- function(object, newdata = NULL, conf_level = .95) {
   .erglm_check_conf_level(conf_level)

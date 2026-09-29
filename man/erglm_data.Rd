@@ -37,6 +37,6 @@ This simulated dataset is entirely synthetic. See the package source
 for the data-generating code.
 }
 \examples{
-erglm_data
+head(erglm_data)
 }
 \keyword{datasets}

@@ -65,6 +65,7 @@ method uses, without needing to call \code{simulate()} yourself.
 }
 \examples{
 mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
-simulate(mod, nsim = 5, seed = 963)
+sim <- simulate(mod, nsim = 5, seed = 963)
+head(sim)
 
 }

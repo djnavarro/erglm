@@ -53,7 +53,8 @@
 #' @exportS3Method stats::simulate
 #' @examples
 #' mod <- erglm_model(ae1 ~ aucss + sex, erglm_data, family = binomial())
-#' simulate(mod, nsim = 5, seed = 963)
+#' sim <- simulate(mod, nsim = 5, seed = 963)
+#' head(sim)
 #'
 simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
   .erglm_resample(object, nsim = nsim, seed = seed)

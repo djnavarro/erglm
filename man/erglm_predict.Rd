@@ -43,9 +43,10 @@ comparison and other inherited \code{glm}/\code{lm} methods (\code{summary()},
 \examples{
 mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 prd <- erglm_predict(mod, erglm_data)
-prd
+head(prd)
 
 mod_gauss <- erglm_model(biomarker_change ~ aucss, erglm_data, family = gaussian())
-erglm_predict(mod_gauss, erglm_data)
+prd_gauss <- erglm_predict(mod_gauss, erglm_data)
+head(prd_gauss)
 
 }
