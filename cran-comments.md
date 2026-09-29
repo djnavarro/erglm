@@ -14,11 +14,13 @@ CRAN resubmission. Highlights (see `NEWS.md` for the complete list):
 * Various documentation fixes.
 
 No changes to `DESCRIPTION`'s dependency declarations require reviewer
-attention this time: `erplots` remains a `Suggests`-only, optional
-interoperability dependency (not on CRAN), used conditionally and with
-its absence verified harmless (see below), and the `Additional_repositories`
-field has been removed now that no vignette/example needs `erplots`
-installed to build.
+attention this time. `erplots`, erglm's `Suggests`-only, optional
+interoperability dependency, is itself now on CRAN (0.1.2, published
+2026-09-09), so the `Additional_repositories`/not-on-CRAN caveats from
+the 0.1.0/0.1.1 submissions no longer apply; erglm's use of it remains
+conditional regardless (registered lazily at load time, with the one
+test file exercising it skipped via
+`testthat::skip_if_not_installed("erplots")`).
 
 ## Test environments
 
@@ -26,9 +28,10 @@ installed to build.
 * R-hub v2 (GitHub Actions workflow): linux, macos-arm64, windows, and
   nosuggests, all R-devel -- all `Status: OK`
   (<https://github.com/djnavarro/erglm/actions/runs/36538736020>)
-* win-builder, R-devel and R-release -- TODO: fill in `Status`/note
-  count and log URLs once the win-builder emails arrive
-  (submitted 2026-09-29, results expected ~30 min later)
+* win-builder, R-release -- `Status: OK`, 0 notes
+  (<https://win-builder.r-project.org/wY4Qc0kaXV7S/00check.log>)
+* win-builder, R-devel -- `Status: OK`, 0 notes
+  (<https://win-builder.r-project.org/z5dYitZ5Fqpp/00check.log>)
 
 ## R CMD check results
 

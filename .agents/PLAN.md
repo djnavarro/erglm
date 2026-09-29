@@ -9,16 +9,17 @@ changelog.
 
 ## Before calling `devtools::release()` for 0.2.0
 
-Local `devtools::check(remote = TRUE, manual = TRUE)` and R-hub v2
-(linux, macos-arm64, windows, nosuggests, all R-devel) are clean: 0
-errors/warnings/notes, `Status: OK` everywhere
-(<https://github.com/djnavarro/erglm/actions/runs/36538736020>).
-win-builder (R-devel and R-release) was submitted 2026-09-29 via
-`devtools::check_win_devel()`/`check_win_release()`; results arrive by
-email (~30 min). Remaining before submitting:
+All checks are complete and clean: local `devtools::check(remote =
+TRUE, manual = TRUE)`, R-hub v2 (linux, macos-arm64, windows,
+nosuggests, all R-devel;
+<https://github.com/djnavarro/erglm/actions/runs/36538736020>), and
+both win-builder platforms (R-devel
+<https://win-builder.r-project.org/z5dYitZ5Fqpp/00check.log>,
+R-release
+<https://win-builder.r-project.org/wY4Qc0kaXV7S/00check.log>) --
+0 errors/warnings/notes everywhere. `cran-comments.md` is fully filled
+in. Remaining before submitting:
 
-- Fill in win-builder's `Status`/note count and log URLs in
-  `cran-comments.md` (currently marked TODO) once the emails arrive.
 - The maintainer's own read-through of `cran-comments.md`/`NEWS.md`
   before submitting.
 
