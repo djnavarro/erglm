@@ -28,7 +28,6 @@ Suggests:
     withr
 URL: https://github.com/djnavarro/erglm, https://erglm.djnavarro.net/
 BugReports: https://github.com/djnavarro/erglm/issues
-Additional_repositories: https://djnavarro.r-universe.dev
 Depends: 
     R (>= 4.1.0)
 LazyData: true
