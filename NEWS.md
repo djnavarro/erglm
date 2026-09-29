@@ -1,4 +1,4 @@
-# erglm (development version)
+# erglm 0.2.0
 
 * `erglm_scm_forward()`/`erglm_scm_backward()` gain a `criterion`
   argument, supporting `"aic"`/`"bic"`-based term selection in addition
