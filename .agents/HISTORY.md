@@ -350,3 +350,18 @@ caller-scope limitation), [#7](https://github.com/djnavarro/minis/issues/7)
 (the trailing-comma bug), and
 [#8](https://github.com/djnavarro/minis/issues/8) (the `if_else()`
 feature request).
+
+One oversight only surfaced once this landed on a PR and CI ran:
+vendoring the minis' *source* without also vendoring their *tests*
+left every function each mini defines but erglm's own code doesn't
+call (e.g. `.table_add_row()`, `.verb_summarise()`, the three
+non-`left_join()` join variants) sitting at 0% coverage, which dragged
+the package's overall coverage down enough to fail `codecov`'s patch
+and project checks. Fixed by porting each mini's own
+`tests/testthat/test-<mini>.R` verbatim into erglm's `tests/testthat/`
+(minus the upstream `source()` line -- unneeded, since the vendored
+functions are already part of erglm's namespace once the package is
+loaded). `miniseed`'s test suite uses `withr` itself, purely as an
+independent tool to verify RNG-state save/restore -- re-added to
+`Suggests` as a test-only dependency (not a runtime one) for that
+reason alone.

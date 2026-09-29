@@ -269,7 +269,23 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   The package should check cleanly (0 errors/warnings/notes).
 - Tests live in `tests/testthat/`, roughly one file per `R/` source file.
   `tests/testthat/test-er-methods.R` exercises interop with erplots and is
-  skipped if erplots isn't installed.
+  skipped if erplots isn't installed. Each vendored mini
+  (`R/minicondition.R`, `R/miniseed.R`, `R/minitable.R`, `R/miniverb.R`,
+  `R/minicase.R`, `R/minijoin.R`) has its own `test-<mini>.R`, ported
+  verbatim from that mini's own test suite in djnavarro/minis (minus the
+  upstream `source()` call at the top -- unnecessary here, since the
+  vendored functions are already part of erglm's own namespace once the
+  package is loaded, the same way any other internal, dot-prefixed
+  helper is directly callable, unqualified, from erglm's other test
+  files). These cover every function in each mini, including the ones
+  erglm's own code doesn't call (kept "for parity with upstream", per
+  each file's header comment) -- without them, those vendored-but-unused
+  functions would sit at 0% coverage, which is what triggered
+  `codecov`'s patch/project checks failing on the PR that introduced
+  these minis; porting each mini's test suite fixed it. `withr` was
+  re-added to `Suggests` (test-only, not a runtime dependency) purely
+  because `test-miniseed.R` uses it to independently verify RNG-state
+  save/restore.
 - Vignettes/articles live in `vignettes/articles/` and are built for the
   pkgdown site, not shipped with the package (see `.Rbuildignore`):
   `erglm.Rmd` ("Getting Started" -- a short tour covering `erglm_data`,

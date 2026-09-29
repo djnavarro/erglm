@@ -24,7 +24,8 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    tibble
+    tibble,
+    withr
 URL: https://github.com/djnavarro/erglm, https://erglm.djnavarro.net/
 BugReports: https://github.com/djnavarro/erglm/issues
 Additional_repositories: https://djnavarro.r-universe.dev
