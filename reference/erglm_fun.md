@@ -37,7 +37,7 @@ Uses `stats::family(object)$linkinv`, so this works for any
 binomial/logistic models; tested for binomial, poisson, gaussian, and
 gamma families. Named `erglm_fun()` for consistency with the companion
 `emaxnls` package's
-[`emaxnls::emax_fun()`](https://emaxnls.djnavarro.net/reference/emax_fun.html),
+[`emaxnls::emax_fun()`](https://rdrr.io/pkg/emaxnls/man/emax_fun.html),
 which serves the same purpose for `emaxnls`/`emaxlogistic` models. The
 returned function checks that `param` is numeric and has one entry per
 column of the model matrix implied by `data`, erroring informatively

@@ -40,7 +40,7 @@ These functions are not typically called directly; they underpin
 and
 [`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md).
 Named and shaped to match the companion `emaxnls` package's
-[`emaxnls::emax_add_term()`](https://emaxnls.djnavarro.net/reference/emax_update.html)/[`emaxnls::emax_remove_term()`](https://emaxnls.djnavarro.net/reference/emax_update.html),
+[`emaxnls::emax_add_term()`](https://rdrr.io/pkg/emaxnls/man/emax_update.html)/[`emaxnls::emax_remove_term()`](https://rdrr.io/pkg/emaxnls/man/emax_update.html),
 which serve the same purpose for `emaxnls`/`emaxlogistic` models – with
 one structural difference: `emaxnls`'s terms are two-sided formulas
 naming a structural parameter (e.g. `E0 ~ AGE`), since covariates there
