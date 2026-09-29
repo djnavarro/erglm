@@ -1,6 +1,6 @@
 # Changelog
 
-## erglm (development version)
+## erglm 0.2.0
 
 - [`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
   gain a `criterion` argument, supporting `"aic"`/`"bic"`-based term

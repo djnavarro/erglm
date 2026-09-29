@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">erglm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,7 +47,7 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="erglm-development-version">erglm (development version)<a class="anchor" aria-label="anchor" href="#erglm-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.0" id="erglm-020">erglm 0.2.0<a class="anchor" aria-label="anchor" href="#erglm-020"></a></h2>
 <ul><li>
 <code><a href="../reference/erglm_scm.html">erglm_scm_forward()</a></code>/<code><a href="../reference/erglm_scm.html">erglm_scm_backward()</a></code> gain a <code>criterion</code> argument, supporting <code>"aic"</code>/<code>"bic"</code>-based term selection in addition to the existing <code>"p-value"</code> default. The SCM history (<code><a href="../reference/erglm_scm.html">erglm_scm_history()</a></code>) gains a <code>criterion</code> column recording which selection rule was applied in each forward/backward step (<a href="https://github.com/djnavarro/erglm/issues/7" class="external-link">#7</a>).</li>
 <li>The bundled <code>erglm_data</code> dataset’s continuous columns (<code>aucss</code>, <code>cmaxss</code>, <code>biomarker_change</code>, <code>ae_duration</code>) are now rounded to two decimal places, a more realistic degree of precision; underlying values are otherwise unchanged.</li>
