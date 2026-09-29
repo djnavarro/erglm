@@ -202,7 +202,7 @@ where the $`p`$-value search above found none:
 aic_mod <- erglm_scm_forward(base_mod, candidates, criterion = "aic", seed = 3425)
 aic_mod$formula
 #> ae1 ~ aucss + weight + age
-#> <environment: 0x55f483182fc8>
+#> <environment: 0x56181c27a020>
 ```
 
 ``` r
