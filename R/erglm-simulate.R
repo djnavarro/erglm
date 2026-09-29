@@ -107,14 +107,14 @@ simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
     }
   )
 
-  sim <- dplyr::bind_rows(sim)
+  sim <- do.call(rbind, sim)
   par <- .table_as_tibble(par)
   # prefix coefficient columns so they can't collide with predictor
   # columns of the same name once joined onto `dat` below
   names(par) <- paste0("coef_", names(par))
   par$sim_id <- seq_len(nsim)
 
-  out <- dplyr::left_join(sim, par, by = "sim_id")
-  out <- dplyr::left_join(out, dat, by = "dat_id")
+  out <- .join_left_join(sim, par, by = "sim_id")
+  out <- .join_left_join(out, dat, by = "dat_id")
   .table_as_tibble(out)
 }

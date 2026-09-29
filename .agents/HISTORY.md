@@ -263,3 +263,72 @@ the rename work recorded elsewhere in this file.
 
 Remaining before actually calling `devtools::release()` is tracked in
 `.agents/PLAN.md`.
+
+## Replacing hard dependencies with vendored minis from djnavarro/minis
+
+Ahead of a 0.2.0 release, erglm's hard dependencies were reviewed with
+an eye toward minimalism -- the package mostly wraps base `glm()`, and a
+full `dplyr`/`tibble`/`rlang`/`withr` dependency chain was more than
+that warranted. All four were replaced, one at a time, with vendored
+minis from [djnavarro/minis](https://github.com/djnavarro/minis) (see
+each of `R/minicondition.R`, `R/miniseed.R`, `R/minitable.R`,
+`R/miniverb.R`+`R/minicase.R`+`R/minijoin.R` in `AGENTS.md` for the
+current-state detail); `mvtnorm` was explicitly kept out of scope
+throughout (no mini exists for multivariate normal sampling, and
+writing one was judged a riskier undertaking than vendoring an existing
+mini), leaving it as erglm's only runtime dependency besides base
+`stats`.
+
+`rlang` and `withr` were clean, behaviorally transparent 1:1 swaps
+(`minicondition`/`miniseed`) -- erglm's usage never needed anything
+beyond plain `abort()`/`warn()`/`inform()` messages or a seeded code
+block. `tibble` and `dplyr` were not: both surfaced real gaps between
+"looks like a drop-in replacement" and "actually behaves the same",
+caught only by testing each call site rather than by inspection:
+
+- `minitable`'s `.table_tibble()` cannot resolve a plain local variable
+  from the *calling* function (only columns already built within the
+  same call) -- its cross-column self-reference trick relies on a
+  hand-built `envir` for `eval()`, unlike real `tibble::tibble()`'s
+  quosure-based arguments. None of erglm's `tibble::tibble()` call sites
+  actually needed self-reference, so they were rewritten as plain
+  `data.frame(..., check.names = FALSE)` instead of routed through the
+  mini at all -- `.table_tibble()` ended up unused in erglm's own code.
+- Fully removing `dplyr` meant losing the one remaining dplyr-specific
+  behavior (`bind_cols()`) that had been preserving `erglm_predict()`'s
+  `fit_link`/`se_link`/`fit_resp` columns' incidental `names()` (a
+  `predict.glm()` artifact) -- plain data frame column assignment always
+  strips a vector's own `names()`, with no base-R way around it. Accepted
+  as a further, cascading piece of the tibble-removal behavior change
+  already documented in `NEWS.md`.
+- `minicase`'s `.case_when()` requires every branch's value to share an
+  identical `typeof()` (dplyr's version auto-coerces to a common type).
+  This caught a real, pre-existing type inconsistency in
+  `erglm_scm_history()`'s `model_updated` column (seeded as a bare `NA`,
+  logical, then later set to `1L`/`0L`, integer) -- fixed by seeding it
+  `NA_integer_` instead.
+- Reproducing `.make_erglm_data()`'s `weight` column exactly (same seed,
+  same values) needed forcing both branches of an `ifelse()` into local
+  variables before the call: base `ifelse()` short-circuits and skips
+  evaluating a branch entirely when a group's condition is uniformly
+  `TRUE`/`FALSE` (true here, since the call is grouped `.by = "sex"`),
+  unlike `dplyr::if_else()`, which always evaluates both -- and since
+  both branches draw random numbers, the skip desyncs the RNG stream and
+  corrupts every downstream column. Caught by comparing regenerated
+  output against the pre-swap values bit-for-bit under the same seed,
+  which is why `erglm_data.rda` was regenerated (not just its class
+  changed) as part of this work.
+- Six dplyr functions (`if_else()`, `n()`, `row_number()`, `pull()`,
+  `bind_cols()`, `bind_rows()`) have no mini equivalent at all in
+  `miniverb`/`minicase`/`minijoin` and were rewritten as direct base-R
+  substitutes case by case, rather than stretching any mini to cover
+  them.
+
+The practical lesson carried forward: a mini that looks like a
+mechanical find-and-replace for some `pkg::fn()` call can still hide a
+real semantic gap (environment handling, type coercion, short-circuit
+evaluation) that only shows up once the actual call sites are exercised
+-- each swap in this effort was verified by running the full test suite
+and, for `dplyr`/`tibble`, by direct side-by-side comparisons against
+the pre-swap output before committing, not by inspection of the mini's
+source alone.

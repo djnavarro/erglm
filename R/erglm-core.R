@@ -108,18 +108,18 @@ erglm_predict <- function(object, newdata = NULL, conf_level = .95) {
   if (is.null(newdata)) newdata <- object$data
   inverse_link <- stats::family(object)$linkinv
   z_scale <- -stats::qnorm((1 - conf_level)/2)
-  out <- newdata |> 
-    dplyr::bind_cols(
-      stats::setNames(
-        stats::predict(object, newdata, se.fit = TRUE, type = "link")[1:2],
-        c('fit_link','se_link')
-      )
-    ) |> 
-    dplyr::mutate(
-      fit_resp = inverse_link(fit_link),
-      ci_lower = inverse_link(fit_link - (z_scale * se_link)),
-      ci_upper = inverse_link(fit_link + (z_scale * se_link)),
-    )
+  pred <- stats::predict(object, newdata, se.fit = TRUE, type = "link")[1:2]
+  out <- newdata
+  # plain data frame column assignment strips a vector's own `names()`
+  # (an artifact of predict()'s row-indexed names, e.g. "1", "2", ...),
+  # unlike dplyr::bind_cols() -- see NEWS.md.
+  out$fit_link <- unname(pred$fit)
+  out$se_link <- unname(pred$se.fit)
+  out <- .verb_mutate(out,
+    fit_resp = inverse_link(fit_link),
+    ci_lower = inverse_link(fit_link - (z_scale * se_link)),
+    ci_upper = inverse_link(fit_link + (z_scale * se_link))
+  )
   return(out)
 }
 
@@ -221,13 +221,15 @@ erglm_fun <- function(object) {
       )
       sim <- list()
       for (ii in seq_len(nsim)) {
-        dd_sim <- newdata |> dplyr::mutate(row_id = dplyr::row_number(), sim_id = ii)
+        dd_sim <- newdata
+        dd_sim$row_id <- seq_len(nrow(newdata))
+        dd_sim$sim_id <- ii
         dd_sim$fit_resp <- fn(param = par[ii, ], dd_sim)
         dd_sim$sim_resp <- .erglm_draw_response(family_name, fit = dd_sim$fit_resp, dispersion = dispersion)
         sim[[ii]] <- dd_sim
       }
     }
   )
-  dplyr::bind_rows(sim)
+  do.call(rbind, sim)
 }
 

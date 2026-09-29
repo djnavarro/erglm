@@ -149,9 +149,7 @@ erglm_scm_forward <- function(mod, candidates, threshold = 0.01, criterion = "p-
     history <- history_new
     last_iter <- this_iter
     mod <- mod_new
-    updates <- history |> 
-      dplyr::filter(iteration == last_iter) |> 
-      dplyr::pull(model_updated)
+    updates <- history$model_updated[history$iteration == last_iter]
     if (all(updates == 0L)) return(mod)
   }
 }
@@ -191,9 +189,7 @@ erglm_scm_backward <- function(mod, candidates, threshold = 0.001, criterion = "
     history <- history_new
     last_iter <- this_iter
     mod <- mod_new
-    updates <- history |> 
-      dplyr::filter(iteration == last_iter) |> 
-      dplyr::pull(model_updated)
+    updates <- history$model_updated[history$iteration == last_iter]
     if (all(updates == 0L)) return(mod)
   }
 }
@@ -216,7 +212,7 @@ erglm_scm_history <- function(mod) {
     term_p_value = NA_real_,
     model_aic = stats::AIC(mod),
     model_bic = stats::BIC(mod),
-    model_updated = NA
+    model_updated = NA_integer_
   )
   return(history_row)
 }
@@ -257,7 +253,7 @@ erglm_scm_history <- function(mod) {
         term_p_value = p_val,
         model_aic = stats::AIC(mod_new),
         model_bic = stats::BIC(mod_new),
-        model_updated = NA
+        model_updated = NA_integer_
       )
       history <- rbind(history, history_row)
       if (use_ic) {
@@ -282,8 +278,8 @@ erglm_scm_history <- function(mod) {
     }
   }
   history <- history |> 
-    dplyr::mutate(
-      model_updated = dplyr::case_when(
+    .verb_mutate(
+      model_updated = .case_when(
         iteration != iter ~ model_updated,
         attempt == update_ind ~ 1L,
         TRUE ~ 0L
@@ -326,7 +322,7 @@ erglm_scm_history <- function(mod) {
         term_p_value = p_val,
         model_aic = stats::AIC(mod_new),
         model_bic = stats::BIC(mod_new),
-        model_updated = NA
+        model_updated = NA_integer_
       )
       history <- rbind(history, history_row)
       if (use_ic) {
@@ -351,8 +347,8 @@ erglm_scm_history <- function(mod) {
     }
   }
   history <- history |> 
-    dplyr::mutate(
-      model_updated = dplyr::case_when(
+    .verb_mutate(
+      model_updated = .case_when(
         iteration != iter ~ model_updated,
         attempt == update_ind ~ 1L,
         TRUE ~ 0L

@@ -11,37 +11,44 @@
         sex = factor(sample(rep(c("Male", "Female"), c(n/2, n/2)))),
         age = sample(18:35, size = n, replace = TRUE)
       ) |> 
-        dplyr::mutate(
-          weight = dplyr::if_else(
-            condition = sex == "Male",
-            true = (stats::runif(dplyr::n(), .05, .95)) |>
+        # ifelse() short-circuits and skips evaluating a branch entirely
+        # when a group's condition is uniformly TRUE/FALSE (as it always
+        # is here, grouped by sex) -- unlike dplyr::if_else(), which
+        # always evaluates both branches. Both runif() draws are forced
+        # explicitly here so the RNG stream is consumed in the same
+        # order either way, keeping erglm_data reproducible under the
+        # same seed.
+        .verb_mutate(
+          weight = {
+            true_val <- (stats::runif(length(sex), .05, .95)) |>
               stats::qlnorm(meanlog = 4.284, sdlog = 0.164) |> 
-              round(),
-            false = (stats::runif(dplyr::n(), .05, .95)) |>
+              round()
+            false_val <- (stats::runif(length(sex), .05, .95)) |>
               stats::qlnorm(meanlog = 4.114, sdlog = 0.164) |> 
               round()
-          ),
-          .by = sex
+            ifelse(sex == "Male", true_val, false_val)
+          },
+          .by = "sex"
         ) |> 
-        dplyr::mutate(
+        .verb_mutate(
           dose = sample(rep(c(0, 100, 200), c(n/3, n/3, n/3))),
           treatment = factor(dose == 0, levels = c(TRUE, FALSE), labels = c("Placebo", "Drug")),
           aucss = (stats::runif(n, .05, .95)) |>
             stats::qlnorm() |>
             (\(x) x * (dose + 10 * weight))() |> 
-            (\(x) dplyr::if_else(dose == 0, 0, x))() |> 
+            (\(x) ifelse(dose == 0, 0, x))() |> 
             round(digits = 3),
           cmaxss = (exp(log(aucss/10) + stats::rnorm(n)/3) + stats::rnorm(n)) |> 
-            (\(x) dplyr::if_else(dose == 0, 0, x))() |> 
+            (\(x) ifelse(dose == 0, 0, x))() |> 
             round(digits = 3),
           ae1 = as.numeric(stats::qlogis(stats::runif(n)) < aucss/200 - 2 + 1 * as.numeric(sex=="Female")),
-          ae2 = as.numeric(stats::qlogis(stats::runif(n)) < aucss/500 - 2.0),
+          ae2 = as.numeric(stats::qlogis(stats::runif(n)) < aucss/500 - 2.0)
         ) |>
         # additional non-binary responses, for demonstrating/testing
         # poisson, gaussian, and gamma families -- appended after the
         # existing columns so their random draws don't perturb ae1/ae2
         # under the same seed.
-        dplyr::mutate(
+        .verb_mutate(
           ae_count = stats::rpois(
             n,
             lambda = exp(-1 + aucss / 1000 + 0.3 * as.numeric(sex == "Female"))
