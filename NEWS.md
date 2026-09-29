@@ -10,7 +10,9 @@
   dataset now return/are plain data frames rather than tibbles, and
   `erglm_predict()`'s `fit_link`/`se_link`/`fit_resp` columns lose the
   observation-index names they used to carry as a `predict.glm()`
-  artifact; underlying values are otherwise unchanged.
+  artifact; underlying values are otherwise unchanged. `tibble` has also
+  been dropped from `Suggests` entirely, since the vignettes now build
+  their example data with plain `data.frame()` calls too.
 * `erglm_scm_forward()`/`erglm_scm_backward()` gain a `criterion`
   argument, supporting `"aic"`/`"bic"`-based term selection in addition
   to the existing `"p-value"` default. The SCM history (`erglm_scm_history()`)

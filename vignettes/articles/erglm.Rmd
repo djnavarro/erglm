@@ -17,7 +17,6 @@ tour of the main pieces; the other articles go into more depth on each.
 
 ```{r setup}
 library(erglm)
-library(tibble)
 ```
 
 ## Example data
@@ -50,7 +49,7 @@ the link and response scales, as a tidy data frame:
 
 ```{r predict}
 mod |>
-  erglm_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
+  erglm_predict(newdata = data.frame(aucss = seq(0, 3000, by = 500), sex = "Female"))
 ```
 
 ## Choosing covariates

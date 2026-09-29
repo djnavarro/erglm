@@ -195,8 +195,11 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   erglm_model()`, and the bundled `erglm_data` dataset (regenerated via
   `.make_erglm_data()`, see below) now return/are plain data frames
   rather than `tbl_df` objects. `tibble` moved from `Imports` to
-  `Suggests` (vignettes and the README still use real tibble in example
-  code, e.g. to build `newdata`).
+  `Suggests` at this point (vignettes and the README still used real
+  tibble in example code, e.g. to build `newdata`), and was later dropped
+  from `DESCRIPTION` entirely once the vignettes were rewritten to build
+  their example data with plain `data.frame()` calls instead -- no `R/`
+  file, test, or article uses the `tibble` package now.
 - `R/miniverb.R`, `R/minicase.R`, `R/minijoin.R` -- vendored copies of
   the `miniverb`/`minicase`/`minijoin` minis from djnavarro/minis,
   providing `.verb_mutate()`, `.case_when()`, and `.join_left_join()` as
@@ -251,7 +254,7 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   `if_else()` equivalent in `minicase`:
   [djnavarro/minis#8](https://github.com/djnavarro/minis/issues/8).
   `dplyr` is dropped from `DESCRIPTION` entirely (not moved to
-  `Suggests`, unlike `tibble`) since no vignette or the README ever
+  `Suggests` first, unlike `tibble`) since no vignette or the README ever
   used it directly.
 - `R/utils-helpers.R`, `R/utils-global.R` -- small internal helpers and
   `globalVariables()` declarations for NSE. `.as_erglm()` records the
@@ -345,8 +348,14 @@ check and a parameter-uncertainty band); no `R/` file uses it.
 ## Conventions
 
 - Use the base R pipe (`|>`), not the magrittr pipe.
-- Follow the existing tidyverse-style conventions (dplyr/tibble/rlang)
-  already used throughout.
+- The package (including its vignettes) is now dependency-free of
+  dplyr/tibble/rlang/withr as runtime tools -- `mvtnorm` is the only
+  runtime dependency besides base `stats`. Where tidyverse-equivalent
+  behavior is needed internally, use the vendored minis in
+  `R/mini*.R` (`.verb_mutate()`, `.case_when()`, `.table_as_tibble()`,
+  etc.) rather than reaching for the real packages; plain base-R/
+  `data.frame()` idioms are preferred everywhere else, including new
+  vignette example code.
 - Public functions are prefixed `erglm_`; internal helpers are prefixed
   with `.erglm_` (or, for a couple of package-wide utilities like
   `.pick_seed()`, no prefix at all).

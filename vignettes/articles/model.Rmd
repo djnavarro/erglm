@@ -11,7 +11,6 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(erglm)
-library(tibble)
 ```
 
 Fitting a model and turning it into predictions are the two most basic tasks in erglm -- every other tool in the package (stepwise covariate selection, simulation) builds on `erglm_model()` and `erglm_predict()`. The ["Getting Started"](erglm.html) article gives a quick tour of both; this article goes into more depth, including how each one generalises unchanged across the other `glm()` families erglm supports.
@@ -37,7 +36,7 @@ The `erglm_predict()` function produces model predictions:
 
 ```{r predict-1}
 pred <- mod |> 
-  erglm_predict(newdata = tibble(
+  erglm_predict(newdata = data.frame(
     aucss = seq(from = 0, to = 1500, by = 100)
   ))
 pred
@@ -55,7 +54,7 @@ The confidence level can be adjusted using the `conf_level` argument
 ```{r predict-2}
 pred <- mod |> 
   erglm_predict(
-    newdata = tibble(aucss = seq(from = 0, to = 1500, by = 100)), 
+    newdata = data.frame(aucss = seq(from = 0, to = 1500, by = 100)), 
     conf_level = 0.8 
   )
 pred
@@ -76,7 +75,7 @@ mod_pois
 
 ```{r predict-3}
 mod_pois |> 
-  erglm_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
+  erglm_predict(newdata = data.frame(aucss = seq(0, 3000, by = 500), sex = "Female"))
 ```
 
 Stepwise covariate modelling also generalises across families -- see the "Stepwise covariate modelling" article for details.

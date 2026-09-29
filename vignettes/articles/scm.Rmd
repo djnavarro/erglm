@@ -12,7 +12,6 @@ options(digits = 4)
 
 ```{r setup, message = FALSE}
 library(erglm)
-library(tibble)
 ```
 
 Once you can fit a single exposure-response model, the next practical question is usually *which covariates belong in the model*. When there are several candidates, testing every combination by hand is tedious and easy to get wrong. `erglm_scm_forward()` and `erglm_scm_backward()` automate this with **stepwise covariate modelling** (SCM): a forward-addition step that greedily adds the most helpful covariates, a backward-elimination step that prunes terms that no longer earn their place, and a complete history of every model considered along the way that serves as an audit log for the procedure.
