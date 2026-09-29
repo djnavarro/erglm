@@ -1,5 +1,10 @@
 # erglm (development version)
 
+* `erglm_scm_forward()`/`erglm_scm_backward()` gain a `criterion`
+  argument, supporting `"aic"`/`"bic"`-based term selection in addition
+  to the existing `"p-value"` default. The SCM history (`erglm_scm_history()`)
+  gains a `criterion` column recording which selection rule was applied
+  in each forward/backward step (#7).
 * The bundled `erglm_data` dataset's continuous columns (`aucss`, `cmaxss`,
   `biomarker_change`, `ae_duration`) are now rounded to two decimal places,
   a more realistic degree of precision; underlying values are otherwise
@@ -13,11 +18,6 @@
   artifact; underlying values are otherwise unchanged. `tibble` has also
   been dropped from `Suggests` entirely, since the vignettes now build
   their example data with plain `data.frame()` calls too.
-* `erglm_scm_forward()`/`erglm_scm_backward()` gain a `criterion`
-  argument, supporting `"aic"`/`"bic"`-based term selection in addition
-  to the existing `"p-value"` default. The SCM history (`erglm_scm_history()`)
-  gains a `criterion` column recording which selection rule was applied
-  in each forward/backward step (#7).
 * Fixed several documentation gaps across help pages, vignettes, and the
   README: missing descriptions, undocumented argument defaults, and
   broken cross-references, including several references to erplots'
