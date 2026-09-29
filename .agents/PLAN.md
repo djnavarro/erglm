@@ -7,15 +7,18 @@ move to [.agents/HISTORY.md](HISTORY.md) and be removed from this file
 rather than marked "done" in place. See `NEWS.md` for the user-facing
 changelog.
 
-## Before calling `devtools::release()`
+## Before calling `devtools::release()` for 0.2.0
 
-CRAN submission prep (see `.agents/HISTORY.md`) is otherwise complete:
-the package checks cleanly (0 errors/warnings, one explained NOTE) on
-R-hub and both win-builder platforms, with `erplots`'s absence
-confirmed harmless. Remaining:
+Local `devtools::check(remote = TRUE, manual = TRUE)` and R-hub v2
+(linux, macos-arm64, windows, nosuggests, all R-devel) are clean: 0
+errors/warnings/notes, `Status: OK` everywhere
+(<https://github.com/djnavarro/erglm/actions/runs/36538736020>).
+win-builder (R-devel and R-release) was submitted 2026-09-29 via
+`devtools::check_win_devel()`/`check_win_release()`; results arrive by
+email (~30 min). Remaining before submitting:
 
-- A final `devtools::check()` at the `0.1.0` version to confirm nothing
-  regressed since the last full check.
+- Fill in win-builder's `Status`/note count and log URLs in
+  `cran-comments.md` (currently marked TODO) once the emails arrive.
 - The maintainer's own read-through of `cran-comments.md`/`NEWS.md`
   before submitting.
 
