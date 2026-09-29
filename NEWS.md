@@ -1,21 +1,12 @@
 # erglm (development version)
 
-* erglm no longer depends on rlang; internal error/warning/message
-  signalling now uses a small vendored base-R equivalent, keeping erglm's
-  behaviour unchanged.
-* erglm no longer depends on withr; internal RNG-seed handling now uses
-  a small vendored base-R equivalent, keeping erglm's behaviour
-  unchanged.
-* erglm no longer depends on tibble or dplyr. `erglm_predict()`,
-  `simulate.erglm_model()`, and the bundled `erglm_data` dataset now are/
-  return plain data frames rather than tibbles (`tbl_df` objects) -- the
-  values and columns are unchanged, but printing and `dplyr`/
-  tibble-specific behaviour (e.g. stricter `$` partial-matching) no
-  longer apply unless you convert the result yourself, e.g. via
-  `tibble::as_tibble()`. `erglm_predict()`'s `fit_link`/`se_link`/
-  `fit_resp` columns also lose the observation-index names (`"1"`,
-  `"2"`, ...) they used to carry as a `predict.glm()` artifact; the
-  values themselves are unaffected.
+* erglm no longer depends on rlang, withr, tibble, or dplyr (`mvtnorm`
+  remains its only runtime dependency besides base `stats`). As a result,
+  `erglm_predict()`, `simulate.erglm_model()`, and the bundled `erglm_data`
+  dataset now return/are plain data frames rather than tibbles, and
+  `erglm_predict()`'s `fit_link`/`se_link`/`fit_resp` columns lose the
+  observation-index names they used to carry as a `predict.glm()`
+  artifact; underlying values are otherwise unchanged.
 * `erglm_scm_forward()`/`erglm_scm_backward()` gain a `criterion`
   argument, supporting `"aic"`/`"bic"`-based term selection in addition
   to the existing `"p-value"` default. The SCM history (`erglm_scm_history()`)
