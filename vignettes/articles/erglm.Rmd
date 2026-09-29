@@ -29,7 +29,7 @@ supported family: binary (`ae1`, `ae2`), count (`ae_count`), continuous
 (`biomarker_change`), and positive right-skewed continuous (`ae_duration`):
 
 ```{r data}
-erglm_data
+head(erglm_data)
 ```
 
 ## Fitting a model
@@ -74,7 +74,8 @@ treatment, including the forward/backward workflow and the audit log
 both parameter uncertainty and observation-level noise:
 
 ```{r simulate}
-simulate(mod, nsim = 5, seed = 2048)
+sim <- simulate(mod, nsim = 5, seed = 2048)
+head(sim)
 ```
 
 See the ["Simulation"](simulate.html) article for details, including the

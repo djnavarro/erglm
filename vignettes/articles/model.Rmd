@@ -19,7 +19,7 @@ Fitting a model and turning it into predictions are the two most basic tasks in 
 The core function is `erglm_model()`, a very thin wrapper around `glm()`. By default it fits a gaussian model (`family = gaussian()`, matching `glm()`'s own default), but any `glm()` family can be supplied explicitly -- `binomial`, `poisson`, and `Gamma` are also tested and supported. The package comes with a synthetic data set called `erglm_data` that we can use:
 
 ```{r data-1}
-erglm_data
+head(erglm_data)
 ```
 
 ## Fitting models

@@ -38,7 +38,7 @@ Calling `simulate()` generates one or more replicate datasets. The number of rep
 
 ```{r simulate-1}
 sim1 <- simulate(mod, nsim = 1, seed = 1)
-sim1
+head(sim1)
 ```
 
 ### What `simulate()` actually does
