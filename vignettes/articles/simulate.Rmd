@@ -14,12 +14,6 @@ knitr::opts_chunk$set(
 options(digits = 4)
 ```
 
-```{r setup, message = FALSE}
-library(erglm)
-library(ggplot2)
-theme_set(theme_bw())
-```
-
 Once a model has been fitted, it's often useful to generate *new* data from it: for predictive checks, for simulation-based intervals, or as the input to some downstream analysis. The package offers two tools for this, operating at different levels:
 
 - **`simulate()`** is the high-level method. It generates complete replicate datasets from a fitted model, automatically propagating both the uncertainty in the parameter estimates and the observation-level noise.
@@ -27,7 +21,10 @@ Once a model has been fitted, it's often useful to generate *new* data from it: 
 
 Both rely on the **mvtnorm** package for drawing parameter values, so it needs to be installed. This article works through both tools using a gaussian model, then shows that they generalise unchanged to the other `glm()` families erglm supports.
 
-```{r fit}
+```{r fit, message=FALSE}
+library(erglm)
+library(ggplot2)
+theme_set(theme_bw())
 mod <- erglm_model(biomarker_change ~ aucss, erglm_data, family = gaussian())
 ```
 

@@ -9,10 +9,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(erglm)
-```
-
 An object returned by `erglm_model()` is a genuine `glm` object -- it has
 class `c("erglm_model", "glm", "lm")`, and the `erglm_model` class only adds
 a little extra metadata on top. This means none of the standard R methods
@@ -22,6 +18,7 @@ modification. This article is a short reference for the ones that come up
 most often when working with exposure-response models.
 
 ```{r model}
+library(erglm)
 mod <- erglm_model(ae1 ~ aucss + dose + sex, erglm_data, family = binomial())
 ```
 
