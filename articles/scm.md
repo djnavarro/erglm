@@ -30,7 +30,11 @@ model:
 
 ``` r
 
-base_mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
+base_mod <- erglm_model(
+  formula = ae1 ~ aucss, 
+  data = erglm_data, 
+  family = binomial()
+)
 
 erglm_add_term(base_mod, ~ sex)
 #> 
@@ -77,9 +81,28 @@ repeats until no remaining candidate clears the bar:
 
 ``` r
 
-fwd_mod <- erglm_scm_forward(base_mod, candidates, threshold = 0.01, seed = 3425)
-fwd_mod$formula
-#> ae1 ~ aucss
+fwd_mod <- base_mod |> 
+  erglm_scm_forward(candidates, threshold = 0.01, seed = 3425)
+
+summary(fwd_mod)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = family, data = data)
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept) -1.79138    0.25560   -7.01  2.4e-12 ***
+#> aucss        0.00550    0.00067    8.21  2.3e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 402.13  on 299  degrees of freedom
+#> Residual deviance: 193.41  on 298  degrees of freedom
+#> AIC: 197.4
+#> 
+#> Number of Fisher Scoring iterations: 7
 ```
 
 None of the four candidates clear the default $`0.01`$ threshold here –
@@ -87,7 +110,8 @@ inspecting the history shows why:
 
 ``` r
 
-erglm_scm_history(fwd_mod)[, c("term_tested", "term_p_value", "model_updated")]
+fwd_mod_log <- erglm_scm_history(fwd_mod)
+fwd_mod_log[, c("term_tested", "term_p_value", "model_updated")]
 #>   term_tested term_p_value model_updated
 #> 1        <NA>           NA            NA
 #> 2        ~sex      0.39063             0
@@ -112,31 +136,34 @@ candidate:
 
 ``` r
 
-full_mod <- erglm_model(ae1 ~ aucss + sex + dose + weight + age, erglm_data, family = binomial())
-bwd_mod <- erglm_scm_backward(full_mod, candidates, threshold = 0.001, seed = 9821)
-bwd_mod$formula
-#> ae1 ~ aucss
-#> attr(,"variables")
-#> list(ae1, aucss)
-#> attr(,"factors")
-#>       aucss
-#> ae1       0
-#> aucss     1
-#> attr(,"term.labels")
-#> [1] "aucss"
-#> attr(,"order")
-#> [1] 1
-#> attr(,"intercept")
-#> [1] 1
-#> attr(,"response")
-#> [1] 1
-#> attr(,".Environment")
-#> <environment: R_GlobalEnv>
-#> attr(,"predvars")
-#> list(ae1, aucss)
-#> attr(,"dataClasses")
-#>       ae1     aucss 
-#> "numeric" "numeric"
+full_mod <- erglm_model(
+  formula = ae1 ~ aucss + sex + dose + weight + age, 
+  data = erglm_data, 
+  family = binomial()
+)
+
+bwd_mod <- full_mod |> 
+  erglm_scm_backward(candidates, threshold = 0.001, seed = 9821)
+
+summary(bwd_mod)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = family, data = data)
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept) -1.79138    0.25560   -7.01  2.4e-12 ***
+#> aucss        0.00550    0.00067    8.21  2.3e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 402.13  on 299  degrees of freedom
+#> Residual deviance: 193.41  on 298  degrees of freedom
+#> AIC: 197.4
+#> 
+#> Number of Fisher Scoring iterations: 7
 ```
 
 All four candidates are pruned, leaving only `aucss` – matching what
@@ -146,22 +173,20 @@ shows the iteration-by-iteration elimination:
 
 ``` r
 
-print(
-  erglm_scm_history(bwd_mod)[, c("iteration", "term_tested", "term_p_value", "model_updated")],
-  row.names = FALSE
-)
-#>  iteration term_tested term_p_value model_updated
-#>          0        <NA>           NA            NA
-#>          1        ~sex      0.86307             1
-#>          1       ~dose      0.84535             0
-#>          1        ~age      0.12318             0
-#>          1     ~weight      0.07129             0
-#>          2     ~weight      0.04418             0
-#>          2        ~age      0.12348             0
-#>          2       ~dose      0.85135             1
-#>          3        ~age      0.11832             1
-#>          3     ~weight      0.04309             0
-#>          4     ~weight      0.06218             1
+bwd_mod_log <- erglm_scm_history(bwd_mod)
+bwd_mod_log[, c("iteration", "term_tested", "term_p_value", "model_updated")]
+#>    iteration term_tested term_p_value model_updated
+#> 1          0        <NA>           NA            NA
+#> 2          1        ~sex      0.86307             1
+#> 3          1       ~dose      0.84535             0
+#> 4          1        ~age      0.12318             0
+#> 5          1     ~weight      0.07129             0
+#> 6          2     ~weight      0.04418             0
+#> 7          2        ~age      0.12348             0
+#> 8          2       ~dose      0.85135             1
+#> 9          3        ~age      0.11832             1
+#> 10         3     ~weight      0.04309             0
+#> 11         4     ~weight      0.06218             1
 ```
 
 Each iteration removes the single worst-performing term
@@ -199,15 +224,36 @@ where the $`p`$-value search above found none:
 
 ``` r
 
-aic_mod <- erglm_scm_forward(base_mod, candidates, criterion = "aic", seed = 3425)
-aic_mod$formula
-#> ae1 ~ aucss + weight + age
-#> <environment: 0x555daa54d178>
+aic_mod <- base_mod |> 
+  erglm_scm_forward(candidates, criterion = "aic", seed = 3425)
+
+summary(aic_mod)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = family, data = data)
+#> 
+#> Coefficients:
+#>              Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)  2.350560   1.744632    1.35    0.178    
+#> aucss        0.005595   0.000689    8.12  4.7e-16 ***
+#> weight      -0.038716   0.019575   -1.98    0.048 *  
+#> age         -0.059916   0.038717   -1.55    0.122    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 402.13  on 299  degrees of freedom
+#> Residual deviance: 187.49  on 296  degrees of freedom
+#> AIC: 195.5
+#> 
+#> Number of Fisher Scoring iterations: 7
 ```
 
 ``` r
 
-erglm_scm_history(aic_mod)[, c("term_tested", "criterion", "term_p_value", "model_aic", "model_updated")]
+aic_mod_log <- erglm_scm_history(aic_mod)
+aic_mod_log[, c("term_tested", "criterion", "term_p_value", "model_aic", "model_updated")]
 #>    term_tested criterion term_p_value model_aic model_updated
 #> 1         <NA>      <NA>           NA     197.4            NA
 #> 2         ~sex       aic           NA     198.7             0
@@ -232,30 +278,28 @@ The same `criterion` argument works for
 
 ``` r
 
-bic_mod <- erglm_scm_backward(full_mod, candidates, criterion = "bic", seed = 9821)
-bic_mod$formula
-#> ae1 ~ aucss
-#> attr(,"variables")
-#> list(ae1, aucss)
-#> attr(,"factors")
-#>       aucss
-#> ae1       0
-#> aucss     1
-#> attr(,"term.labels")
-#> [1] "aucss"
-#> attr(,"order")
-#> [1] 1
-#> attr(,"intercept")
-#> [1] 1
-#> attr(,"response")
-#> [1] 1
-#> attr(,".Environment")
-#> <environment: R_GlobalEnv>
-#> attr(,"predvars")
-#> list(ae1, aucss)
-#> attr(,"dataClasses")
-#>       ae1     aucss 
-#> "numeric" "numeric"
+bic_mod <- full_mod |> 
+  erglm_scm_backward(candidates, criterion = "bic", seed = 9821)
+
+summary(bic_mod)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = family, data = data)
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept) -1.79138    0.25560   -7.01  2.4e-12 ***
+#> aucss        0.00550    0.00067    8.21  2.3e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 402.13  on 299  degrees of freedom
+#> Residual deviance: 193.41  on 298  degrees of freedom
+#> AIC: 197.4
+#> 
+#> Number of Fisher Scoring iterations: 7
 ```
 
 ## Forward addition piped to backward elimination
@@ -271,8 +315,25 @@ final_mod <- base_mod |>
   erglm_scm_forward(candidates, threshold = 0.01, seed = 3425) |>
   erglm_scm_backward(candidates, threshold = 0.001, seed = 9821)
 
-final_mod$formula
-#> ae1 ~ aucss
+summary(final_mod)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = family, data = data)
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept) -1.79138    0.25560   -7.01  2.4e-12 ***
+#> aucss        0.00550    0.00067    8.21  2.3e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 402.13  on 299  degrees of freedom
+#> Residual deviance: 193.41  on 298  degrees of freedom
+#> AIC: 197.4
+#> 
+#> Number of Fisher Scoring iterations: 7
 ```
 
 Since forward addition already found nothing worth adding, backward
@@ -295,10 +356,34 @@ default forward threshold:
 
 ``` r
 
-base_pois <- erglm_model(ae_count ~ aucss, erglm_data, family = poisson())
-fwd_pois <- erglm_scm_forward(base_pois, candidates, threshold = 0.01, seed = 3425)
-fwd_pois$formula
-#> ae_count ~ aucss
+base_pois <- erglm_model(
+  formula = ae_count ~ aucss, 
+  data = erglm_data, 
+  family = poisson()
+)
+
+fwd_pois <- base_pois |> 
+  erglm_scm_forward(candidates, threshold = 0.01, seed = 3425)
+
+summary(fwd_pois)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = family, data = data)
+#> 
+#> Coefficients:
+#>              Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept) -1.00e+00   9.59e-02   -10.5   <2e-16 ***
+#> aucss        1.04e-03   4.22e-05    24.8   <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 868.78  on 299  degrees of freedom
+#> Residual deviance: 275.61  on 298  degrees of freedom
+#> AIC: 713.8
+#> 
+#> Number of Fisher Scoring iterations: 5
 ```
 
 Internally,

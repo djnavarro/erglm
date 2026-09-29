@@ -99,7 +99,11 @@ single term from a fitted model. Two exported helpers do exactly that,
 taking a one-sided formula naming the term and returning a refitted
 model:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">base_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">base_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span></span>
+<span>  formula <span class="op">=</span> <span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">erglm_data</span>, </span>
+<span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/erglm_term.html">erglm_add_term</a></span><span class="op">(</span><span class="va">base_mod</span>, <span class="op">~</span> <span class="va">sex</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -144,14 +148,34 @@ is retained, provided that
 is below <code>threshold</code>. The step repeats until no remaining
 candidate clears the bar:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fwd_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">base_mod</span>, <span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.01</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span></span>
-<span><span class="va">fwd_mod</span><span class="op">$</span><span class="va">formula</span></span>
-<span><span class="co">#&gt; ae1 ~ aucss</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">fwd_mod</span> <span class="op">&lt;-</span> <span class="va">base_mod</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.01</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fwd_mod</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::glm(formula = formula, family = family, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept) -1.79138    0.25560   -7.01  2.4e-12 ***</span></span>
+<span><span class="co">#&gt; aucss        0.00550    0.00067    8.21  2.3e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 402.13  on 299  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance: 193.41  on 298  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: 197.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 7</span></span></code></pre></div>
 <p>None of the four candidates clear the default
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.01</mn><annotation encoding="application/x-tex">0.01</annotation></semantics></math>
 threshold here – inspecting the history shows why:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">fwd_mod</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term_tested"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">fwd_mod_log</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">fwd_mod</span><span class="op">)</span></span>
+<span><span class="va">fwd_mod_log</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term_tested"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   term_tested term_p_value model_updated</span></span>
 <span><span class="co">#&gt; 1        &lt;NA&gt;           NA            NA</span></span>
 <span><span class="co">#&gt; 2        ~sex      0.39063             0</span></span>
@@ -177,53 +201,54 @@ is removed if that
 exceeds <code>threshold</code>. To see it doing real work, start from a
 saturated model that already contains every candidate:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">full_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dose</span> <span class="op">+</span> <span class="va">weight</span> <span class="op">+</span> <span class="va">age</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">bwd_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">full_mod</span>, <span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.001</span>, seed <span class="op">=</span> <span class="fl">9821</span><span class="op">)</span></span>
-<span><span class="va">bwd_mod</span><span class="op">$</span><span class="va">formula</span></span>
-<span><span class="co">#&gt; ae1 ~ aucss</span></span>
-<span><span class="co">#&gt; attr(,"variables")</span></span>
-<span><span class="co">#&gt; list(ae1, aucss)</span></span>
-<span><span class="co">#&gt; attr(,"factors")</span></span>
-<span><span class="co">#&gt;       aucss</span></span>
-<span><span class="co">#&gt; ae1       0</span></span>
-<span><span class="co">#&gt; aucss     1</span></span>
-<span><span class="co">#&gt; attr(,"term.labels")</span></span>
-<span><span class="co">#&gt; [1] "aucss"</span></span>
-<span><span class="co">#&gt; attr(,"order")</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; attr(,"intercept")</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; attr(,"response")</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; attr(,".Environment")</span></span>
-<span><span class="co">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span>
-<span><span class="co">#&gt; attr(,"predvars")</span></span>
-<span><span class="co">#&gt; list(ae1, aucss)</span></span>
-<span><span class="co">#&gt; attr(,"dataClasses")</span></span>
-<span><span class="co">#&gt;       ae1     aucss </span></span>
-<span><span class="co">#&gt; "numeric" "numeric"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">full_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span></span>
+<span>  formula <span class="op">=</span> <span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dose</span> <span class="op">+</span> <span class="va">weight</span> <span class="op">+</span> <span class="va">age</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">erglm_data</span>, </span>
+<span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bwd_mod</span> <span class="op">&lt;-</span> <span class="va">full_mod</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.001</span>, seed <span class="op">=</span> <span class="fl">9821</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bwd_mod</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::glm(formula = formula, family = family, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept) -1.79138    0.25560   -7.01  2.4e-12 ***</span></span>
+<span><span class="co">#&gt; aucss        0.00550    0.00067    8.21  2.3e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 402.13  on 299  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance: 193.41  on 298  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: 197.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 7</span></span></code></pre></div>
 <p>All four candidates are pruned, leaving only <code>aucss</code> –
 matching what forward addition already told us: none of
 <code>sex</code>, <code>dose</code>, <code>weight</code>, or
 <code>age</code> earns a place in the model at these thresholds. The
 full audit log shows the iteration-by-iteration elimination:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">bwd_mod</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"iteration"</span>, <span class="st">"term_tested"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt;  iteration term_tested term_p_value model_updated</span></span>
-<span><span class="co">#&gt;          0        &lt;NA&gt;           NA            NA</span></span>
-<span><span class="co">#&gt;          1        ~sex      0.86307             1</span></span>
-<span><span class="co">#&gt;          1       ~dose      0.84535             0</span></span>
-<span><span class="co">#&gt;          1        ~age      0.12318             0</span></span>
-<span><span class="co">#&gt;          1     ~weight      0.07129             0</span></span>
-<span><span class="co">#&gt;          2     ~weight      0.04418             0</span></span>
-<span><span class="co">#&gt;          2        ~age      0.12348             0</span></span>
-<span><span class="co">#&gt;          2       ~dose      0.85135             1</span></span>
-<span><span class="co">#&gt;          3        ~age      0.11832             1</span></span>
-<span><span class="co">#&gt;          3     ~weight      0.04309             0</span></span>
-<span><span class="co">#&gt;          4     ~weight      0.06218             1</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bwd_mod_log</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">bwd_mod</span><span class="op">)</span></span>
+<span><span class="va">bwd_mod_log</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"iteration"</span>, <span class="st">"term_tested"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;    iteration term_tested term_p_value model_updated</span></span>
+<span><span class="co">#&gt; 1          0        &lt;NA&gt;           NA            NA</span></span>
+<span><span class="co">#&gt; 2          1        ~sex      0.86307             1</span></span>
+<span><span class="co">#&gt; 3          1       ~dose      0.84535             0</span></span>
+<span><span class="co">#&gt; 4          1        ~age      0.12318             0</span></span>
+<span><span class="co">#&gt; 5          1     ~weight      0.07129             0</span></span>
+<span><span class="co">#&gt; 6          2     ~weight      0.04418             0</span></span>
+<span><span class="co">#&gt; 7          2        ~age      0.12348             0</span></span>
+<span><span class="co">#&gt; 8          2       ~dose      0.85135             1</span></span>
+<span><span class="co">#&gt; 9          3        ~age      0.11832             1</span></span>
+<span><span class="co">#&gt; 10         3     ~weight      0.04309             0</span></span>
+<span><span class="co">#&gt; 11         4     ~weight      0.06218             1</span></span></code></pre></div>
 <p>Each iteration removes the single worst-performing term
 (<code>model_updated == 1</code>); the next iteration re-tests
 everything still in the model, since removing one term can change the
@@ -265,12 +290,33 @@ covariates worth adding where the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-value
 search above found none:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">aic_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">base_mod</span>, <span class="va">candidates</span>, criterion <span class="op">=</span> <span class="st">"aic"</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span></span>
-<span><span class="va">aic_mod</span><span class="op">$</span><span class="va">formula</span></span>
-<span><span class="co">#&gt; ae1 ~ aucss + weight + age</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x555daa54d178&gt;</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">aic_mod</span> <span class="op">&lt;-</span> <span class="va">base_mod</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">candidates</span>, criterion <span class="op">=</span> <span class="st">"aic"</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">aic_mod</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::glm(formula = formula, family = family, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;              Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  2.350560   1.744632    1.35    0.178    </span></span>
+<span><span class="co">#&gt; aucss        0.005595   0.000689    8.12  4.7e-16 ***</span></span>
+<span><span class="co">#&gt; weight      -0.038716   0.019575   -1.98    0.048 *  </span></span>
+<span><span class="co">#&gt; age         -0.059916   0.038717   -1.55    0.122    </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 402.13  on 299  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance: 187.49  on 296  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: 195.5</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 7</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">aic_mod</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term_tested"</span>, <span class="st">"criterion"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_aic"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">aic_mod_log</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">aic_mod</span><span class="op">)</span></span>
+<span><span class="va">aic_mod_log</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term_tested"</span>, <span class="st">"criterion"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_aic"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;    term_tested criterion term_p_value model_aic model_updated</span></span>
 <span><span class="co">#&gt; 1         &lt;NA&gt;      &lt;NA&gt;           NA     197.4            NA</span></span>
 <span><span class="co">#&gt; 2         ~sex       aic           NA     198.7             0</span></span>
@@ -291,30 +337,28 @@ one criterion can still be audited against the other.</p>
 <p>The same <code>criterion</code> argument works for
 <code><a href="../reference/erglm_scm.html">erglm_scm_backward()</a></code>:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bic_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">full_mod</span>, <span class="va">candidates</span>, criterion <span class="op">=</span> <span class="st">"bic"</span>, seed <span class="op">=</span> <span class="fl">9821</span><span class="op">)</span></span>
-<span><span class="va">bic_mod</span><span class="op">$</span><span class="va">formula</span></span>
-<span><span class="co">#&gt; ae1 ~ aucss</span></span>
-<span><span class="co">#&gt; attr(,"variables")</span></span>
-<span><span class="co">#&gt; list(ae1, aucss)</span></span>
-<span><span class="co">#&gt; attr(,"factors")</span></span>
-<span><span class="co">#&gt;       aucss</span></span>
-<span><span class="co">#&gt; ae1       0</span></span>
-<span><span class="co">#&gt; aucss     1</span></span>
-<span><span class="co">#&gt; attr(,"term.labels")</span></span>
-<span><span class="co">#&gt; [1] "aucss"</span></span>
-<span><span class="co">#&gt; attr(,"order")</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; attr(,"intercept")</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; attr(,"response")</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; attr(,".Environment")</span></span>
-<span><span class="co">#&gt; &lt;environment: R_GlobalEnv&gt;</span></span>
-<span><span class="co">#&gt; attr(,"predvars")</span></span>
-<span><span class="co">#&gt; list(ae1, aucss)</span></span>
-<span><span class="co">#&gt; attr(,"dataClasses")</span></span>
-<span><span class="co">#&gt;       ae1     aucss </span></span>
-<span><span class="co">#&gt; "numeric" "numeric"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bic_mod</span> <span class="op">&lt;-</span> <span class="va">full_mod</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">candidates</span>, criterion <span class="op">=</span> <span class="st">"bic"</span>, seed <span class="op">=</span> <span class="fl">9821</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bic_mod</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::glm(formula = formula, family = family, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept) -1.79138    0.25560   -7.01  2.4e-12 ***</span></span>
+<span><span class="co">#&gt; aucss        0.00550    0.00067    8.21  2.3e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 402.13  on 299  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance: 193.41  on 298  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: 197.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 7</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="forward-addition-piped-to-backward-elimination">Forward addition piped to backward elimination<a class="anchor" aria-label="anchor" href="#forward-addition-piped-to-backward-elimination"></a>
@@ -329,8 +373,25 @@ the pipe:</p>
 <span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.01</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.001</span>, seed <span class="op">=</span> <span class="fl">9821</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">final_mod</span><span class="op">$</span><span class="va">formula</span></span>
-<span><span class="co">#&gt; ae1 ~ aucss</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">final_mod</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::glm(formula = formula, family = family, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept) -1.79138    0.25560   -7.01  2.4e-12 ***</span></span>
+<span><span class="co">#&gt; aucss        0.00550    0.00067    8.21  2.3e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 402.13  on 299  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance: 193.41  on 298  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: 197.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 7</span></span></code></pre></div>
 <p>Since forward addition already found nothing worth adding, backward
 elimination has nothing left to prune, and the pipeline settles on the
 base model. <code>final_mod</code> is an ordinary fitted model object,
@@ -349,10 +410,34 @@ summary as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>≈</mo><mn>0.07</mn></mrow><annotation encoding="application/x-tex">p \approx 0.07</annotation></semantics></math>)
 that still doesn’t clear the default forward threshold:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">base_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae_count</span> <span class="op">~</span> <span class="va">aucss</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">fwd_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">base_pois</span>, <span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.01</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span></span>
-<span><span class="va">fwd_pois</span><span class="op">$</span><span class="va">formula</span></span>
-<span><span class="co">#&gt; ae_count ~ aucss</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">base_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span></span>
+<span>  formula <span class="op">=</span> <span class="va">ae_count</span> <span class="op">~</span> <span class="va">aucss</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">erglm_data</span>, </span>
+<span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fwd_pois</span> <span class="op">&lt;-</span> <span class="va">base_pois</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">candidates</span>, threshold <span class="op">=</span> <span class="fl">0.01</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fwd_pois</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; stats::glm(formula = formula, family = family, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;              Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept) -1.00e+00   9.59e-02   -10.5   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; aucss        1.04e-03   4.22e-05    24.8   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 868.78  on 299  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance: 275.61  on 298  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: 713.8</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 5</span></span></code></pre></div>
 <p>Internally,
 <code><a href="../reference/erglm_scm.html">erglm_scm_forward()</a></code>/<code><a href="../reference/erglm_scm.html">erglm_scm_backward()</a></code> pick
 a likelihood-ratio chi-squared test for families with known dispersion
