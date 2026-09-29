@@ -87,9 +87,7 @@ and even then its effect is usually invisible. Concretely: each step of
 `erglm_scm_forward()`/ `erglm_scm_backward()` shuffles the candidate
 terms ([`sample()`](https://rdrr.io/r/base/sample.html)) before testing
 them one at a time, and the shuffled order is the *only* thing `seed`
-(via
-[`withr::with_seed()`](https://withr.r-lib.org/reference/with_seed.html))
-controls. Term p-values come from
+(via a seeded-then-restored RNG block) controls. Term p-values come from
 [`stats::anova()`](https://rdrr.io/r/stats/anova.html) on models fitted
 with [`stats::glm()`](https://rdrr.io/r/stats/glm.html), which is a
 deterministic algorithm (iteratively reweighted least squares, no random
@@ -157,38 +155,44 @@ what might be a long, expensive search.
 mod0 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
 mod1 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"))
 erglm_scm_history(mod1)
-#> # A tibble: 3 × 12
-#>   iteration attempt step       criterion action term_tested model_tested      
-#>       <int>   <int> <chr>      <chr>     <chr>  <chr>       <chr>             
-#> 1         0       0 base model NA        NA     NA          ae1 ~ aucss       
-#> 2         1       1 forward    p-value   add    ~sex        ae1 ~ aucss + sex 
-#> 3         1       2 forward    p-value   add    ~dose       ae1 ~ aucss + dose
-#> # ℹ 5 more variables: model_converged <lgl>, term_p_value <dbl>,
-#> #   model_aic <dbl>, model_bic <dbl>, model_updated <int>
+#>   iteration attempt       step criterion action term_tested       model_tested
+#> 1         0       0 base model      <NA>   <NA>        <NA>        ae1 ~ aucss
+#> 2         1       1    forward   p-value    add        ~sex  ae1 ~ aucss + sex
+#> 3         1       2    forward   p-value    add       ~dose ae1 ~ aucss + dose
+#>   model_converged term_p_value model_aic model_bic model_updated
+#> 1            TRUE           NA  197.4073  204.8149            NA
+#> 2            TRUE    0.3906316  198.6704  209.7817             0
+#> 3            TRUE    0.7024744  199.2614  210.3728             0
 
 mod2 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 mod3 <- erglm_scm_backward(mod2, candidates = c("sex", "dose"))
 erglm_scm_history(mod3)
-#> # A tibble: 4 × 12
-#>   iteration attempt step       criterion action term_tested model_tested        
-#>       <int>   <int> <chr>      <chr>     <chr>  <chr>       <chr>               
-#> 1         0       0 base model NA        NA     NA          ae1 ~ aucss + sex +…
-#> 2         1       1 backward   p-value   remove ~dose       ae1 ~ aucss + sex   
-#> 3         1       2 backward   p-value   remove ~sex        ae1 ~ aucss + dose  
-#> 4         2       3 backward   p-value   remove ~sex        ae1 ~ aucss         
-#> # ℹ 5 more variables: model_converged <lgl>, term_p_value <dbl>,
-#> #   model_aic <dbl>, model_bic <dbl>, model_updated <int>
+#>   iteration attempt       step criterion action term_tested
+#> 1         0       0 base model      <NA>   <NA>        <NA>
+#> 2         1       1   backward   p-value remove       ~dose
+#> 3         1       2   backward   p-value remove        ~sex
+#> 4         2       3   backward   p-value remove        ~sex
+#>               model_tested model_converged term_p_value model_aic model_bic
+#> 1 ae1 ~ aucss + sex + dose            TRUE           NA  200.5607  215.3758
+#> 2        ae1 ~ aucss + sex            TRUE    0.7405587  198.6704  209.7817
+#> 3       ae1 ~ aucss + dose            TRUE    0.4025483  199.2614  210.3728
+#> 4              ae1 ~ aucss            TRUE    0.3906316  197.4073  204.8149
+#>   model_updated
+#> 1            NA
+#> 2             1
+#> 3             0
+#> 4             1
 
 # AIC-based forward addition/backward elimination instead of p-value
 mod4 <- erglm_scm_forward(mod0, candidates = c("sex", "dose"), criterion = "aic")
 mod5 <- erglm_scm_backward(mod4, candidates = c("sex", "dose"), criterion = "bic")
 erglm_scm_history(mod5)
-#> # A tibble: 3 × 12
-#>   iteration attempt step       criterion action term_tested model_tested      
-#>       <int>   <int> <chr>      <chr>     <chr>  <chr>       <chr>             
-#> 1         0       0 base model NA        NA     NA          ae1 ~ aucss       
-#> 2         1       1 forward    aic       add    ~dose       ae1 ~ aucss + dose
-#> 3         1       2 forward    aic       add    ~sex        ae1 ~ aucss + sex 
-#> # ℹ 5 more variables: model_converged <lgl>, term_p_value <dbl>,
-#> #   model_aic <dbl>, model_bic <dbl>, model_updated <int>
+#>   iteration attempt       step criterion action term_tested       model_tested
+#> 1         0       0 base model      <NA>   <NA>        <NA>        ae1 ~ aucss
+#> 2         1       1    forward       aic    add       ~dose ae1 ~ aucss + dose
+#> 3         1       2    forward       aic    add        ~sex  ae1 ~ aucss + sex
+#>   model_converged term_p_value model_aic model_bic model_updated
+#> 1            TRUE           NA  197.4073  204.8149            NA
+#> 2            TRUE           NA  199.2614  210.3728             0
+#> 3            TRUE           NA  198.6704  209.7817             0
 ```

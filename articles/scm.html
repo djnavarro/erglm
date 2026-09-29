@@ -153,14 +153,12 @@ candidate clears the bar:</p>
 threshold here – inspecting the history shows why:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">fwd_mod</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term_tested"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 3</span></span></span>
 <span><span class="co">#&gt;   term_tested term_p_value model_updated</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>                 <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ~sex              0.391              0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ~weight           0.062<span style="text-decoration: underline;">2</span>             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ~age              0.177              0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ~dose             0.702              0</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        &lt;NA&gt;           NA            NA</span></span>
+<span><span class="co">#&gt; 2        ~sex      0.39063             0</span></span>
+<span><span class="co">#&gt; 3     ~weight      0.06218             0</span></span>
+<span><span class="co">#&gt; 4        ~age      0.17665             0</span></span>
+<span><span class="co">#&gt; 5       ~dose      0.70247             0</span></span></code></pre></div>
 <p><code>sex</code> does have a genuine (if modest) effect on
 <code>ae1</code> in the data-generating process behind
 <code>erglm_data</code>, but once <code>aucss</code> is already in the
@@ -213,22 +211,20 @@ full audit log shows the iteration-by-iteration elimination:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">bwd_mod</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"iteration"</span>, <span class="st">"term_tested"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  n <span class="op">=</span> <span class="cn">Inf</span></span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 4</span></span></span>
-<span><span class="co">#&gt;    iteration term_tested term_p_value model_updated</span></span>
-<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>         0 <span style="color: #BB0000;">NA</span>               <span style="color: #BB0000;">NA</span>                 <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>         1 ~sex              0.863              1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>         1 ~dose             0.845              0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>         1 ~age              0.123              0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>         1 ~weight           0.071<span style="text-decoration: underline;">3</span>             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>         2 ~weight           0.044<span style="text-decoration: underline;">2</span>             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>         2 ~age              0.123              0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>         2 ~dose             0.851              1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>         3 ~age              0.118              1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>         3 ~weight           0.043<span style="text-decoration: underline;">1</span>             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>         4 ~weight           0.062<span style="text-decoration: underline;">2</span>             1</span></span></code></pre></div>
+<span><span class="co">#&gt;  iteration term_tested term_p_value model_updated</span></span>
+<span><span class="co">#&gt;          0        &lt;NA&gt;           NA            NA</span></span>
+<span><span class="co">#&gt;          1        ~sex      0.86307             1</span></span>
+<span><span class="co">#&gt;          1       ~dose      0.84535             0</span></span>
+<span><span class="co">#&gt;          1        ~age      0.12318             0</span></span>
+<span><span class="co">#&gt;          1     ~weight      0.07129             0</span></span>
+<span><span class="co">#&gt;          2     ~weight      0.04418             0</span></span>
+<span><span class="co">#&gt;          2        ~age      0.12348             0</span></span>
+<span><span class="co">#&gt;          2       ~dose      0.85135             1</span></span>
+<span><span class="co">#&gt;          3        ~age      0.11832             1</span></span>
+<span><span class="co">#&gt;          3     ~weight      0.04309             0</span></span>
+<span><span class="co">#&gt;          4     ~weight      0.06218             1</span></span></code></pre></div>
 <p>Each iteration removes the single worst-performing term
 (<code>model_updated == 1</code>); the next iteration re-tests
 everything still in the model, since removing one term can change the
@@ -273,22 +269,20 @@ search above found none:</p>
 <code class="sourceCode R"><span><span class="va">aic_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_forward</a></span><span class="op">(</span><span class="va">base_mod</span>, <span class="va">candidates</span>, criterion <span class="op">=</span> <span class="st">"aic"</span>, seed <span class="op">=</span> <span class="fl">3425</span><span class="op">)</span></span>
 <span><span class="va">aic_mod</span><span class="op">$</span><span class="va">formula</span></span>
 <span><span class="co">#&gt; ae1 ~ aucss + weight + age</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55e1efc9baf0&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x564d0583b5f0&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">aic_mod</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term_tested"</span>, <span class="st">"criterion"</span>, <span class="st">"term_p_value"</span>, <span class="st">"model_aic"</span>, <span class="st">"model_updated"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 5</span></span></span>
 <span><span class="co">#&gt;    term_tested criterion term_p_value model_aic model_updated</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>                  <span style="color: #BB0000;">NA</span>      197.            <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> ~sex        aic                 <span style="color: #BB0000;">NA</span>      199.             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> ~weight     aic                 <span style="color: #BB0000;">NA</span>      196.             1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> ~age        aic                 <span style="color: #BB0000;">NA</span>      198.             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> ~dose       aic                 <span style="color: #BB0000;">NA</span>      199.             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> ~age        aic                 <span style="color: #BB0000;">NA</span>      195.             1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> ~sex        aic                 <span style="color: #BB0000;">NA</span>      198.             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> ~dose       aic                 <span style="color: #BB0000;">NA</span>      198.             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> ~sex        aic                 <span style="color: #BB0000;">NA</span>      197.             0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> ~dose       aic                 <span style="color: #BB0000;">NA</span>      197.             0</span></span></code></pre></div>
+<span><span class="co">#&gt; 1         &lt;NA&gt;      &lt;NA&gt;           NA     197.4            NA</span></span>
+<span><span class="co">#&gt; 2         ~sex       aic           NA     198.7             0</span></span>
+<span><span class="co">#&gt; 3      ~weight       aic           NA     195.9             1</span></span>
+<span><span class="co">#&gt; 4         ~age       aic           NA     197.6             0</span></span>
+<span><span class="co">#&gt; 5        ~dose       aic           NA     199.3             0</span></span>
+<span><span class="co">#&gt; 6         ~age       aic           NA     195.5             1</span></span>
+<span><span class="co">#&gt; 7         ~sex       aic           NA     197.9             0</span></span>
+<span><span class="co">#&gt; 8        ~dose       aic           NA     197.8             0</span></span>
+<span><span class="co">#&gt; 9         ~sex       aic           NA     197.5             0</span></span>
+<span><span class="co">#&gt; 10       ~dose       aic           NA     197.5             0</span></span></code></pre></div>
 <p>The history’s <code>criterion</code> column records which selection
 rule drove each step (<code>NA</code> for the base-model row), and
 <code>term_p_value</code> is <code>NA</code> throughout since it isn’t

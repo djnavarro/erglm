@@ -167,17 +167,24 @@ confidence interval on the response scale and returns everything as a
 tidy data frame bound to <code>newdata</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span><span class="va">mod</span>, newdata <span class="op">=</span> <span class="va">erglm_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 18</span></span></span>
-<span><span class="co">#&gt;      id sex      age weight  dose treatment aucss cmaxss   ae1   ae2 ae_count</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 Male      35     79   200 Drug       673.   97.3     0     1        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2 Female    22     58   200 Drug      <span style="text-decoration: underline;">2</span>806.  301.      1     1        6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3 Female    28     58     0 Placebo      0     0       0     0        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4 Female    18     57   100 Drug      <span style="text-decoration: underline;">1</span>169.  198.      1     1        0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5 Male      28     77   100 Drug       377.   51.4     0     0        0</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 7 more variables: biomarker_change &lt;dbl&gt;, ae_duration &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   fit_link &lt;dbl&gt;, se_link &lt;dbl&gt;, fit_resp &lt;dbl&gt;, ci_lower &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ci_upper &lt;dbl&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   id    sex age weight dose treatment    aucss  cmaxss ae1 ae2 ae_count</span></span>
+<span><span class="co">#&gt; 1  1   Male  35     79  200      Drug  673.091  97.328   0   1        1</span></span>
+<span><span class="co">#&gt; 2  2 Female  22     58  200      Drug 2806.115 300.615   1   1        6</span></span>
+<span><span class="co">#&gt; 3  3 Female  28     58    0   Placebo    0.000   0.000   0   0        1</span></span>
+<span><span class="co">#&gt; 4  4 Female  18     57  100      Drug 1169.045 197.783   1   1        0</span></span>
+<span><span class="co">#&gt; 5  5   Male  28     77  100      Drug  377.288  51.429   0   0        0</span></span>
+<span><span class="co">#&gt;   biomarker_change ae_duration   fit_link   se_link  fit_resp   ci_lower</span></span>
+<span><span class="co">#&gt; 1         1.216895   12.402338  1.7777096 0.3791246 0.8554138 0.73781428</span></span>
+<span><span class="co">#&gt; 2         4.867072   13.697841 13.3467035 2.1713090 0.9999984 0.99988734</span></span>
+<span><span class="co">#&gt; 3        -1.832830    5.262023 -1.6827031 0.3205633 0.1567379 0.09021639</span></span>
+<span><span class="co">#&gt; 4         1.900170    6.699422  4.5962761 0.8650804 0.9900114 0.94788348</span></span>
+<span><span class="co">#&gt; 5        -1.009179    6.152825  0.1099635 0.2732910 0.5274632 0.39515907</span></span>
+<span><span class="co">#&gt;    ci_upper</span></span>
+<span><span class="co">#&gt; 1 0.9255858</span></span>
+<span><span class="co">#&gt; 2 1.0000000</span></span>
+<span><span class="co">#&gt; 3 0.2583791</span></span>
+<span><span class="co">#&gt; 4 0.9981520</span></span>
+<span><span class="co">#&gt; 5 0.6560192</span></span></code></pre></div>
 <p>Use whichever is more convenient: <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> for a quick
 point estimate, or <code><a href="../reference/erglm_predict.html">erglm_predict()</a></code> when you want interval
 bounds without computing them by hand.</p>

@@ -113,17 +113,24 @@ scale and returns everything as a tidy data frame bound to `newdata`:
 ``` r
 
 erglm_predict(mod, newdata = erglm_data[1:5, ])
-#> # A tibble: 5 × 18
-#>      id sex      age weight  dose treatment aucss cmaxss   ae1   ae2 ae_count
-#>   <int> <fct>  <int>  <dbl> <dbl> <fct>     <dbl>  <dbl> <dbl> <dbl>    <int>
-#> 1     1 Male      35     79   200 Drug       673.   97.3     0     1        1
-#> 2     2 Female    22     58   200 Drug      2806.  301.      1     1        6
-#> 3     3 Female    28     58     0 Placebo      0     0       0     0        1
-#> 4     4 Female    18     57   100 Drug      1169.  198.      1     1        0
-#> 5     5 Male      28     77   100 Drug       377.   51.4     0     0        0
-#> # ℹ 7 more variables: biomarker_change <dbl>, ae_duration <dbl>,
-#> #   fit_link <dbl>, se_link <dbl>, fit_resp <dbl>, ci_lower <dbl>,
-#> #   ci_upper <dbl>
+#>   id    sex age weight dose treatment    aucss  cmaxss ae1 ae2 ae_count
+#> 1  1   Male  35     79  200      Drug  673.091  97.328   0   1        1
+#> 2  2 Female  22     58  200      Drug 2806.115 300.615   1   1        6
+#> 3  3 Female  28     58    0   Placebo    0.000   0.000   0   0        1
+#> 4  4 Female  18     57  100      Drug 1169.045 197.783   1   1        0
+#> 5  5   Male  28     77  100      Drug  377.288  51.429   0   0        0
+#>   biomarker_change ae_duration   fit_link   se_link  fit_resp   ci_lower
+#> 1         1.216895   12.402338  1.7777096 0.3791246 0.8554138 0.73781428
+#> 2         4.867072   13.697841 13.3467035 2.1713090 0.9999984 0.99988734
+#> 3        -1.832830    5.262023 -1.6827031 0.3205633 0.1567379 0.09021639
+#> 4         1.900170    6.699422  4.5962761 0.8650804 0.9900114 0.94788348
+#> 5        -1.009179    6.152825  0.1099635 0.2732910 0.5274632 0.39515907
+#>    ci_upper
+#> 1 0.9255858
+#> 2 1.0000000
+#> 3 0.2583791
+#> 4 0.9981520
+#> 5 0.6560192
 ```
 
 Use whichever is more convenient:

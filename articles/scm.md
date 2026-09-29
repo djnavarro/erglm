@@ -89,14 +89,12 @@ inspecting the history shows why:
 ``` r
 
 erglm_scm_history(fwd_mod)[, c("term_tested", "term_p_value", "model_updated")]
-#> # A tibble: 5 × 3
 #>   term_tested term_p_value model_updated
-#>   <chr>              <dbl>         <int>
-#> 1 NA               NA                 NA
-#> 2 ~sex              0.391              0
-#> 3 ~weight           0.0622             0
-#> 4 ~age              0.177              0
-#> 5 ~dose             0.702              0
+#> 1        <NA>           NA            NA
+#> 2        ~sex      0.39063             0
+#> 3     ~weight      0.06218             0
+#> 4        ~age      0.17665             0
+#> 5       ~dose      0.70247             0
 ```
 
 `sex` does have a genuine (if modest) effect on `ae1` in the
@@ -151,22 +149,20 @@ shows the iteration-by-iteration elimination:
 
 print(
   erglm_scm_history(bwd_mod)[, c("iteration", "term_tested", "term_p_value", "model_updated")],
-  n = Inf
+  row.names = FALSE
 )
-#> # A tibble: 11 × 4
-#>    iteration term_tested term_p_value model_updated
-#>        <int> <chr>              <dbl>         <int>
-#>  1         0 NA               NA                 NA
-#>  2         1 ~sex              0.863              1
-#>  3         1 ~dose             0.845              0
-#>  4         1 ~age              0.123              0
-#>  5         1 ~weight           0.0713             0
-#>  6         2 ~weight           0.0442             0
-#>  7         2 ~age              0.123              0
-#>  8         2 ~dose             0.851              1
-#>  9         3 ~age              0.118              1
-#> 10         3 ~weight           0.0431             0
-#> 11         4 ~weight           0.0622             1
+#>  iteration term_tested term_p_value model_updated
+#>          0        <NA>           NA            NA
+#>          1        ~sex      0.86307             1
+#>          1       ~dose      0.84535             0
+#>          1        ~age      0.12318             0
+#>          1     ~weight      0.07129             0
+#>          2     ~weight      0.04418             0
+#>          2        ~age      0.12348             0
+#>          2       ~dose      0.85135             1
+#>          3        ~age      0.11832             1
+#>          3     ~weight      0.04309             0
+#>          4     ~weight      0.06218             1
 ```
 
 Each iteration removes the single worst-performing term
@@ -207,25 +203,23 @@ where the $`p`$-value search above found none:
 aic_mod <- erglm_scm_forward(base_mod, candidates, criterion = "aic", seed = 3425)
 aic_mod$formula
 #> ae1 ~ aucss + weight + age
-#> <environment: 0x55e1efc9baf0>
+#> <environment: 0x564d0583b5f0>
 ```
 
 ``` r
 
 erglm_scm_history(aic_mod)[, c("term_tested", "criterion", "term_p_value", "model_aic", "model_updated")]
-#> # A tibble: 10 × 5
 #>    term_tested criterion term_p_value model_aic model_updated
-#>    <chr>       <chr>            <dbl>     <dbl>         <int>
-#>  1 NA          NA                  NA      197.            NA
-#>  2 ~sex        aic                 NA      199.             0
-#>  3 ~weight     aic                 NA      196.             1
-#>  4 ~age        aic                 NA      198.             0
-#>  5 ~dose       aic                 NA      199.             0
-#>  6 ~age        aic                 NA      195.             1
-#>  7 ~sex        aic                 NA      198.             0
-#>  8 ~dose       aic                 NA      198.             0
-#>  9 ~sex        aic                 NA      197.             0
-#> 10 ~dose       aic                 NA      197.             0
+#> 1         <NA>      <NA>           NA     197.4            NA
+#> 2         ~sex       aic           NA     198.7             0
+#> 3      ~weight       aic           NA     195.9             1
+#> 4         ~age       aic           NA     197.6             0
+#> 5        ~dose       aic           NA     199.3             0
+#> 6         ~age       aic           NA     195.5             1
+#> 7         ~sex       aic           NA     197.9             0
+#> 8        ~dose       aic           NA     197.8             0
+#> 9         ~sex       aic           NA     197.5             0
+#> 10       ~dose       aic           NA     197.5             0
 ```
 
 The history’s `criterion` column records which selection rule drove each
