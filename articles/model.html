@@ -79,8 +79,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span></code></pre></div>
 <p>Fitting a model and turning it into predictions are the two most
 basic tasks in erglm – every other tool in the package (stepwise
 covariate selection, simulation) builds on <code><a href="../reference/erglm_model.html">erglm_model()</a></code>
@@ -136,29 +135,27 @@ called <code>erglm_data</code> that we can use:</p>
 predictions:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="va">mod</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>    aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="fl">1500</span>, by <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span>  <span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">pred</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 16 × 6</span></span></span>
-<span><span class="co">#&gt;    aucss fit_link se_link fit_resp ci_lower ci_upper</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0   -<span style="color: #BB0000;">1.79</span>    0.256    0.143   0.091<span style="text-decoration: underline;">8</span>    0.216</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   100   -<span style="color: #BB0000;">1.24</span>    0.214    0.224   0.160     0.305</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>   200   -<span style="color: #BB0000;">0.692</span>   0.187    0.334   0.258     0.419</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>   300   -<span style="color: #BB0000;">0.142</span>   0.182    0.465   0.378     0.554</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>   400    0.408   0.201    0.600   0.503     0.690</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>   500    0.957   0.238    0.723   0.620     0.806</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>   600    1.51    0.286    0.819   0.720     0.888</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>   700    2.06    0.341    0.887   0.800     0.938</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>   800    2.61    0.399    0.931   0.861     0.967</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   900    3.16    0.460    0.959   0.905     0.983</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>  <span style="text-decoration: underline;">1</span>000    3.71    0.522    0.976   0.936     0.991</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>  <span style="text-decoration: underline;">1</span>100    4.26    0.585    0.986   0.957     0.996</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span>  <span style="text-decoration: underline;">1</span>200    4.81    0.649    0.992   0.972     0.998</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span>  <span style="text-decoration: underline;">1</span>300    5.36    0.714    0.995   0.981     0.999</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span>  <span style="text-decoration: underline;">1</span>400    5.90    0.779    0.997   0.988     0.999</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span>  <span style="text-decoration: underline;">1</span>500    6.45    0.844    0.998   0.992     1.000</span></span></code></pre></div>
+<span><span class="co">#&gt;    aucss   fit_link   se_link  fit_resp   ci_lower  ci_upper</span></span>
+<span><span class="co">#&gt; 1      0 -1.7913830 0.2555998 0.1429032 0.09175856 0.2157823</span></span>
+<span><span class="co">#&gt; 2    100 -1.2416503 0.2136687 0.2241489 0.15970386 0.3051553</span></span>
+<span><span class="co">#&gt; 3    200 -0.6919175 0.1869474 0.3336067 0.25762916 0.4193342</span></span>
+<span><span class="co">#&gt; 4    300 -0.1421847 0.1822536 0.4645136 0.37768282 0.5535503</span></span>
+<span><span class="co">#&gt; 5    400  0.4075481 0.2011352 0.6004998 0.50333251 0.6903521</span></span>
+<span><span class="co">#&gt; 6    500  0.9572808 0.2380470 0.7225770 0.62027537 0.8059404</span></span>
+<span><span class="co">#&gt; 7    600  1.5070136 0.2860933 0.8186182 0.72036663 0.8877285</span></span>
+<span><span class="co">#&gt; 8    700  2.0567464 0.3405942 0.8866275 0.80046354 0.9384453</span></span>
+<span><span class="co">#&gt; 9    800  2.6064791 0.3989127 0.9312774 0.86112011 0.9673379</span></span>
+<span><span class="co">#&gt; 10   900  3.1562119 0.4595980 0.9591528 0.90511671 0.9829935</span></span>
+<span><span class="co">#&gt; 11  1000  3.7059447 0.5218250 0.9760125 0.93602720 0.9912395</span></span>
+<span><span class="co">#&gt; 12  1100  4.2556774 0.5851019 0.9860149 0.95725832 0.9955147</span></span>
+<span><span class="co">#&gt; 13  1200  4.8054102 0.6491219 0.9918811 0.97161654 0.9977117</span></span>
+<span><span class="co">#&gt; 14  1300  5.3551430 0.7136849 0.9952984 0.98122630 0.9988351</span></span>
+<span><span class="co">#&gt; 15  1400  5.9048757 0.7786560 0.9972813 0.98761416 0.9994078</span></span>
+<span><span class="co">#&gt; 16  1500  6.4546085 0.8439408 0.9984292 0.99184160 0.9996992</span></span></code></pre></div>
 <p><code>pred</code> reports both the link-scale (<code>fit_link</code>)
 and response-scale (<code>fit_resp</code>) predictions. If you need to
 move between these two scales yourself – e.g. to transform a raw
@@ -175,29 +172,27 @@ from the model’s <code><a href="https://rdrr.io/r/stats/glm.html" class="exter
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="va">mod</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span></span>
-<span>    newdata <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="fl">1500</span>, by <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>    newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="fl">1500</span>, by <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>    conf_level <span class="op">=</span> <span class="fl">0.8</span> </span>
 <span>  <span class="op">)</span></span>
 <span><span class="va">pred</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 16 × 6</span></span></span>
-<span><span class="co">#&gt;    aucss fit_link se_link fit_resp ci_lower ci_upper</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     0   -<span style="color: #BB0000;">1.79</span>    0.256    0.143    0.107    0.188</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   100   -<span style="color: #BB0000;">1.24</span>    0.214    0.224    0.180    0.275</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>   200   -<span style="color: #BB0000;">0.692</span>   0.187    0.334    0.283    0.389</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>   300   -<span style="color: #BB0000;">0.142</span>   0.182    0.465    0.407    0.523</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>   400    0.408   0.201    0.600    0.537    0.660</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>   500    0.957   0.238    0.723    0.658    0.779</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>   600    1.51    0.286    0.819    0.758    0.867</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>   700    2.06    0.341    0.887    0.835    0.924</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>   800    2.61    0.399    0.931    0.890    0.958</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   900    3.16    0.460    0.959    0.929    0.977</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>  <span style="text-decoration: underline;">1</span>000    3.71    0.522    0.976    0.954    0.988</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>  <span style="text-decoration: underline;">1</span>100    4.26    0.585    0.986    0.971    0.993</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span>  <span style="text-decoration: underline;">1</span>200    4.81    0.649    0.992    0.982    0.996</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span>  <span style="text-decoration: underline;">1</span>300    5.36    0.714    0.995    0.988    0.998</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span>  <span style="text-decoration: underline;">1</span>400    5.90    0.779    0.997    0.993    0.999</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span>  <span style="text-decoration: underline;">1</span>500    6.45    0.844    0.998    0.995    0.999</span></span></code></pre></div>
+<span><span class="co">#&gt;    aucss   fit_link   se_link  fit_resp  ci_lower  ci_upper</span></span>
+<span><span class="co">#&gt; 1      0 -1.7913830 0.2555998 0.1429032 0.1072688 0.1878840</span></span>
+<span><span class="co">#&gt; 2    100 -1.2416503 0.2136687 0.2241489 0.1801284 0.2753147</span></span>
+<span><span class="co">#&gt; 3    200 -0.6919175 0.1869474 0.3336067 0.2826204 0.3888058</span></span>
+<span><span class="co">#&gt; 4    300 -0.1421847 0.1822536 0.4645136 0.4071519 0.5228298</span></span>
+<span><span class="co">#&gt; 5    400  0.4075481 0.2011352 0.6004998 0.5373759 0.6604529</span></span>
+<span><span class="co">#&gt; 6    500  0.9572808 0.2380470 0.7225770 0.6575086 0.7794304</span></span>
+<span><span class="co">#&gt; 7    600  1.5070136 0.2860933 0.8186182 0.7577476 0.8668809</span></span>
+<span><span class="co">#&gt; 8    700  2.0567464 0.3405942 0.8866275 0.8348306 0.9236662</span></span>
+<span><span class="co">#&gt; 9    800  2.6064791 0.3989127 0.9312774 0.8904408 0.9576172</span></span>
+<span><span class="co">#&gt; 10   900  3.1562119 0.4595980 0.9591528 0.9287214 0.9769149</span></span>
+<span><span class="co">#&gt; 11  1000  3.7059447 0.5218250 0.9760125 0.9542266 0.9875645</span></span>
+<span><span class="co">#&gt; 12  1100  4.2556774 0.5851019 0.9860149 0.9708535 0.9933437</span></span>
+<span><span class="co">#&gt; 13  1200  4.8054102 0.6491219 0.9918811 0.9815402 0.9964501</span></span>
+<span><span class="co">#&gt; 14  1300  5.3551430 0.7136849 0.9952984 0.9883476 0.9981109</span></span>
+<span><span class="co">#&gt; 15  1400  5.9048757 0.7786560 0.9972813 0.9926596 0.9989960</span></span>
+<span><span class="co">#&gt; 16  1500  6.4546085 0.8439408 0.9984292 0.9953815 0.9994668</span></span></code></pre></div>
 <p>Choosing which covariates belong in the model – stepwise covariate
 modelling with
 <code><a href="../reference/erglm_scm.html">erglm_scm_forward()</a></code>/<code><a href="../reference/erglm_scm.html">erglm_scm_backward()</a></code> – is
@@ -230,17 +225,15 @@ unchanged, since both operate on the link scale generically via
 <code>stats::family(object)$linkinv</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod_pois</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3000</span>, by <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, sex <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 7</span></span></span>
-<span><span class="co">#&gt;   aucss sex    fit_link se_link fit_resp ci_lower ci_upper</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     0 Female   -<span style="color: #BB0000;">0.930</span>  0.104     0.395    0.322    0.484</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   500 Female   -<span style="color: #BB0000;">0.404</span>  0.088<span style="text-decoration: underline;">8</span>    0.668    0.561    0.795</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">1</span>000 Female    0.123  0.076<span style="text-decoration: underline;">9</span>    1.13     0.973    1.31 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">1</span>500 Female    0.650  0.069<span style="text-decoration: underline;">6</span>    1.91     1.67     2.19 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>000 Female    1.18   0.068<span style="text-decoration: underline;">4</span>    3.24     2.84     3.71 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>500 Female    1.70   0.073<span style="text-decoration: underline;">6</span>    5.49     4.75     6.34 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>  <span style="text-decoration: underline;">3</span>000 Female    2.23   0.084<span style="text-decoration: underline;">1</span>    9.29     7.88    11.0</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3000</span>, by <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, sex <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   aucss    sex   fit_link    se_link  fit_resp  ci_lower   ci_upper</span></span>
+<span><span class="co">#&gt; 1     0 Female -0.9300263 0.10377160 0.3945433 0.3219320  0.4835321</span></span>
+<span><span class="co">#&gt; 2   500 Female -0.4035030 0.08880099 0.6679760 0.5612719  0.7949657</span></span>
+<span><span class="co">#&gt; 3  1000 Female  0.1230202 0.07687139 1.1309072 0.9727336  1.3148010</span></span>
+<span><span class="co">#&gt; 4  1500 Female  0.6495434 0.06956528 1.9146664 1.6706252  2.1943565</span></span>
+<span><span class="co">#&gt; 5  2000 Female  1.1760666 0.06838105 3.2415986 2.8350008  3.7065110</span></span>
+<span><span class="co">#&gt; 6  2500 Female  1.7025898 0.07361474 5.4881424 4.7507742  6.3399576</span></span>
+<span><span class="co">#&gt; 7  3000 Female  2.2291131 0.08407625 9.2916213 7.8799901 10.9561338</span></span></code></pre></div>
 <p>Stepwise covariate modelling also generalises across families – see
 the “Stepwise covariate modelling” article for details.</p>
 </div>

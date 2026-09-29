@@ -17,7 +17,10 @@
   `fit_link`/`se_link`/`fit_resp` columns lose the observation-index
   names they used to carry as a
   [`predict.glm()`](https://rdrr.io/r/stats/predict.glm.html) artifact;
-  underlying values are otherwise unchanged.
+  underlying values are otherwise unchanged. `tibble` has also been
+  dropped from `Suggests` entirely, since the vignettes now build their
+  example data with plain
+  [`data.frame()`](https://rdrr.io/r/base/data.frame.html) calls too.
 - [`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
   gain a `criterion` argument, supporting `"aic"`/`"bic"`-based term
   selection in addition to the existing `"p-value"` default. The SCM

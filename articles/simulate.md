@@ -3,7 +3,6 @@
 ``` r
 
 library(erglm)
-library(tibble)
 library(ggplot2)
 theme_set(theme_bw())
 ```
@@ -192,7 +191,7 @@ relationship over a grid of `aucss` values:
 
 ``` r
 
-grid <- tibble(aucss = c(0, 1000, 2000, 3000, 4000))
+grid <- data.frame(aucss = c(0, 1000, 2000, 3000, 4000))
 f(data = grid)
 #> [1] -1.6439  0.2021  2.0480  3.8940  5.7399
 ```
@@ -227,13 +226,13 @@ n_draws <- 500
 draws <- mvtnorm::rmvnorm(n_draws, mean = coef(mod), sigma = vcov(mod))
 colnames(draws) <- names(coef(mod))
 
-curve_grid <- tibble(aucss = seq(0, max(erglm_data$aucss), length.out = 100))
+curve_grid <- data.frame(aucss = seq(0, max(erglm_data$aucss), length.out = 100))
 
 # evaluate the curve for every parameter draw
 curves <- apply(draws, 1, function(p) f(data = curve_grid, param = p))
 
 # summarise pointwise across draws
-band <- tibble(
+band <- data.frame(
   aucss = curve_grid$aucss,
   fit = f(data = curve_grid),
   lwr = apply(curves, 1, stats::quantile, probs = 0.025),

@@ -11,7 +11,6 @@ articles go into more depth on each.
 ``` r
 
 library(erglm)
-library(tibble)
 ```
 
 ## Example data
@@ -75,17 +74,15 @@ response scales, as a tidy data frame:
 ``` r
 
 mod |>
-  erglm_predict(newdata = tibble(aucss = seq(0, 3000, by = 500), sex = "Female"))
-#> # A tibble: 7 × 7
-#>   aucss sex    fit_link se_link fit_resp ci_lower ci_upper
-#>   <dbl> <chr>     <dbl>   <dbl>    <dbl>    <dbl>    <dbl>
-#> 1     0 Female    -1.65   0.301    0.161   0.0964    0.258
-#> 2   500 Female     1.11   0.297    0.751   0.628     0.844
-#> 3  1000 Female     3.86   0.558    0.979   0.941     0.993
-#> 4  1500 Female     6.61   0.871    0.999   0.993     1.000
-#> 5  2000 Female     9.37   1.20     1.000   0.999     1.000
-#> 6  2500 Female    12.1    1.53     1.000   1.000     1.000
-#> 7  3000 Female    14.9    1.86     1.000   1.000     1.000
+  erglm_predict(newdata = data.frame(aucss = seq(0, 3000, by = 500), sex = "Female"))
+#>   aucss    sex  fit_link   se_link  fit_resp   ci_lower  ci_upper
+#> 1     0 Female -1.648112 0.3008814 0.1613643 0.09640451 0.2576162
+#> 2   500 Female  1.105879 0.2971389 0.7513601 0.62796529 0.8439953
+#> 3  1000 Female  3.859871 0.5575033 0.9793641 0.94087655 0.9929843
+#> 4  1500 Female  6.613862 0.8706807 0.9986602 0.99266226 0.9997566
+#> 5  2000 Female  9.367854 1.1958747 0.9999146 0.99911052 0.9999918
+#> 6  2500 Female 12.121845 1.5254193 0.9999946 0.99989187 0.9999997
+#> 7  3000 Female 14.875836 1.8569998 0.9999997 0.99998681 1.0000000
 ```
 
 ## Choosing covariates
