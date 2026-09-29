@@ -144,6 +144,45 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   `.seed_local_seed()`/`.seed_local_preserve_seed()`) as a dependency-free
   stand-in for `withr::with_seed()`. Part of the same hard-dependency
   reduction effort described above.
+- `R/minitable.R` -- a vendored copy of the `minitable` mini from
+  djnavarro/minis, but erglm only actually calls `.table_as_tibble()`
+  from it (one thin wrapper around `as.data.frame(x, check.names =
+  FALSE)`, used where the input is already columnar -- e.g. coercing a
+  matrix of sampled coefficients in `.erglm_resample()`).
+  `.table_tibble()` turned out to be unusable for erglm's actual
+  `tibble::tibble()` call sites: its cross-column self-reference NSE
+  trick only resolves a name against columns already built within the
+  same call, not against ordinary local variables in the calling
+  function (e.g. a local `mod` inside `erglm_scm_history()`) -- real
+  `tibble::tibble()` has no such limitation, since it evaluates
+  arguments as quosures carrying the caller's environment. None of
+  erglm's call sites actually needed the self-reference feature, so
+  they were rewritten as plain base `data.frame(..., check.names =
+  FALSE)` calls instead of routed through the mini (see the warning in
+  `R/minitable.R`'s header comment before reaching for `.table_tibble()`
+  at a new call site). `erglm_scm_history()`'s row-appending (previously
+  `tibble::add_row()`) uses plain `rbind()`, for the same reason
+  `.table_add_row()` doesn't fit: `tibble::add_row(history,
+  history_row)` relies on `add_row()`'s special-case splicing of a whole
+  pre-built row passed as a single unnamed data frame argument, which
+  `.table_add_row()` doesn't reproduce (its `...` only accepts
+  name-value pairs) -- `rbind()` is a direct, simpler substitute since
+  each `history_row` already has identical columns to `history`.
+  `erglm_predict()`'s `fit_link`/`se_link` construction skips
+  `.table_as_tibble()`/`as.data.frame()` entirely and passes
+  `stats::predict()`'s named-vector output straight to
+  `dplyr::bind_cols()`, because `as.data.frame()` promotes a named
+  vector's own `names()` into row names (discarding them from the
+  vector itself) where `tibble::as_tibble()` preserves them as a plain
+  vector attribute -- `bind_cols()` on a bare list keeps that attribute
+  intact.
+  This whole swap is a genuine, documented public-API behavior change,
+  unlike the rlang/withr swaps: `erglm_predict()`, `simulate.
+  erglm_model()`, and the bundled `erglm_data` dataset (regenerated via
+  `.make_erglm_data()`, see below) now return/are plain data frames
+  rather than `tbl_df` objects. `tibble` moved from `Imports` to
+  `Suggests` (vignettes and the README still use real tibble in example
+  code, e.g. to build `newdata`).
 - `R/utils-helpers.R`, `R/utils-global.R` -- small internal helpers and
   `globalVariables()` declarations for NSE. `.as_erglm()` records the
   fitted model's actual family (`stats::family(mod)$family`) in

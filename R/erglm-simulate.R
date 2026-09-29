@@ -36,7 +36,7 @@
 #' argument) via the same `.erglm_draw_response()` noise mechanism this
 #' method uses, without needing to call `simulate()` yourself.
 #'
-#' @returns A tibble with one row per observation per simulated
+#' @returns A data frame with one row per observation per simulated
 #' replicate, containing:
 #' - `dat_id`, `sim_id`: identifiers for the original observation and
 #'   the simulation replicate
@@ -96,7 +96,8 @@ simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
       sim <- vector("list", nsim)
       for (ss in seq_len(nsim)) {
         mu_ss <- fn(param = par[ss, ], data = mod$data, type = "response")
-        sim[[ss]] <- tibble::tibble(
+        sim[[ss]] <- data.frame(
+          check.names = FALSE,
           dat_id = seq_len(nr),
           sim_id = ss,
           mu = mu_ss,
@@ -107,7 +108,7 @@ simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
   )
 
   sim <- dplyr::bind_rows(sim)
-  par <- tibble::as_tibble(par)
+  par <- .table_as_tibble(par)
   # prefix coefficient columns so they can't collide with predictor
   # columns of the same name once joined onto `dat` below
   names(par) <- paste0("coef_", names(par))
@@ -115,5 +116,5 @@ simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
 
   out <- dplyr::left_join(sim, par, by = "sim_id")
   out <- dplyr::left_join(out, dat, by = "dat_id")
-  tibble::as_tibble(out)
+  .table_as_tibble(out)
 }

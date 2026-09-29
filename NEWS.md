@@ -6,6 +6,13 @@
 * erglm no longer depends on withr; internal RNG-seed handling now uses
   a small vendored base-R equivalent, keeping erglm's behaviour
   unchanged.
+* erglm no longer depends on tibble. `erglm_predict()`,
+  `simulate.erglm_model()`, and the bundled `erglm_data` dataset now are/
+  return plain data frames rather than tibbles (`tbl_df` objects) -- the
+  values and columns are unchanged, but printing and `dplyr`/
+  tibble-specific behaviour (e.g. stricter `$` partial-matching) no
+  longer apply unless you convert the result yourself, e.g. via
+  `tibble::as_tibble()`.
 * `erglm_scm_forward()`/`erglm_scm_backward()` gain a `criterion`
   argument, supporting `"aic"`/`"bic"`-based term selection in addition
   to the existing `"p-value"` default. The SCM history (`erglm_scm_history()`)

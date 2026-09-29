@@ -203,7 +203,8 @@ erglm_scm_backward <- function(mod, candidates, threshold = 0.001, criterion = "
 erglm_scm_history <- function(mod) {
   history <- mod$erglm$history
   if (!is.null(history)) return(history)
-  history_row <- tibble::tibble(
+  history_row <- data.frame(
+    check.names = FALSE,
     iteration = 0L,
     attempt = 0L,
     step = "base model",
@@ -243,7 +244,8 @@ erglm_scm_history <- function(mod) {
     if (!.erglm_term_in_model(mod, add)) {
       mod_new <- erglm_add_term(mod, add, quiet = TRUE)
       p_val <- if (use_ic) NA_real_ else .erglm_anova_p(mod, mod_new, test)
-      history_row <- tibble::tibble(
+      history_row <- data.frame(
+        check.names = FALSE,
         iteration = iter,
         attempt = attm,
         step = "forward",
@@ -257,7 +259,7 @@ erglm_scm_history <- function(mod) {
         model_bic = stats::BIC(mod_new),
         model_updated = NA
       )
-      history <- tibble::add_row(history, history_row)
+      history <- rbind(history, history_row)
       if (use_ic) {
         candidate_ic <- as.numeric(ic_fn(mod_new))
         if (candidate_ic < best_metric) {
@@ -311,7 +313,8 @@ erglm_scm_history <- function(mod) {
     if (.erglm_term_in_model(mod, del)) {
       mod_new <- erglm_remove_term(mod, del, quiet = TRUE)
       p_val <- if (use_ic) NA_real_ else .erglm_anova_p(mod, mod_new, test)
-      history_row <- tibble::tibble(
+      history_row <- data.frame(
+        check.names = FALSE,
         iteration = iter,
         attempt = attm,
         step = "backward",
@@ -325,7 +328,7 @@ erglm_scm_history <- function(mod) {
         model_bic = stats::BIC(mod_new),
         model_updated = NA
       )
-      history <- tibble::add_row(history, history_row)
+      history <- rbind(history, history_row)
       if (use_ic) {
         candidate_ic <- as.numeric(ic_fn(mod_new))
         if (candidate_ic < best_metric) {

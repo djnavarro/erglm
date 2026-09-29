@@ -16,7 +16,7 @@ erglm_predict(object, newdata = NULL, conf_level = 0.95)
 \item{conf_level}{Confidence level for the intervals. Defaults to \code{0.95}.}
 }
 \value{
-A tibble
+A data frame
 }
 \description{
 Computes model-based predictions and confidence intervals on the

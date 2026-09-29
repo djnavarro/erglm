@@ -5,7 +5,8 @@
   .seed_with_seed(
     seed = seed,
     code = {
-      erglm_data <- tibble::tibble(
+      erglm_data <- data.frame(
+        check.names = FALSE,
         id = 1:n,
         sex = factor(sample(rep(c("Male", "Female"), c(n/2, n/2)))),
         age = sample(18:35, size = n, replace = TRUE)

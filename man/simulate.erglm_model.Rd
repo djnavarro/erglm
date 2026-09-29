@@ -18,7 +18,7 @@ chosen and reported.}
 \item{...}{Ignored}
 }
 \value{
-A tibble with one row per observation per simulated
+A data frame with one row per observation per simulated
 replicate, containing:
 \itemize{
 \item \code{dat_id}, \code{sim_id}: identifiers for the original observation and

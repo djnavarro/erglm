@@ -75,7 +75,7 @@ erglm_model <- function(formula, data, family = stats::gaussian(), ...) {
 #' `NULL`, in which case the data the model was originally fitted to
 #' (`object$data`) is used.
 #' @param conf_level Confidence level for the intervals. Defaults to `0.95`.
-#' @returns A tibble
+#' @returns A data frame
 #'
 #' @details Computes intervals on the link scale and back-transforms with
 #' `stats::family(object)$linkinv`, so this works for any `glm()` family,
@@ -111,7 +111,7 @@ erglm_predict <- function(object, newdata = NULL, conf_level = .95) {
   out <- newdata |> 
     dplyr::bind_cols(
       stats::setNames(
-        tibble::as_tibble(stats::predict(object, newdata, se.fit = TRUE, type = "link")[1:2]),
+        stats::predict(object, newdata, se.fit = TRUE, type = "link")[1:2],
         c('fit_link','se_link')
       )
     ) |> 
