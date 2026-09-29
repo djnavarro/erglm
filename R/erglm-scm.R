@@ -41,7 +41,7 @@
 #' invisible. Concretely: each step of `erglm_scm_forward()`/
 #' `erglm_scm_backward()` shuffles the candidate terms (`sample()`)
 #' before testing them one at a time, and the shuffled order is the
-#' *only* thing `seed` (via `withr::with_seed()`) controls. Term p-values
+#' *only* thing `seed` (via a seeded-then-restored RNG block) controls. Term p-values
 #' come from `stats::anova()` on models fitted with `stats::glm()`, which
 #' is a deterministic algorithm (iteratively reweighted least squares,
 #' no random starting values) -- so which candidate is *found* to be
@@ -123,7 +123,7 @@ erglm_scm_forward <- function(mod, candidates, threshold = 0.01, criterion = "p-
   if (is.null(seed)) {
     seed <- .pick_seed()
   }
-  withr::with_seed(
+  .seed_with_seed(
     seed = seed,
     code = {
       mod_out <- .erglm_scm_forward(
@@ -149,9 +149,7 @@ erglm_scm_forward <- function(mod, candidates, threshold = 0.01, criterion = "p-
     history <- history_new
     last_iter <- this_iter
     mod <- mod_new
-    updates <- history |> 
-      dplyr::filter(iteration == last_iter) |> 
-      dplyr::pull(model_updated)
+    updates <- history$model_updated[history$iteration == last_iter]
     if (all(updates == 0L)) return(mod)
   }
 }
@@ -165,7 +163,7 @@ erglm_scm_backward <- function(mod, candidates, threshold = 0.001, criterion = "
   if (is.null(seed)) {
     seed <- .pick_seed()
   }
-  withr::with_seed(
+  .seed_with_seed(
     seed = seed,
     code = {
       mod_out <- .erglm_scm_backward(
@@ -191,9 +189,7 @@ erglm_scm_backward <- function(mod, candidates, threshold = 0.001, criterion = "
     history <- history_new
     last_iter <- this_iter
     mod <- mod_new
-    updates <- history |> 
-      dplyr::filter(iteration == last_iter) |> 
-      dplyr::pull(model_updated)
+    updates <- history$model_updated[history$iteration == last_iter]
     if (all(updates == 0L)) return(mod)
   }
 }
@@ -203,7 +199,8 @@ erglm_scm_backward <- function(mod, candidates, threshold = 0.001, criterion = "
 erglm_scm_history <- function(mod) {
   history <- mod$erglm$history
   if (!is.null(history)) return(history)
-  history_row <- tibble::tibble(
+  history_row <- data.frame(
+    check.names = FALSE,
     iteration = 0L,
     attempt = 0L,
     step = "base model",
@@ -215,7 +212,7 @@ erglm_scm_history <- function(mod) {
     term_p_value = NA_real_,
     model_aic = stats::AIC(mod),
     model_bic = stats::BIC(mod),
-    model_updated = NA
+    model_updated = NA_integer_
   )
   return(history_row)
 }
@@ -243,7 +240,8 @@ erglm_scm_history <- function(mod) {
     if (!.erglm_term_in_model(mod, add)) {
       mod_new <- erglm_add_term(mod, add, quiet = TRUE)
       p_val <- if (use_ic) NA_real_ else .erglm_anova_p(mod, mod_new, test)
-      history_row <- tibble::tibble(
+      history_row <- data.frame(
+        check.names = FALSE,
         iteration = iter,
         attempt = attm,
         step = "forward",
@@ -255,9 +253,9 @@ erglm_scm_history <- function(mod) {
         term_p_value = p_val,
         model_aic = stats::AIC(mod_new),
         model_bic = stats::BIC(mod_new),
-        model_updated = NA
+        model_updated = NA_integer_
       )
-      history <- tibble::add_row(history, history_row)
+      history <- rbind(history, history_row)
       if (use_ic) {
         candidate_ic <- as.numeric(ic_fn(mod_new))
         if (candidate_ic < best_metric) {
@@ -266,7 +264,7 @@ erglm_scm_history <- function(mod) {
           best_mod <- mod_new
         }
       } else if (is.na(p_val)) {
-        rlang::warn(paste0(
+        .cond_warn(paste0(
           "Skipping candidate term `", deparse(add), "` in forward step ",
           iter, ": comparison p-value is NA (often caused by a candidate ",
           "that's aliased/collinear with a term already in the model, ",
@@ -280,8 +278,8 @@ erglm_scm_history <- function(mod) {
     }
   }
   history <- history |> 
-    dplyr::mutate(
-      model_updated = dplyr::case_when(
+    .verb_mutate(
+      model_updated = .case_when(
         iteration != iter ~ model_updated,
         attempt == update_ind ~ 1L,
         TRUE ~ 0L
@@ -311,7 +309,8 @@ erglm_scm_history <- function(mod) {
     if (.erglm_term_in_model(mod, del)) {
       mod_new <- erglm_remove_term(mod, del, quiet = TRUE)
       p_val <- if (use_ic) NA_real_ else .erglm_anova_p(mod, mod_new, test)
-      history_row <- tibble::tibble(
+      history_row <- data.frame(
+        check.names = FALSE,
         iteration = iter,
         attempt = attm,
         step = "backward",
@@ -323,9 +322,9 @@ erglm_scm_history <- function(mod) {
         term_p_value = p_val,
         model_aic = stats::AIC(mod_new),
         model_bic = stats::BIC(mod_new),
-        model_updated = NA
+        model_updated = NA_integer_
       )
-      history <- tibble::add_row(history, history_row)
+      history <- rbind(history, history_row)
       if (use_ic) {
         candidate_ic <- as.numeric(ic_fn(mod_new))
         if (candidate_ic < best_metric) {
@@ -334,7 +333,7 @@ erglm_scm_history <- function(mod) {
           best_mod <- mod_new
         }
       } else if (is.na(p_val)) {
-        rlang::warn(paste0(
+        .cond_warn(paste0(
           "Skipping candidate term `", deparse(del), "` in backward step ",
           iter, ": comparison p-value is NA (often caused by a candidate ",
           "that's aliased/collinear with another term in the model, ",
@@ -348,8 +347,8 @@ erglm_scm_history <- function(mod) {
     }
   }
   history <- history |> 
-    dplyr::mutate(
-      model_updated = dplyr::case_when(
+    .verb_mutate(
+      model_updated = .case_when(
         iteration != iter ~ model_updated,
         attempt == update_ind ~ 1L,
         TRUE ~ 0L
@@ -425,14 +424,14 @@ erglm_add_term <- function(mod, term, quiet = FALSE) {
   trm_add_lab <- attr(trm_add, "term.labels")
   ind <- which(trm_mod_lab == trm_add_lab)
   if (length(ind) != 0L) {
-    if (!quiet) rlang::warn("cannot add a term that already exists in the model")
+    if (!quiet) .cond_warn("cannot add a term that already exists in the model")
     return(mod)
   }
   trm_add_var <- all.vars(attr(trm_add, "variables"))
   dat <- mod$data
   vars_ok <- trm_add_var %in% names(dat)
   if (!all(vars_ok)) {
-    if (!quiet) rlang::warn("cannot add a term that uses variables not in the data")
+    if (!quiet) .cond_warn("cannot add a term that uses variables not in the data")
     return(mod)
   }
   fml <- stats::as.formula(
@@ -451,7 +450,7 @@ erglm_remove_term <- function(mod, term, quiet = FALSE) {
   trm_del_lab <- attr(trm_del, "term.labels")
   ind <- which(trm_mod_lab == trm_del_lab)
   if (length(ind) == 0L) {
-    if (!quiet) rlang::warn("cannot remove a term that does not exist in the model")
+    if (!quiet) .cond_warn("cannot remove a term that does not exist in the model")
     return(mod)
   }
   dat <- mod$data

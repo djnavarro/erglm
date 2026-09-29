@@ -52,7 +52,7 @@ Because both sources are included, the simulated `val` column behaves like a gen
 
 ### The output format
 
-The result is a tidy, long-format tibble with `nsim`$\times$`nobs` rows:
+The result is a tidy, long-format data frame with `nsim`$\times$`nobs` rows:
 
 ```{r simulate-cols}
 names(sim1)

@@ -83,7 +83,7 @@ into the wrong one:
   better than "the default is `seed = NULL`", which tells the reader nothing
   until they go read `@details` too).
 - **`@returns`**: the shape of the return value. For a standalone page, one
-  sentence naming the concrete type (e.g. "A tibble" for `erglm_predict()`).
+  sentence naming the concrete type (e.g. "A data frame" for `erglm_predict()`).
   For a shared `@rdname` page where the functions return genuinely different
   things, disambiguate explicitly within the one `@returns` tag rather than
   writing something vague enough to cover all of them -- `erglm_scm`'s

@@ -96,7 +96,7 @@ test_that("erglm_scm_forward supports AIC-based selection", {
   mod1 <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
   mod2 <- erglm_scm_forward(mod1, candidates = c("sex", "dose"), criterion = "aic", seed = 909)
   hh2 <- erglm_scm_history(mod2)
-  step_rows <- dplyr::filter(hh2, iteration > 0)
+  step_rows <- hh2[hh2$iteration > 0, ]
   expect_true(all(step_rows$criterion == "aic"))
   expect_true(all(is.na(step_rows$term_p_value)))
   expect_true(stats::AIC(mod2) <= stats::AIC(mod1))
@@ -106,7 +106,7 @@ test_that("erglm_scm_backward supports BIC-based selection", {
   mod1 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
   mod2 <- erglm_scm_backward(mod1, candidates = c("sex", "dose"), criterion = "bic", seed = 909)
   hh2 <- erglm_scm_history(mod2)
-  step_rows <- dplyr::filter(hh2, iteration > 0)
+  step_rows <- hh2[hh2$iteration > 0, ]
   expect_true(all(step_rows$criterion == "bic"))
   expect_true(all(is.na(step_rows$term_p_value)))
   expect_true(stats::BIC(mod2) <= stats::BIC(mod1))

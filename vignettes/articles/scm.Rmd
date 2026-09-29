@@ -69,7 +69,7 @@ All four candidates are pruned, leaving only `aucss` -- matching what forward ad
 ```{r backward-history}
 print(
   erglm_scm_history(bwd_mod)[, c("iteration", "term_tested", "term_p_value", "model_updated")],
-  n = Inf
+  row.names = FALSE
 )
 ```
 

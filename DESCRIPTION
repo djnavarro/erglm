@@ -16,18 +16,16 @@ Language: en-GB
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Imports: 
-    dplyr,
     mvtnorm,
-    rlang,
-    stats,
-    tibble,
-    withr
+    stats
 Suggests: 
     erplots,
     ggplot2,
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tibble,
+    withr
 URL: https://github.com/djnavarro/erglm, https://erglm.djnavarro.net/
 BugReports: https://github.com/djnavarro/erglm/issues
 Additional_repositories: https://djnavarro.r-universe.dev

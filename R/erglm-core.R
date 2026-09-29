@@ -75,7 +75,7 @@ erglm_model <- function(formula, data, family = stats::gaussian(), ...) {
 #' `NULL`, in which case the data the model was originally fitted to
 #' (`object$data`) is used.
 #' @param conf_level Confidence level for the intervals. Defaults to `0.95`.
-#' @returns A tibble
+#' @returns A data frame
 #'
 #' @details Computes intervals on the link scale and back-transforms with
 #' `stats::family(object)$linkinv`, so this works for any `glm()` family,
@@ -108,18 +108,18 @@ erglm_predict <- function(object, newdata = NULL, conf_level = .95) {
   if (is.null(newdata)) newdata <- object$data
   inverse_link <- stats::family(object)$linkinv
   z_scale <- -stats::qnorm((1 - conf_level)/2)
-  out <- newdata |> 
-    dplyr::bind_cols(
-      stats::setNames(
-        tibble::as_tibble(stats::predict(object, newdata, se.fit = TRUE, type = "link")[1:2]),
-        c('fit_link','se_link')
-      )
-    ) |> 
-    dplyr::mutate(
-      fit_resp = inverse_link(fit_link),
-      ci_lower = inverse_link(fit_link - (z_scale * se_link)),
-      ci_upper = inverse_link(fit_link + (z_scale * se_link)),
-    )
+  pred <- stats::predict(object, newdata, se.fit = TRUE, type = "link")[1:2]
+  out <- newdata
+  # plain data frame column assignment strips a vector's own `names()`
+  # (an artifact of predict()'s row-indexed names, e.g. "1", "2", ...),
+  # unlike dplyr::bind_cols() -- see NEWS.md.
+  out$fit_link <- unname(pred$fit)
+  out$se_link <- unname(pred$se.fit)
+  out <- .verb_mutate(out,
+    fit_resp = inverse_link(fit_link),
+    ci_lower = inverse_link(fit_link - (z_scale * se_link)),
+    ci_upper = inverse_link(fit_link + (z_scale * se_link))
+  )
   return(out)
 }
 
@@ -178,7 +178,7 @@ erglm_fun <- function(object) {
     if (is.null(data)) data <- object$data
     mm <- stats::model.matrix(ff, data)
     if (!is.numeric(param) || length(param) != ncol(mm)) {
-      rlang::abort(paste0(
+      .cond_abort(paste0(
         "`param` must be a numeric vector of length ", ncol(mm),
         " (one entry per column of the model matrix: ",
         paste(colnames(mm), collapse = ", "), "), not length ",
@@ -206,12 +206,12 @@ erglm_fun <- function(object) {
   .erglm_check_nsim(nsim)
   if (is.null(seed)) {
     seed <- .pick_seed()
-    rlang::inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))
+    .cond_inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))
   }
   fn <- erglm_fun(object)
   family_name <- stats::family(object)$family
   dispersion <- summary(object)$dispersion
-  withr::with_seed(
+  .seed_with_seed(
     seed = seed,
     code = {
       par <- mvtnorm::rmvnorm(
@@ -221,13 +221,15 @@ erglm_fun <- function(object) {
       )
       sim <- list()
       for (ii in seq_len(nsim)) {
-        dd_sim <- newdata |> dplyr::mutate(row_id = dplyr::row_number(), sim_id = ii)
+        dd_sim <- newdata
+        dd_sim$row_id <- seq_len(nrow(newdata))
+        dd_sim$sim_id <- ii
         dd_sim$fit_resp <- fn(param = par[ii, ], dd_sim)
         dd_sim$sim_resp <- .erglm_draw_response(family_name, fit = dd_sim$fit_resp, dispersion = dispersion)
         sim[[ii]] <- dd_sim
       }
     }
   )
-  dplyr::bind_rows(sim)
+  do.call(rbind, sim)
 }
 
