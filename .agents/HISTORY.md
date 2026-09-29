@@ -294,6 +294,16 @@ caught only by testing each call site rather than by inspection:
   actually needed self-reference, so they were rewritten as plain
   `data.frame(..., check.names = FALSE)` instead of routed through the
   mini at all -- `.table_tibble()` ended up unused in erglm's own code.
+  Filed upstream as
+  [djnavarro/minis#6](https://github.com/djnavarro/minis/issues/6).
+- Both `.table_tibble()` and `.verb_mutate()` also choke on a trailing
+  comma after the last argument (`f(a = 1, b = 2,)` is valid R syntax
+  and produces a genuine extra, unnamed/missing element in `...`, which
+  real `tibble::tibble()`/`dplyr::mutate()` silently tolerate but these
+  minis' `match.call()`-based argument walking does not) -- a handful of
+  erglm's own call sites had trailing commas and needed them stripped
+  as part of this swap. Filed upstream as
+  [djnavarro/minis#7](https://github.com/djnavarro/minis/issues/7).
 - Fully removing `dplyr` meant losing the one remaining dplyr-specific
   behavior (`bind_cols()`) that had been preserving `erglm_predict()`'s
   `fit_link`/`se_link`/`fit_resp` columns' incidental `names()` (a
@@ -317,7 +327,9 @@ caught only by testing each call site rather than by inspection:
   corrupts every downstream column. Caught by comparing regenerated
   output against the pre-swap values bit-for-bit under the same seed,
   which is why `erglm_data.rda` was regenerated (not just its class
-  changed) as part of this work.
+  changed) as part of this work. Filed upstream as a feature request
+  for an eager, type-strict `if_else()` equivalent in `minicase`:
+  [djnavarro/minis#8](https://github.com/djnavarro/minis/issues/8).
 - Six dplyr functions (`if_else()`, `n()`, `row_number()`, `pull()`,
   `bind_cols()`, `bind_rows()`) have no mini equivalent at all in
   `miniverb`/`minicase`/`minijoin` and were rewritten as direct base-R
@@ -331,4 +343,10 @@ evaluation) that only shows up once the actual call sites are exercised
 -- each swap in this effort was verified by running the full test suite
 and, for `dplyr`/`tibble`, by direct side-by-side comparisons against
 the pre-swap output before committing, not by inspection of the mini's
-source alone.
+source alone. Three issues were filed upstream on djnavarro/minis as a
+result, for later consideration there:
+[#6](https://github.com/djnavarro/minis/issues/6) (the `.table_tibble()`
+caller-scope limitation), [#7](https://github.com/djnavarro/minis/issues/7)
+(the trailing-comma bug), and
+[#8](https://github.com/djnavarro/minis/issues/8) (the `if_else()`
+feature request).

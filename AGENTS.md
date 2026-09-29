@@ -162,7 +162,14 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   they were rewritten as plain base `data.frame(..., check.names =
   FALSE)` calls instead of routed through the mini (see the warning in
   `R/minitable.R`'s header comment before reaching for `.table_tibble()`
-  at a new call site). `erglm_scm_history()`'s row-appending (previously
+  at a new call site). Filed upstream as
+  [djnavarro/minis#6](https://github.com/djnavarro/minis/issues/6).
+  Separately, `.table_tibble()` also doesn't tolerate a trailing comma
+  after the last argument (it produces a genuine extra, unnamed
+  argument that breaks its `match.call()`-based argument walking),
+  filed as [djnavarro/minis#7](https://github.com/djnavarro/minis/issues/7)
+  -- the same issue covers `.verb_mutate()` below, which has the same
+  bug for the same reason. `erglm_scm_history()`'s row-appending (previously
   `tibble::add_row()`) uses plain `rbind()`, for the same reason
   `.table_add_row()` doesn't fit: `tibble::add_row(history,
   history_row)` relies on `add_row()`'s special-case splicing of a whole
@@ -240,6 +247,9 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   `ifelse()` call, so both are always evaluated, in the same order,
   regardless of implementation -- keeping `erglm_data`'s values
   reproducible under `.make_erglm_data(seed = 2407L)` across the swap.
+  Filed upstream as a feature request for an eager, type-strict
+  `if_else()` equivalent in `minicase`:
+  [djnavarro/minis#8](https://github.com/djnavarro/minis/issues/8).
   `dplyr` is dropped from `DESCRIPTION` entirely (not moved to
   `Suggests`, unlike `tibble`) since no vignette or the README ever
   used it directly.
