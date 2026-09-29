@@ -21,7 +21,11 @@ library(erglm)
 At the lowest level, covariate modelling is just adding or removing a single term from a fitted model. Two exported helpers do exactly that, `erglm_add_term()` and `erglm_remove_term()`, each taking a one-sided formula naming the term and returning a refitted model:
 
 ```{r building-blocks}
-base_mod <- erglm_model(ae1 ~ aucss, erglm_data, family = binomial())
+base_mod <- erglm_model(
+  formula = ae1 ~ aucss, 
+  data = erglm_data, 
+  family = binomial()
+)
 
 erglm_add_term(base_mod, ~ sex)
 ```
@@ -41,14 +45,17 @@ candidates <- c("sex", "dose", "weight", "age")
 Every candidate not already in the model is added in turn and compared against the current model; the term with the smallest $p$-value is retained, provided that $p$-value is below `threshold`. The step repeats until no remaining candidate clears the bar:
 
 ```{r forward}
-fwd_mod <- erglm_scm_forward(base_mod, candidates, threshold = 0.01, seed = 3425)
-fwd_mod$formula
+fwd_mod <- base_mod |> 
+  erglm_scm_forward(candidates, threshold = 0.01, seed = 3425)
+
+summary(fwd_mod)
 ```
 
 None of the four candidates clear the default $0.01$ threshold here -- inspecting the history shows why:
 
 ```{r forward-history}
-erglm_scm_history(fwd_mod)[, c("term_tested", "term_p_value", "model_updated")]
+fwd_mod_log <- erglm_scm_history(fwd_mod)
+fwd_mod_log[, c("term_tested", "term_p_value", "model_updated")]
 ```
 
 `sex` does have a genuine (if modest) effect on `ae1` in the data-generating process behind `erglm_data`, but once `aucss` is already in the model that effect isn't strong enough, at this sample size, to clear a $0.01$ threshold -- so the search correctly leaves it out rather than adding a covariate that doesn't earn its place.
@@ -58,18 +65,23 @@ erglm_scm_history(fwd_mod)[, c("term_tested", "term_p_value", "model_updated")]
 Backward elimination works in reverse: each term currently in the model is dropped in turn, and the term with the *largest* $p$-value is removed if that $p$-value exceeds `threshold`. To see it doing real work, start from a saturated model that already contains every candidate:
 
 ```{r backward}
-full_mod <- erglm_model(ae1 ~ aucss + sex + dose + weight + age, erglm_data, family = binomial())
-bwd_mod <- erglm_scm_backward(full_mod, candidates, threshold = 0.001, seed = 9821)
-bwd_mod$formula
+full_mod <- erglm_model(
+  formula = ae1 ~ aucss + sex + dose + weight + age, 
+  data = erglm_data, 
+  family = binomial()
+)
+
+bwd_mod <- full_mod |> 
+  erglm_scm_backward(candidates, threshold = 0.001, seed = 9821)
+
+summary(bwd_mod)
 ```
 
 All four candidates are pruned, leaving only `aucss` -- matching what forward addition already told us: none of `sex`, `dose`, `weight`, or `age` earns a place in the model at these thresholds. The full audit log shows the iteration-by-iteration elimination:
 
 ```{r backward-history}
-print(
-  erglm_scm_history(bwd_mod)[, c("iteration", "term_tested", "term_p_value", "model_updated")],
-  row.names = FALSE
-)
+bwd_mod_log <- erglm_scm_history(bwd_mod)
+bwd_mod_log[, c("iteration", "term_tested", "term_p_value", "model_updated")]
 ```
 
 Each iteration removes the single worst-performing term (`model_updated == 1`); the next iteration re-tests everything still in the model, since removing one term can change the others' apparent significance.
@@ -85,12 +97,15 @@ By default, each step selects a term using the $p$-value approach described abov
 Because AIC is more permissive than the default $p$-value threshold, forward addition with `criterion = "aic"` finds covariates worth adding where the $p$-value search above found none:
 
 ```{r forward-aic}
-aic_mod <- erglm_scm_forward(base_mod, candidates, criterion = "aic", seed = 3425)
-aic_mod$formula
+aic_mod <- base_mod |> 
+  erglm_scm_forward(candidates, criterion = "aic", seed = 3425)
+
+summary(aic_mod)
 ```
 
 ```{r forward-aic-history}
-erglm_scm_history(aic_mod)[, c("term_tested", "criterion", "term_p_value", "model_aic", "model_updated")]
+aic_mod_log <- erglm_scm_history(aic_mod)
+aic_mod_log[, c("term_tested", "criterion", "term_p_value", "model_aic", "model_updated")]
 ```
 
 The history's `criterion` column records which selection rule drove each step (`NA` for the base-model row), and `term_p_value` is `NA` throughout since it isn't used here. `model_aic` and `model_bic` are always populated regardless of `criterion`, so a search driven by one criterion can still be audited against the other.
@@ -98,8 +113,10 @@ The history's `criterion` column records which selection rule drove each step (`
 The same `criterion` argument works for `erglm_scm_backward()`:
 
 ```{r backward-bic}
-bic_mod <- erglm_scm_backward(full_mod, candidates, criterion = "bic", seed = 9821)
-bic_mod$formula
+bic_mod <- full_mod |> 
+  erglm_scm_backward(candidates, criterion = "bic", seed = 9821)
+
+summary(bic_mod)
 ```
 
 ## Forward addition piped to backward elimination
@@ -111,7 +128,7 @@ final_mod <- base_mod |>
   erglm_scm_forward(candidates, threshold = 0.01, seed = 3425) |>
   erglm_scm_backward(candidates, threshold = 0.001, seed = 9821)
 
-final_mod$formula
+summary(final_mod)
 ```
 
 Since forward addition already found nothing worth adding, backward elimination has nothing left to prune, and the pipeline settles on the base model. `final_mod` is an ordinary fitted model object, so all the usual methods apply -- `summary()`, `confint()`, `predict()`, and so on all behave normally.
@@ -121,9 +138,16 @@ Since forward addition already found nothing worth adding, backward elimination 
 Nothing about the SCM interface changes across `glm()` families. The same candidates, applied to the Poisson-distributed `ae_count` response, tell an analogous story -- `sex` has a borderline effect (visible in the full-model summary as $p \approx 0.07$) that still doesn't clear the default forward threshold:
 
 ```{r poisson}
-base_pois <- erglm_model(ae_count ~ aucss, erglm_data, family = poisson())
-fwd_pois <- erglm_scm_forward(base_pois, candidates, threshold = 0.01, seed = 3425)
-fwd_pois$formula
+base_pois <- erglm_model(
+  formula = ae_count ~ aucss, 
+  data = erglm_data, 
+  family = poisson()
+)
+
+fwd_pois <- base_pois |> 
+  erglm_scm_forward(candidates, threshold = 0.01, seed = 3425)
+
+summary(fwd_pois)
 ```
 
 Internally, `erglm_scm_forward()`/`erglm_scm_backward()` pick a likelihood-ratio chi-squared test for families with known dispersion (`binomial`, `poisson`, as used above) and an F-test for families with an estimated dispersion parameter (`gaussian`, `Gamma`), matching `stats::anova()`'s own `test` argument -- set the `test` argument explicitly to override this.
