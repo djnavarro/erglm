@@ -87,7 +87,7 @@ simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
 
   fn <- erglm_fun(mod)
 
-  withr::with_seed(
+  .seed_with_seed(
     seed = seed,
     code = {
       par <- mvtnorm::rmvnorm(n = nsim, mean = est, sigma = stats::vcov(mod))

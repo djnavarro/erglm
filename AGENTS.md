@@ -138,6 +138,12 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   one dependency at a time; `mvtnorm` is explicitly out of scope for this
   effort (there's no mini for multivariate normal sampling, and writing
   one is a riskier undertaking than vendoring an existing mini).
+- `R/miniseed.R` -- a vendored copy of the `miniseed` mini from
+  djnavarro/minis, providing `.seed_with_seed()` (plus, unused so far but
+  kept for parity with upstream, `.seed_with_preserve_seed()`/
+  `.seed_local_seed()`/`.seed_local_preserve_seed()`) as a dependency-free
+  stand-in for `withr::with_seed()`. Part of the same hard-dependency
+  reduction effort described above.
 - `R/utils-helpers.R`, `R/utils-global.R` -- small internal helpers and
   `globalVariables()` declarations for NSE. `.as_erglm()` records the
   fitted model's actual family (`stats::family(mod)$family`) in

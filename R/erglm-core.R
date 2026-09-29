@@ -211,7 +211,7 @@ erglm_fun <- function(object) {
   fn <- erglm_fun(object)
   family_name <- stats::family(object)$family
   dispersion <- summary(object)$dispersion
-  withr::with_seed(
+  .seed_with_seed(
     seed = seed,
     code = {
       par <- mvtnorm::rmvnorm(

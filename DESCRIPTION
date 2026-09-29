@@ -19,8 +19,7 @@ Imports:
     dplyr,
     mvtnorm,
     stats,
-    tibble,
-    withr
+    tibble
 Suggests: 
     erplots,
     ggplot2,

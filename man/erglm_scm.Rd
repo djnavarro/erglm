@@ -76,7 +76,7 @@ implemented, only (a) is real, and even then its effect is usually
 invisible. Concretely: each step of \code{erglm_scm_forward()}/
 \code{erglm_scm_backward()} shuffles the candidate terms (\code{sample()})
 before testing them one at a time, and the shuffled order is the
-\emph{only} thing \code{seed} (via \code{withr::with_seed()}) controls. Term p-values
+\emph{only} thing \code{seed} (via a seeded-then-restored RNG block) controls. Term p-values
 come from \code{stats::anova()} on models fitted with \code{stats::glm()}, which
 is a deterministic algorithm (iteratively reweighted least squares,
 no random starting values) -- so which candidate is \emph{found} to be

@@ -2,7 +2,7 @@
 
 .make_erglm_data <- function(seed) {
   n <- 300L
-  withr::with_seed(
+  .seed_with_seed(
     seed = seed,
     code = {
       erglm_data <- tibble::tibble(

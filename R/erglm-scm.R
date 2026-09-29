@@ -41,7 +41,7 @@
 #' invisible. Concretely: each step of `erglm_scm_forward()`/
 #' `erglm_scm_backward()` shuffles the candidate terms (`sample()`)
 #' before testing them one at a time, and the shuffled order is the
-#' *only* thing `seed` (via `withr::with_seed()`) controls. Term p-values
+#' *only* thing `seed` (via a seeded-then-restored RNG block) controls. Term p-values
 #' come from `stats::anova()` on models fitted with `stats::glm()`, which
 #' is a deterministic algorithm (iteratively reweighted least squares,
 #' no random starting values) -- so which candidate is *found* to be
@@ -123,7 +123,7 @@ erglm_scm_forward <- function(mod, candidates, threshold = 0.01, criterion = "p-
   if (is.null(seed)) {
     seed <- .pick_seed()
   }
-  withr::with_seed(
+  .seed_with_seed(
     seed = seed,
     code = {
       mod_out <- .erglm_scm_forward(
@@ -165,7 +165,7 @@ erglm_scm_backward <- function(mod, candidates, threshold = 0.001, criterion = "
   if (is.null(seed)) {
     seed <- .pick_seed()
   }
-  withr::with_seed(
+  .seed_with_seed(
     seed = seed,
     code = {
       mod_out <- .erglm_scm_backward(
