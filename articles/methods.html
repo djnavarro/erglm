@@ -104,10 +104,10 @@ errors, and dispersion information:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;               Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
-<span><span class="co">#&gt; (Intercept) -1.6827031  0.3205633  -5.249 1.53e-07 ***</span></span>
+<span><span class="co">#&gt; (Intercept) -1.6827029  0.3205633  -5.249 1.53e-07 ***</span></span>
 <span><span class="co">#&gt; aucss        0.0052806  0.0009409   5.612 2.00e-08 ***</span></span>
 <span><span class="co">#&gt; dose         0.0010573  0.0031778   0.333    0.739    </span></span>
-<span><span class="co">#&gt; sexMale     -0.3053683  0.3656515  -0.835    0.404    </span></span>
+<span><span class="co">#&gt; sexMale     -0.3053701  0.3656516  -0.835    0.404    </span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -128,14 +128,14 @@ for any <code>glm</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  (Intercept)        aucss         dose      sexMale </span></span>
-<span><span class="co">#&gt; -1.682703108  0.005280590  0.001057316 -0.305368299</span></span></code></pre></div>
+<span><span class="co">#&gt; -1.682702868  0.005280591  0.001057317 -0.305370136</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
 <span><span class="co">#&gt;               (Intercept)         aucss          dose       sexMale</span></span>
-<span><span class="co">#&gt; (Intercept)  1.027608e-01 -4.300767e-05 -3.378202e-04 -5.997505e-02</span></span>
-<span><span class="co">#&gt; aucss       -4.300767e-05  8.853364e-07 -2.126617e-06 -2.736543e-05</span></span>
-<span><span class="co">#&gt; dose        -3.378202e-04 -2.126617e-06  1.009860e-05  6.150646e-05</span></span>
-<span><span class="co">#&gt; sexMale     -5.997505e-02 -2.736543e-05  6.150646e-05  1.337010e-01</span></span></code></pre></div>
+<span><span class="co">#&gt; (Intercept)  0.1027608425 -4.300750e-05 -3.378206e-04 -5.997503e-02</span></span>
+<span><span class="co">#&gt; aucss       -0.0000430075  8.853349e-07 -2.126613e-06 -2.736574e-05</span></span>
+<span><span class="co">#&gt; dose        -0.0003378206 -2.126613e-06  1.009859e-05  6.150678e-05</span></span>
+<span><span class="co">#&gt; sexMale     -0.0599750321 -2.736574e-05  6.150678e-05  1.337011e-01</span></span></code></pre></div>
 <p>Confidence intervals for individual coefficients can be obtained from
 <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> (profile-likelihood based, so slightly slower but
 generally preferred over a Wald interval for <code>glm</code>
@@ -144,10 +144,10 @@ models):</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Waiting for profiling to be done...</span></span>
 <span><span class="co">#&gt;                    2.5 %       97.5 %</span></span>
-<span><span class="co">#&gt; (Intercept) -2.348177240 -1.084757101</span></span>
-<span><span class="co">#&gt; aucss        0.003626947  0.007337455</span></span>
-<span><span class="co">#&gt; dose        -0.005392874  0.007172194</span></span>
-<span><span class="co">#&gt; sexMale     -1.031425155  0.409529436</span></span></code></pre></div>
+<span><span class="co">#&gt; (Intercept) -2.348177012 -1.084756854</span></span>
+<span><span class="co">#&gt; aucss        0.003626949  0.007337453</span></span>
+<span><span class="co">#&gt; dose        -0.005392869  0.007172192</span></span>
+<span><span class="co">#&gt; sexMale     -1.031427317  0.409527797</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="predictions">Predictions<a class="anchor" aria-label="anchor" href="#predictions"></a>
@@ -158,7 +158,7 @@ default it returns predictions on the link scale; use
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod</span>, newdata <span class="op">=</span> <span class="va">erglm_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         1         2         3         4         5 </span></span>
-<span><span class="co">#&gt; 0.8554138 0.9999984 0.1567379 0.9900114 0.5274632</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.8554130 0.9999984 0.1567379 0.9900112 0.5274655</span></span></code></pre></div>
 <p><code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> can also return standard errors
 (<code>se.fit = TRUE</code>), which is the basis for erglm’s own
 <code><a href="../reference/erglm_predict.html">erglm_predict()</a></code> – that function is a thin, opinionated
@@ -167,24 +167,24 @@ confidence interval on the response scale and returns everything as a
 tidy data frame bound to <code>newdata</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span><span class="va">mod</span>, newdata <span class="op">=</span> <span class="va">erglm_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   id    sex age weight dose treatment    aucss  cmaxss ae1 ae2 ae_count</span></span>
-<span><span class="co">#&gt; 1  1   Male  35     79  200      Drug  673.091  97.328   0   1        1</span></span>
-<span><span class="co">#&gt; 2  2 Female  22     58  200      Drug 2806.115 300.615   1   1        6</span></span>
-<span><span class="co">#&gt; 3  3 Female  28     58    0   Placebo    0.000   0.000   0   0        1</span></span>
-<span><span class="co">#&gt; 4  4 Female  18     57  100      Drug 1169.045 197.783   1   1        0</span></span>
-<span><span class="co">#&gt; 5  5   Male  28     77  100      Drug  377.288  51.429   0   0        0</span></span>
+<span><span class="co">#&gt;   id    sex age weight dose treatment   aucss cmaxss ae1 ae2 ae_count</span></span>
+<span><span class="co">#&gt; 1  1   Male  35     79  200      Drug  673.09  97.33   0   1        1</span></span>
+<span><span class="co">#&gt; 2  2 Female  22     58  200      Drug 2806.12 300.62   1   1        6</span></span>
+<span><span class="co">#&gt; 3  3 Female  28     58    0   Placebo    0.00   0.00   0   0        1</span></span>
+<span><span class="co">#&gt; 4  4 Female  18     57  100      Drug 1169.04 197.78   1   1        0</span></span>
+<span><span class="co">#&gt; 5  5   Male  28     77  100      Drug  377.29  51.43   0   0        0</span></span>
 <span><span class="co">#&gt;   biomarker_change ae_duration   fit_link   se_link  fit_resp   ci_lower</span></span>
-<span><span class="co">#&gt; 1         1.216895   12.402338  1.7777096 0.3791246 0.8554138 0.73781428</span></span>
-<span><span class="co">#&gt; 2         4.867072   13.697841 13.3467035 2.1713090 0.9999984 0.99988734</span></span>
-<span><span class="co">#&gt; 3        -1.832830    5.262023 -1.6827031 0.3205633 0.1567379 0.09021639</span></span>
-<span><span class="co">#&gt; 4         1.900170    6.699422  4.5962761 0.8650804 0.9900114 0.94788348</span></span>
-<span><span class="co">#&gt; 5        -1.009179    6.152825  0.1099635 0.2732910 0.5274632 0.39515907</span></span>
+<span><span class="co">#&gt; 1             1.22       12.40  1.7777033 0.3791242 0.8554130 0.73781320</span></span>
+<span><span class="co">#&gt; 2             4.87       13.70 13.3467325 2.1713121 0.9999984 0.99988734</span></span>
+<span><span class="co">#&gt; 3            -1.83        5.26 -1.6827029 0.3205633 0.1567379 0.09021641</span></span>
+<span><span class="co">#&gt; 4             1.90        6.70  4.5962509 0.8650754 0.9900112 0.94788272</span></span>
+<span><span class="co">#&gt; 5            -1.01        6.15  0.1099728 0.2732914 0.5274655 0.39516112</span></span>
 <span><span class="co">#&gt;    ci_upper</span></span>
-<span><span class="co">#&gt; 1 0.9255858</span></span>
+<span><span class="co">#&gt; 1 0.9255853</span></span>
 <span><span class="co">#&gt; 2 1.0000000</span></span>
 <span><span class="co">#&gt; 3 0.2583791</span></span>
-<span><span class="co">#&gt; 4 0.9981520</span></span>
-<span><span class="co">#&gt; 5 0.6560192</span></span></code></pre></div>
+<span><span class="co">#&gt; 4 0.9981519</span></span>
+<span><span class="co">#&gt; 5 0.6560215</span></span></code></pre></div>
 <p>Use whichever is more convenient: <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> for a quick
 point estimate, or <code><a href="../reference/erglm_predict.html">erglm_predict()</a></code> when you want interval
 bounds without computing them by hand.</p>
@@ -201,12 +201,12 @@ outside of erglm’s own stepwise covariate modelling
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC</a></span><span class="op">(</span><span class="va">mod</span>, <span class="va">mod_no_sex</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            df      AIC</span></span>
-<span><span class="co">#&gt; mod         4 200.5607</span></span>
-<span><span class="co">#&gt; mod_no_sex  3 199.2614</span></span>
+<span><span class="co">#&gt; mod         4 200.5606</span></span>
+<span><span class="co">#&gt; mod_no_sex  3 199.2613</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">BIC</a></span><span class="op">(</span><span class="va">mod</span>, <span class="va">mod_no_sex</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            df      BIC</span></span>
 <span><span class="co">#&gt; mod         4 215.3758</span></span>
-<span><span class="co">#&gt; mod_no_sex  3 210.3728</span></span></code></pre></div>
+<span><span class="co">#&gt; mod_no_sex  3 210.3727</span></span></code></pre></div>
 <p>For nested models, <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code> gives a likelihood-ratio (or
 F, for families with estimated dispersion) test directly – this is
 exactly the machinery
@@ -220,7 +220,7 @@ internally, exposed here for one-off comparisons:</p>
 <span><span class="co">#&gt; Model 2: ae1 ~ aucss + dose + sex</span></span>
 <span><span class="co">#&gt;   Resid. Df Resid. Dev Df Deviance Pr(&gt;Chi)</span></span>
 <span><span class="co">#&gt; 1       297     193.26                     </span></span>
-<span><span class="co">#&gt; 2       296     192.56  1   0.7007   0.4025</span></span></code></pre></div>
+<span><span class="co">#&gt; 2       296     192.56  1  0.70071   0.4025</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="a-note-on-diagnostic-plots">A note on diagnostic plots<a class="anchor" aria-label="anchor" href="#a-note-on-diagnostic-plots"></a>

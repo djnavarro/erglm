@@ -35,10 +35,10 @@ summary(mod)
 #> 
 #> Coefficients:
 #>               Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept) -1.6827031  0.3205633  -5.249 1.53e-07 ***
+#> (Intercept) -1.6827029  0.3205633  -5.249 1.53e-07 ***
 #> aucss        0.0052806  0.0009409   5.612 2.00e-08 ***
 #> dose         0.0010573  0.0031778   0.333    0.739    
-#> sexMale     -0.3053683  0.3656515  -0.835    0.404    
+#> sexMale     -0.3053701  0.3656516  -0.835    0.404    
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -61,17 +61,17 @@ available via [`coef()`](https://rdrr.io/r/stats/coef.html) and
 
 coef(mod)
 #>  (Intercept)        aucss         dose      sexMale 
-#> -1.682703108  0.005280590  0.001057316 -0.305368299
+#> -1.682702868  0.005280591  0.001057317 -0.305370136
 ```
 
 ``` r
 
 vcov(mod)
 #>               (Intercept)         aucss          dose       sexMale
-#> (Intercept)  1.027608e-01 -4.300767e-05 -3.378202e-04 -5.997505e-02
-#> aucss       -4.300767e-05  8.853364e-07 -2.126617e-06 -2.736543e-05
-#> dose        -3.378202e-04 -2.126617e-06  1.009860e-05  6.150646e-05
-#> sexMale     -5.997505e-02 -2.736543e-05  6.150646e-05  1.337010e-01
+#> (Intercept)  0.1027608425 -4.300750e-05 -3.378206e-04 -5.997503e-02
+#> aucss       -0.0000430075  8.853349e-07 -2.126613e-06 -2.736574e-05
+#> dose        -0.0003378206 -2.126613e-06  1.009859e-05  6.150678e-05
+#> sexMale     -0.0599750321 -2.736574e-05  6.150678e-05  1.337011e-01
 ```
 
 Confidence intervals for individual coefficients can be obtained from
@@ -84,10 +84,10 @@ for `glm` models):
 confint(mod)
 #> Waiting for profiling to be done...
 #>                    2.5 %       97.5 %
-#> (Intercept) -2.348177240 -1.084757101
-#> aucss        0.003626947  0.007337455
-#> dose        -0.005392874  0.007172194
-#> sexMale     -1.031425155  0.409529436
+#> (Intercept) -2.348177012 -1.084756854
+#> aucss        0.003626949  0.007337453
+#> dose        -0.005392869  0.007172192
+#> sexMale     -1.031427317  0.409527797
 ```
 
 ## Predictions
@@ -100,7 +100,7 @@ link scale; use `type = "response"` for the response scale:
 
 predict(mod, newdata = erglm_data[1:5, ], type = "response")
 #>         1         2         3         4         5 
-#> 0.8554138 0.9999984 0.1567379 0.9900114 0.5274632
+#> 0.8554130 0.9999984 0.1567379 0.9900112 0.5274655
 ```
 
 [`predict()`](https://rdrr.io/r/stats/predict.html) can also return
@@ -113,24 +113,24 @@ scale and returns everything as a tidy data frame bound to `newdata`:
 ``` r
 
 erglm_predict(mod, newdata = erglm_data[1:5, ])
-#>   id    sex age weight dose treatment    aucss  cmaxss ae1 ae2 ae_count
-#> 1  1   Male  35     79  200      Drug  673.091  97.328   0   1        1
-#> 2  2 Female  22     58  200      Drug 2806.115 300.615   1   1        6
-#> 3  3 Female  28     58    0   Placebo    0.000   0.000   0   0        1
-#> 4  4 Female  18     57  100      Drug 1169.045 197.783   1   1        0
-#> 5  5   Male  28     77  100      Drug  377.288  51.429   0   0        0
+#>   id    sex age weight dose treatment   aucss cmaxss ae1 ae2 ae_count
+#> 1  1   Male  35     79  200      Drug  673.09  97.33   0   1        1
+#> 2  2 Female  22     58  200      Drug 2806.12 300.62   1   1        6
+#> 3  3 Female  28     58    0   Placebo    0.00   0.00   0   0        1
+#> 4  4 Female  18     57  100      Drug 1169.04 197.78   1   1        0
+#> 5  5   Male  28     77  100      Drug  377.29  51.43   0   0        0
 #>   biomarker_change ae_duration   fit_link   se_link  fit_resp   ci_lower
-#> 1         1.216895   12.402338  1.7777096 0.3791246 0.8554138 0.73781428
-#> 2         4.867072   13.697841 13.3467035 2.1713090 0.9999984 0.99988734
-#> 3        -1.832830    5.262023 -1.6827031 0.3205633 0.1567379 0.09021639
-#> 4         1.900170    6.699422  4.5962761 0.8650804 0.9900114 0.94788348
-#> 5        -1.009179    6.152825  0.1099635 0.2732910 0.5274632 0.39515907
+#> 1             1.22       12.40  1.7777033 0.3791242 0.8554130 0.73781320
+#> 2             4.87       13.70 13.3467325 2.1713121 0.9999984 0.99988734
+#> 3            -1.83        5.26 -1.6827029 0.3205633 0.1567379 0.09021641
+#> 4             1.90        6.70  4.5962509 0.8650754 0.9900112 0.94788272
+#> 5            -1.01        6.15  0.1099728 0.2732914 0.5274655 0.39516112
 #>    ci_upper
-#> 1 0.9255858
+#> 1 0.9255853
 #> 2 1.0000000
 #> 3 0.2583791
-#> 4 0.9981520
-#> 5 0.6560192
+#> 4 0.9981519
+#> 5 0.6560215
 ```
 
 Use whichever is more convenient:
@@ -154,12 +154,12 @@ mod_no_sex <- erglm_model(ae1 ~ aucss + dose, erglm_data, family = binomial())
 
 AIC(mod, mod_no_sex)
 #>            df      AIC
-#> mod         4 200.5607
-#> mod_no_sex  3 199.2614
+#> mod         4 200.5606
+#> mod_no_sex  3 199.2613
 BIC(mod, mod_no_sex)
 #>            df      BIC
 #> mod         4 215.3758
-#> mod_no_sex  3 210.3728
+#> mod_no_sex  3 210.3727
 ```
 
 For nested models, [`anova()`](https://rdrr.io/r/stats/anova.html) gives
@@ -177,7 +177,7 @@ anova(mod_no_sex, mod, test = "Chisq")
 #> Model 2: ae1 ~ aucss + dose + sex
 #>   Resid. Df Resid. Dev Df Deviance Pr(>Chi)
 #> 1       297     193.26                     
-#> 2       296     192.56  1   0.7007   0.4025
+#> 2       296     192.56  1  0.70071   0.4025
 ```
 
 ## A note on diagnostic plots

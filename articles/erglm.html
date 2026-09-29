@@ -100,20 +100,20 @@ response columns for each supported family: binary (<code>ae1</code>,
 (<code>ae_duration</code>):</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">erglm_data</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   id    sex age weight dose treatment    aucss  cmaxss ae1 ae2 ae_count</span></span>
-<span><span class="co">#&gt; 1  1   Male  35     79  200      Drug  673.091  97.328   0   1        1</span></span>
-<span><span class="co">#&gt; 2  2 Female  22     58  200      Drug 2806.115 300.615   1   1        6</span></span>
-<span><span class="co">#&gt; 3  3 Female  28     58    0   Placebo    0.000   0.000   0   0        1</span></span>
-<span><span class="co">#&gt; 4  4 Female  18     57  100      Drug 1169.045 197.783   1   1        0</span></span>
-<span><span class="co">#&gt; 5  5   Male  28     77  100      Drug  377.288  51.429   0   0        0</span></span>
-<span><span class="co">#&gt; 6  6 Female  19     76  200      Drug  327.079  25.373   1   0        0</span></span>
+<span><span class="co">#&gt;   id    sex age weight dose treatment   aucss cmaxss ae1 ae2 ae_count</span></span>
+<span><span class="co">#&gt; 1  1   Male  35     79  200      Drug  673.09  97.33   0   1        1</span></span>
+<span><span class="co">#&gt; 2  2 Female  22     58  200      Drug 2806.12 300.62   1   1        6</span></span>
+<span><span class="co">#&gt; 3  3 Female  28     58    0   Placebo    0.00   0.00   0   0        1</span></span>
+<span><span class="co">#&gt; 4  4 Female  18     57  100      Drug 1169.04 197.78   1   1        0</span></span>
+<span><span class="co">#&gt; 5  5   Male  28     77  100      Drug  377.29  51.43   0   0        0</span></span>
+<span><span class="co">#&gt; 6  6 Female  19     76  200      Drug  327.08  25.37   1   0        0</span></span>
 <span><span class="co">#&gt;   biomarker_change ae_duration</span></span>
-<span><span class="co">#&gt; 1         1.216895   12.402338</span></span>
-<span><span class="co">#&gt; 2         4.867072   13.697841</span></span>
-<span><span class="co">#&gt; 3        -1.832830    5.262023</span></span>
-<span><span class="co">#&gt; 4         1.900170    6.699422</span></span>
-<span><span class="co">#&gt; 5        -1.009179    6.152825</span></span>
-<span><span class="co">#&gt; 6        -4.972753   12.829726</span></span></code></pre></div>
+<span><span class="co">#&gt; 1             1.22       12.40</span></span>
+<span><span class="co">#&gt; 2             4.87       13.70</span></span>
+<span><span class="co">#&gt; 3            -1.83        5.26</span></span>
+<span><span class="co">#&gt; 4             1.90        6.70</span></span>
+<span><span class="co">#&gt; 5            -1.01        6.15</span></span>
+<span><span class="co">#&gt; 6            -4.97       12.83</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="fitting-a-model">Fitting a model<a class="anchor" aria-label="anchor" href="#fitting-a-model"></a>
@@ -130,7 +130,7 @@ plus a <code>family</code> argument (defaulting to
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt; (Intercept)        aucss      sexMale  </span></span>
-<span><span class="co">#&gt;   -1.648112     0.005508    -0.312232  </span></span>
+<span><span class="co">#&gt;   -1.648112     0.005508    -0.312234  </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Degrees of Freedom: 299 Total (i.e. Null);  297 Residual</span></span>
 <span><span class="co">#&gt; Null Deviance:       402.1 </span></span>
@@ -170,7 +170,7 @@ addition/elimination based on significance testing:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt; (Intercept)        aucss      sexMale  </span></span>
-<span><span class="co">#&gt;   -1.648112     0.005508    -0.312232  </span></span>
+<span><span class="co">#&gt;   -1.648112     0.005508    -0.312234  </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Degrees of Freedom: 299 Total (i.e. Null);  297 Residual</span></span>
 <span><span class="co">#&gt; Null Deviance:       402.1 </span></span>
@@ -188,20 +188,20 @@ noise:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">2048</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   dat_id sim_id        mu val coef_(Intercept)  coef_aucss coef_sexMale</span></span>
-<span><span class="co">#&gt; 1      1      1 0.8408612   0        -1.858621 0.005770134   -0.3605541</span></span>
-<span><span class="co">#&gt; 2      2      1 0.9999994   1        -1.858621 0.005770134   -0.3605541</span></span>
-<span><span class="co">#&gt; 3      3      1 0.1348639   0        -1.858621 0.005770134   -0.3605541</span></span>
-<span><span class="co">#&gt; 4      4      1 0.9925119   1        -1.858621 0.005770134   -0.3605541</span></span>
-<span><span class="co">#&gt; 5      5      1 0.4894583   1        -1.858621 0.005770134   -0.3605541</span></span>
-<span><span class="co">#&gt; 6      6      1 0.5071666   1        -1.858621 0.005770134   -0.3605541</span></span>
-<span><span class="co">#&gt;      aucss    sex</span></span>
-<span><span class="co">#&gt; 1  673.091   Male</span></span>
-<span><span class="co">#&gt; 2 2806.115 Female</span></span>
-<span><span class="co">#&gt; 3    0.000 Female</span></span>
-<span><span class="co">#&gt; 4 1169.045 Female</span></span>
-<span><span class="co">#&gt; 5  377.288   Male</span></span>
-<span><span class="co">#&gt; 6  327.079 Female</span></span></code></pre></div>
+<span><span class="co">#&gt;   dat_id sim_id        mu val coef_(Intercept)  coef_aucss coef_sexMale   aucss</span></span>
+<span><span class="co">#&gt; 1      1      1 0.8408603   0        -1.858621 0.005770135   -0.3605561  673.09</span></span>
+<span><span class="co">#&gt; 2      2      1 0.9999994   1        -1.858621 0.005770135   -0.3605561 2806.12</span></span>
+<span><span class="co">#&gt; 3      3      1 0.1348639   0        -1.858621 0.005770135   -0.3605561    0.00</span></span>
+<span><span class="co">#&gt; 4      4      1 0.9925117   1        -1.858621 0.005770135   -0.3605561 1169.04</span></span>
+<span><span class="co">#&gt; 5      5      1 0.4894609   1        -1.858621 0.005770135   -0.3605561  377.29</span></span>
+<span><span class="co">#&gt; 6      6      1 0.5071682   1        -1.858621 0.005770135   -0.3605561  327.08</span></span>
+<span><span class="co">#&gt;      sex</span></span>
+<span><span class="co">#&gt; 1   Male</span></span>
+<span><span class="co">#&gt; 2 Female</span></span>
+<span><span class="co">#&gt; 3 Female</span></span>
+<span><span class="co">#&gt; 4 Female</span></span>
+<span><span class="co">#&gt; 5   Male</span></span>
+<span><span class="co">#&gt; 6 Female</span></span></code></pre></div>
 <p>See the <a href="simulate.html">“Simulation”</a> article for details,
 including the lower-level <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> building block.</p>
 </div>

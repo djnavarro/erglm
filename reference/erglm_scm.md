@@ -160,9 +160,9 @@ erglm_scm_history(mod1)
 #> 2         1       1    forward   p-value    add        ~sex  ae1 ~ aucss + sex
 #> 3         1       2    forward   p-value    add       ~dose ae1 ~ aucss + dose
 #>   model_converged term_p_value model_aic model_bic model_updated
-#> 1            TRUE           NA  197.4073  204.8149            NA
-#> 2            TRUE    0.3906316  198.6704  209.7817             0
-#> 3            TRUE    0.7024744  199.2614  210.3728             0
+#> 1            TRUE           NA  197.4073  204.8148            NA
+#> 2            TRUE    0.3906289  198.6703  209.7816             0
+#> 3            TRUE    0.7024738  199.2613  210.3727             0
 
 mod2 <- erglm_model(ae1 ~ aucss + sex + dose, erglm_data, family = binomial())
 mod3 <- erglm_scm_backward(mod2, candidates = c("sex", "dose"))
@@ -173,10 +173,10 @@ erglm_scm_history(mod3)
 #> 3         1       2   backward   p-value remove        ~sex
 #> 4         2       3   backward   p-value remove        ~sex
 #>               model_tested model_converged term_p_value model_aic model_bic
-#> 1 ae1 ~ aucss + sex + dose            TRUE           NA  200.5607  215.3758
-#> 2        ae1 ~ aucss + sex            TRUE    0.7405587  198.6704  209.7817
-#> 3       ae1 ~ aucss + dose            TRUE    0.4025483  199.2614  210.3728
-#> 4              ae1 ~ aucss            TRUE    0.3906316  197.4073  204.8149
+#> 1 ae1 ~ aucss + sex + dose            TRUE           NA  200.5606  215.3758
+#> 2        ae1 ~ aucss + sex            TRUE    0.7405585  198.6703  209.7816
+#> 3       ae1 ~ aucss + dose            TRUE    0.4025456  199.2613  210.3727
+#> 4              ae1 ~ aucss            TRUE    0.3906289  197.4073  204.8148
 #>   model_updated
 #> 1            NA
 #> 2             1
@@ -192,7 +192,7 @@ erglm_scm_history(mod5)
 #> 2         1       1    forward       aic    add       ~dose ae1 ~ aucss + dose
 #> 3         1       2    forward       aic    add        ~sex  ae1 ~ aucss + sex
 #>   model_converged term_p_value model_aic model_bic model_updated
-#> 1            TRUE           NA  197.4073  204.8149            NA
-#> 2            TRUE           NA  199.2614  210.3728             0
-#> 3            TRUE           NA  198.6704  209.7817             0
+#> 1            TRUE           NA  197.4073  204.8148            NA
+#> 2            TRUE           NA  199.2613  210.3727             0
+#> 3            TRUE           NA  198.6703  209.7816             0
 ```

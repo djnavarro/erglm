@@ -116,12 +116,12 @@ datasets. The number of replicates is set by <code>nsim</code>, and a
 <code class="sourceCode R"><span><span class="va">sim1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">1</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   dat_id sim_id      mu       val coef_(Intercept) coef_aucss  aucss</span></span>
-<span><span class="co">#&gt; 1      1      1 -0.4369 -1.686464           -1.716     0.0019  673.1</span></span>
-<span><span class="co">#&gt; 2      2      1  3.6156  6.001067           -1.716     0.0019 2806.1</span></span>
-<span><span class="co">#&gt; 3      3      1 -1.7157 -1.222992           -1.716     0.0019    0.0</span></span>
-<span><span class="co">#&gt; 4      4      1  0.5053 -0.721537           -1.716     0.0019 1169.0</span></span>
-<span><span class="co">#&gt; 5      5      1 -0.9989 -0.270042           -1.716     0.0019  377.3</span></span>
-<span><span class="co">#&gt; 6      6      1 -1.0943  0.009739           -1.716     0.0019  327.1</span></span></code></pre></div>
+<span><span class="co">#&gt; 1      1      1 -0.4370 -1.686683           -1.716     0.0019  673.1</span></span>
+<span><span class="co">#&gt; 2      2      1  3.6157  6.001413           -1.716     0.0019 2806.1</span></span>
+<span><span class="co">#&gt; 3      3      1 -1.7159 -1.223122           -1.716     0.0019    0.0</span></span>
+<span><span class="co">#&gt; 4      4      1  0.5053 -0.721710           -1.716     0.0019 1169.0</span></span>
+<span><span class="co">#&gt; 5      5      1 -0.9990 -0.270107           -1.716     0.0019  377.3</span></span>
+<span><span class="co">#&gt; 6      6      1 -1.0944  0.009701           -1.716     0.0019  327.1</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="what-simulate-actually-does">What <code>simulate()</code> actually does<a class="anchor" aria-label="anchor" href="#what-simulate-actually-does"></a>
 </h3>
@@ -237,10 +237,10 @@ default to the values used when the model was fitted:</p>
 <span></span>
 <span><span class="co"># with no arguments, it reproduces the fitted values</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] -0.4013  3.5360 -1.6437  0.5142 -0.9473 -1.0400</span></span>
+<span><span class="co">#&gt; [1] -0.4014  3.5361 -1.6439  0.5141 -0.9474 -1.0401</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       1       2       3       4       5       6 </span></span>
-<span><span class="co">#&gt; -0.4013  3.5360 -1.6437  0.5142 -0.9473 -1.0400</span></span></code></pre></div>
+<span><span class="co">#&gt; -0.4014  3.5361 -1.6439  0.5141 -0.9474 -1.0401</span></span></code></pre></div>
 <p>Because you control both arguments, you can evaluate the model in
 situations the original fit never saw. Supplying <code>param</code> lets
 you ask counterfactual “what if the parameters were different?”
@@ -249,7 +249,7 @@ questions – for example, setting the intercept to zero:</p>
 <code class="sourceCode R"><span><span class="va">alt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
 <span><span class="va">alt</span><span class="op">[</span><span class="st">"(Intercept)"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span>param <span class="op">=</span> <span class="va">alt</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1.2424 5.1797 0.0000 2.1579 0.6964 0.6037</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1.2425 5.1800 0.0000 2.1580 0.6965 0.6038</span></span></code></pre></div>
 <p>Supplying <code>data</code> lets you evaluate the curve at exposures
 and covariate values of your choosing – for instance, tracing the
 exposure-response relationship over a grid of <code>aucss</code>
@@ -257,7 +257,7 @@ values:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1000</span>, <span class="fl">2000</span>, <span class="fl">3000</span>, <span class="fl">4000</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">f</span><span class="op">(</span>data <span class="op">=</span> <span class="va">grid</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] -1.6437  0.2022  2.0480  3.8939  5.7397</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] -1.6439  0.2021  2.0480  3.8940  5.7399</span></span></code></pre></div>
 <p>By default <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> returns predictions on the
 response scale (<code>type = "response"</code>); pass
 <code>type = "link"</code> for the link scale.</p>

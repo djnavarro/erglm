@@ -44,12 +44,12 @@ one or more replicate datasets. The number of replicates is set by
 sim1 <- simulate(mod, nsim = 1, seed = 1)
 head(sim1)
 #>   dat_id sim_id      mu       val coef_(Intercept) coef_aucss  aucss
-#> 1      1      1 -0.4369 -1.686464           -1.716     0.0019  673.1
-#> 2      2      1  3.6156  6.001067           -1.716     0.0019 2806.1
-#> 3      3      1 -1.7157 -1.222992           -1.716     0.0019    0.0
-#> 4      4      1  0.5053 -0.721537           -1.716     0.0019 1169.0
-#> 5      5      1 -0.9989 -0.270042           -1.716     0.0019  377.3
-#> 6      6      1 -1.0943  0.009739           -1.716     0.0019  327.1
+#> 1      1      1 -0.4370 -1.686683           -1.716     0.0019  673.1
+#> 2      2      1  3.6157  6.001413           -1.716     0.0019 2806.1
+#> 3      3      1 -1.7159 -1.223122           -1.716     0.0019    0.0
+#> 4      4      1  0.5053 -0.721710           -1.716     0.0019 1169.0
+#> 5      5      1 -0.9990 -0.270107           -1.716     0.0019  377.3
+#> 6      6      1 -1.0944  0.009701           -1.716     0.0019  327.1
 ```
 
 ### What `simulate()` actually does
@@ -167,10 +167,10 @@ f <- erglm_fun(mod)
 
 # with no arguments, it reproduces the fitted values
 head(f())
-#> [1] -0.4013  3.5360 -1.6437  0.5142 -0.9473 -1.0400
+#> [1] -0.4014  3.5361 -1.6439  0.5141 -0.9474 -1.0401
 head(fitted(mod))
 #>       1       2       3       4       5       6 
-#> -0.4013  3.5360 -1.6437  0.5142 -0.9473 -1.0400
+#> -0.4014  3.5361 -1.6439  0.5141 -0.9474 -1.0401
 ```
 
 Because you control both arguments, you can evaluate the model in
@@ -183,7 +183,7 @@ example, setting the intercept to zero:
 alt <- coef(mod)
 alt["(Intercept)"] <- 0
 head(f(param = alt))
-#> [1] 1.2424 5.1797 0.0000 2.1579 0.6964 0.6037
+#> [1] 1.2425 5.1800 0.0000 2.1580 0.6965 0.6038
 ```
 
 Supplying `data` lets you evaluate the curve at exposures and covariate
@@ -194,7 +194,7 @@ relationship over a grid of `aucss` values:
 
 grid <- tibble(aucss = c(0, 1000, 2000, 3000, 4000))
 f(data = grid)
-#> [1] -1.6437  0.2022  2.0480  3.8939  5.7397
+#> [1] -1.6439  0.2021  2.0480  3.8940  5.7399
 ```
 
 By default
