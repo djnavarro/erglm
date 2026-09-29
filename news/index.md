@@ -2,26 +2,18 @@
 
 ## erglm (development version)
 
-- erglm no longer depends on rlang; internal error/warning/message
-  signalling now uses a small vendored base-R equivalent, keeping
-  erglm’s behaviour unchanged.
-- erglm no longer depends on withr; internal RNG-seed handling now uses
-  a small vendored base-R equivalent, keeping erglm’s behaviour
-  unchanged.
-- erglm no longer depends on tibble or dplyr.
+- erglm no longer depends on rlang, withr, tibble, or dplyr (`mvtnorm`
+  remains its only runtime dependency besides base `stats`). As a
+  result,
   [`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md),
   [`simulate.erglm_model()`](https://erglm.djnavarro.net/reference/simulate.erglm_model.md),
-  and the bundled `erglm_data` dataset now are/ return plain data frames
-  rather than tibbles (`tbl_df` objects) – the values and columns are
-  unchanged, but printing and `dplyr`/ tibble-specific behaviour
-  (e.g. stricter `$` partial-matching) no longer apply unless you
-  convert the result yourself, e.g. via
-  [`tibble::as_tibble()`](https://tibble.tidyverse.org/reference/as_tibble.html).
+  and the bundled `erglm_data` dataset now return/are plain data frames
+  rather than tibbles, and
   [`erglm_predict()`](https://erglm.djnavarro.net/reference/erglm_predict.md)’s
-  `fit_link`/`se_link`/ `fit_resp` columns also lose the
-  observation-index names (`"1"`, `"2"`, …) they used to carry as a
+  `fit_link`/`se_link`/`fit_resp` columns lose the observation-index
+  names they used to carry as a
   [`predict.glm()`](https://rdrr.io/r/stats/predict.glm.html) artifact;
-  the values themselves are unaffected.
+  underlying values are otherwise unchanged.
 - [`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
   gain a `criterion` argument, supporting `"aic"`/`"bic"`-based term
   selection in addition to the existing `"p-value"` default. The SCM
