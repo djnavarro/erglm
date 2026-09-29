@@ -1,5 +1,8 @@
 # erglm (development version)
 
+* erglm no longer depends on rlang; internal error/warning/message
+  signalling now uses a small vendored base-R equivalent, keeping erglm's
+  behaviour unchanged.
 * `erglm_scm_forward()`/`erglm_scm_backward()` gain a `criterion`
   argument, supporting `"aic"`/`"bic"`-based term selection in addition
   to the existing `"p-value"` default. The SCM history (`erglm_scm_history()`)

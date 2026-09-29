@@ -124,6 +124,20 @@ check and a parameter-uncertainty band); no `R/` file uses it.
   `1 - deviance/null.deviance`) for the classic OLS case -- gaussian
   family with an identity link -- and is `NA` otherwise, since it isn't
   a meaningful summary for other family/link combinations.
+- `R/minicondition.R` -- a vendored copy of the `minicondition` mini from
+  [djnavarro/minis](https://github.com/djnavarro/minis), providing
+  `.cond_abort()`/`.cond_warn()`/`.cond_inform()` as dependency-free
+  stand-ins for `rlang::abort()`/`warn()`/`inform()` (erglm's usage never
+  needed rlang's `class`/backtrace features beyond a plain message, so
+  the swap is behaviourally transparent). Copied verbatim from upstream
+  aside from stripping the mini's own roxygen `@export` tags, since these
+  functions stay internal to erglm; re-copy the whole file from upstream
+  rather than hand-editing it if erglm's needs grow. This is part of an
+  ongoing effort (see `.agents/PLAN.md`) to replace some of erglm's hard
+  dependencies (`dplyr`, `rlang`, `tibble`, `withr`) with vendored minis,
+  one dependency at a time; `mvtnorm` is explicitly out of scope for this
+  effort (there's no mini for multivariate normal sampling, and writing
+  one is a riskier undertaking than vendoring an existing mini).
 - `R/utils-helpers.R`, `R/utils-global.R` -- small internal helpers and
   `globalVariables()` declarations for NSE. `.as_erglm()` records the
   fitted model's actual family (`stats::family(mod)$family`) in

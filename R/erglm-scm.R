@@ -266,7 +266,7 @@ erglm_scm_history <- function(mod) {
           best_mod <- mod_new
         }
       } else if (is.na(p_val)) {
-        rlang::warn(paste0(
+        .cond_warn(paste0(
           "Skipping candidate term `", deparse(add), "` in forward step ",
           iter, ": comparison p-value is NA (often caused by a candidate ",
           "that's aliased/collinear with a term already in the model, ",
@@ -334,7 +334,7 @@ erglm_scm_history <- function(mod) {
           best_mod <- mod_new
         }
       } else if (is.na(p_val)) {
-        rlang::warn(paste0(
+        .cond_warn(paste0(
           "Skipping candidate term `", deparse(del), "` in backward step ",
           iter, ": comparison p-value is NA (often caused by a candidate ",
           "that's aliased/collinear with another term in the model, ",
@@ -425,14 +425,14 @@ erglm_add_term <- function(mod, term, quiet = FALSE) {
   trm_add_lab <- attr(trm_add, "term.labels")
   ind <- which(trm_mod_lab == trm_add_lab)
   if (length(ind) != 0L) {
-    if (!quiet) rlang::warn("cannot add a term that already exists in the model")
+    if (!quiet) .cond_warn("cannot add a term that already exists in the model")
     return(mod)
   }
   trm_add_var <- all.vars(attr(trm_add, "variables"))
   dat <- mod$data
   vars_ok <- trm_add_var %in% names(dat)
   if (!all(vars_ok)) {
-    if (!quiet) rlang::warn("cannot add a term that uses variables not in the data")
+    if (!quiet) .cond_warn("cannot add a term that uses variables not in the data")
     return(mod)
   }
   fml <- stats::as.formula(
@@ -451,7 +451,7 @@ erglm_remove_term <- function(mod, term, quiet = FALSE) {
   trm_del_lab <- attr(trm_del, "term.labels")
   ind <- which(trm_mod_lab == trm_del_lab)
   if (length(ind) == 0L) {
-    if (!quiet) rlang::warn("cannot remove a term that does not exist in the model")
+    if (!quiet) .cond_warn("cannot remove a term that does not exist in the model")
     return(mod)
   }
   dat <- mod$data

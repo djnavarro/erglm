@@ -69,7 +69,7 @@ simulate.erglm_model <- function(object, nsim = 1, seed = NULL, ...) {
   .erglm_check_nsim(nsim)
   if (is.null(seed)) {
     seed <- .pick_seed()
-    rlang::inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))
+    .cond_inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))
   }
 
   family_name <- stats::family(mod)$family

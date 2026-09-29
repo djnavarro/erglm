@@ -178,7 +178,7 @@ erglm_fun <- function(object) {
     if (is.null(data)) data <- object$data
     mm <- stats::model.matrix(ff, data)
     if (!is.numeric(param) || length(param) != ncol(mm)) {
-      rlang::abort(paste0(
+      .cond_abort(paste0(
         "`param` must be a numeric vector of length ", ncol(mm),
         " (one entry per column of the model matrix: ",
         paste(colnames(mm), collapse = ", "), "), not length ",
@@ -206,7 +206,7 @@ erglm_fun <- function(object) {
   .erglm_check_nsim(nsim)
   if (is.null(seed)) {
     seed <- .pick_seed()
-    rlang::inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))
+    .cond_inform(paste0("Using seed = ", seed, ". Pass `seed = ", seed, "` to reproduce this result."))
   }
   fn <- erglm_fun(object)
   family_name <- stats::family(object)$family
