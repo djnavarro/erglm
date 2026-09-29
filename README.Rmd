@@ -42,7 +42,6 @@ pak::pak("djnavarro/erglm")
 
 ```{r}
 #| label: erglm-model
-
 library(erglm)
 
 head(erglm_data)

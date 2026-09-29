@@ -37,10 +37,10 @@
             stats::qlnorm() |>
             (\(x) x * (dose + 10 * weight))() |> 
             (\(x) ifelse(dose == 0, 0, x))() |> 
-            round(digits = 3),
+            round(digits = 2),
           cmaxss = (exp(log(aucss/10) + stats::rnorm(n)/3) + stats::rnorm(n)) |> 
             (\(x) ifelse(dose == 0, 0, x))() |> 
-            round(digits = 3),
+            round(digits = 2),
           ae1 = as.numeric(stats::qlogis(stats::runif(n)) < aucss/200 - 2 + 1 * as.numeric(sex=="Female")),
           ae2 = as.numeric(stats::qlogis(stats::runif(n)) < aucss/500 - 2.0)
         ) |>
@@ -53,11 +53,13 @@
             n,
             lambda = exp(-1 + aucss / 1000 + 0.3 * as.numeric(sex == "Female"))
           ),
-          biomarker_change = stats::rnorm(n, mean = -2 + aucss / 500, sd = 1.5),
+          biomarker_change = stats::rnorm(n, mean = -2 + aucss / 500, sd = 1.5) |>
+            round(digits = 2),
           ae_duration = {
             mean_duration <- 5 + dose / 50 + aucss / 500
             stats::rgamma(n, shape = 2, rate = 2 / mean_duration)
-          }
+          } |>
+            round(digits = 2)
         )
     }
   )

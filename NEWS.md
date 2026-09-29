@@ -1,5 +1,9 @@
 # erglm (development version)
 
+* The bundled `erglm_data` dataset's continuous columns (`aucss`, `cmaxss`,
+  `biomarker_change`, `ae_duration`) are now rounded to two decimal places,
+  a more realistic degree of precision; underlying values are otherwise
+  unchanged.
 * erglm no longer depends on rlang, withr, tibble, or dplyr (`mvtnorm`
   remains its only runtime dependency besides base `stats`). As a result,
   `erglm_predict()`, `simulate.erglm_model()`, and the bundled `erglm_data`
