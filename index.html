@@ -86,24 +86,22 @@
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">erglm_data</span></span>
-<span><span class="co">#&gt; # A tibble: 300 × 13</span></span>
-<span><span class="co">#&gt;       id sex      age weight  dose treatment aucss cmaxss   ae1   ae2 ae_count</span></span>
-<span><span class="co">#&gt;    &lt;int&gt; &lt;fct&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;int&gt;</span></span>
-<span><span class="co">#&gt;  1     1 Male      35     79   200 Drug       673.   97.3     0     1        1</span></span>
-<span><span class="co">#&gt;  2     2 Female    22     58   200 Drug      2806.  301.      1     1        6</span></span>
-<span><span class="co">#&gt;  3     3 Female    28     58     0 Placebo      0     0       0     0        1</span></span>
-<span><span class="co">#&gt;  4     4 Female    18     57   100 Drug      1169.  198.      1     1        0</span></span>
-<span><span class="co">#&gt;  5     5 Male      28     77   100 Drug       377.   51.4     0     0        0</span></span>
-<span><span class="co">#&gt;  6     6 Female    19     76   200 Drug       327.   25.4     1     0        0</span></span>
-<span><span class="co">#&gt;  7     7 Male      30     70     0 Placebo      0     0       0     0        0</span></span>
-<span><span class="co">#&gt;  8     8 Female    34     60   100 Drug      1208.  133.      1     1        1</span></span>
-<span><span class="co">#&gt;  9     9 Male      21     89     0 Placebo      0     0       0     0        0</span></span>
-<span><span class="co">#&gt; 10    10 Female    34     56   200 Drug       254.   31.0     0     0        1</span></span>
-<span><span class="co">#&gt; # ℹ 290 more rows</span></span>
-<span><span class="co">#&gt; # ℹ 2 more variables: biomarker_change &lt;dbl&gt;, ae_duration &lt;dbl&gt;</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">erglm_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   id    sex age weight dose treatment    aucss  cmaxss ae1 ae2 ae_count</span></span>
+<span><span class="co">#&gt; 1  1   Male  35     79  200      Drug  673.091  97.328   0   1        1</span></span>
+<span><span class="co">#&gt; 2  2 Female  22     58  200      Drug 2806.115 300.615   1   1        6</span></span>
+<span><span class="co">#&gt; 3  3 Female  28     58    0   Placebo    0.000   0.000   0   0        1</span></span>
+<span><span class="co">#&gt; 4  4 Female  18     57  100      Drug 1169.045 197.783   1   1        0</span></span>
+<span><span class="co">#&gt; 5  5   Male  28     77  100      Drug  377.288  51.429   0   0        0</span></span>
+<span><span class="co">#&gt; 6  6 Female  19     76  200      Drug  327.079  25.373   1   0        0</span></span>
+<span><span class="co">#&gt;   biomarker_change ae_duration</span></span>
+<span><span class="co">#&gt; 1         1.216895   12.402338</span></span>
+<span><span class="co">#&gt; 2         4.867072   13.697841</span></span>
+<span><span class="co">#&gt; 3        -1.832830    5.262023</span></span>
+<span><span class="co">#&gt; 4         1.900170    6.699422</span></span>
+<span><span class="co">#&gt; 5        -1.009179    6.152825</span></span>
+<span><span class="co">#&gt; 6        -4.972753   12.829726</span></span>
 <span></span>
 <span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mod</span></span>
@@ -125,15 +123,21 @@
 <code class="sourceCode R"><span><span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">dose</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_scm.html">erglm_scm_backward</a></span><span class="op">(</span><span class="va">mod1</span>, candidates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sex"</span>, <span class="st">"dose"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/erglm_scm.html">erglm_scm_history</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 4 × 12</span></span>
-<span><span class="co">#&gt;   iteration attempt step       criterion action term_tested model_tested        </span></span>
-<span><span class="co">#&gt;       &lt;int&gt;   &lt;int&gt; &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;               </span></span>
-<span><span class="co">#&gt; 1         0       0 base model &lt;NA&gt;      &lt;NA&gt;   &lt;NA&gt;        ae1 ~ aucss + sex +…</span></span>
-<span><span class="co">#&gt; 2         1       1 backward   p-value   remove ~dose       ae1 ~ aucss + sex   </span></span>
-<span><span class="co">#&gt; 3         1       2 backward   p-value   remove ~sex        ae1 ~ aucss + dose  </span></span>
-<span><span class="co">#&gt; 4         2       3 backward   p-value   remove ~sex        ae1 ~ aucss         </span></span>
-<span><span class="co">#&gt; # ℹ 5 more variables: model_converged &lt;lgl&gt;, term_p_value &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   model_aic &lt;dbl&gt;, model_bic &lt;dbl&gt;, model_updated &lt;int&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   iteration attempt       step criterion action term_tested</span></span>
+<span><span class="co">#&gt; 1         0       0 base model      &lt;NA&gt;   &lt;NA&gt;        &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 2         1       1   backward   p-value remove       ~dose</span></span>
+<span><span class="co">#&gt; 3         1       2   backward   p-value remove        ~sex</span></span>
+<span><span class="co">#&gt; 4         2       3   backward   p-value remove        ~sex</span></span>
+<span><span class="co">#&gt;               model_tested model_converged term_p_value model_aic model_bic</span></span>
+<span><span class="co">#&gt; 1 ae1 ~ aucss + sex + dose            TRUE           NA  200.5607  215.3758</span></span>
+<span><span class="co">#&gt; 2        ae1 ~ aucss + sex            TRUE    0.7405587  198.6704  209.7817</span></span>
+<span><span class="co">#&gt; 3       ae1 ~ aucss + dose            TRUE    0.4025483  199.2614  210.3728</span></span>
+<span><span class="co">#&gt; 4              ae1 ~ aucss            TRUE    0.3906316  197.4073  204.8149</span></span>
+<span><span class="co">#&gt;   model_updated</span></span>
+<span><span class="co">#&gt; 1            NA</span></span>
+<span><span class="co">#&gt; 2             1</span></span>
+<span><span class="co">#&gt; 3             0</span></span>
+<span><span class="co">#&gt; 4             1</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="simulation">Simulation<a class="anchor" aria-label="anchor" href="#simulation"></a>
@@ -141,22 +145,21 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">mod</span>, nsim <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
-<span><span class="va">sim</span></span>
-<span><span class="co">#&gt; # A tibble: 1,500 × 9</span></span>
-<span><span class="co">#&gt;    dat_id sim_id    mu   val `coef_(Intercept)` coef_aucss coef_sexMale aucss</span></span>
-<span><span class="co">#&gt;     &lt;int&gt;  &lt;int&gt; &lt;dbl&gt; &lt;int&gt;              &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1      1      1 0.894     1              -2.09    0.00601        0.179  673.</span></span>
-<span><span class="co">#&gt;  2      2      1 1.000     1              -2.09    0.00601        0.179 2806.</span></span>
-<span><span class="co">#&gt;  3      3      1 0.110     0              -2.09    0.00601        0.179    0 </span></span>
-<span><span class="co">#&gt;  4      4      1 0.993     1              -2.09    0.00601        0.179 1169.</span></span>
-<span><span class="co">#&gt;  5      5      1 0.588     1              -2.09    0.00601        0.179  377.</span></span>
-<span><span class="co">#&gt;  6      6      1 0.468     1              -2.09    0.00601        0.179  327.</span></span>
-<span><span class="co">#&gt;  7      7      1 0.129     0              -2.09    0.00601        0.179    0 </span></span>
-<span><span class="co">#&gt;  8      8      1 0.994     1              -2.09    0.00601        0.179 1208.</span></span>
-<span><span class="co">#&gt;  9      9      1 0.129     1              -2.09    0.00601        0.179    0 </span></span>
-<span><span class="co">#&gt; 10     10      1 0.362     1              -2.09    0.00601        0.179  254.</span></span>
-<span><span class="co">#&gt; # ℹ 1,490 more rows</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: sex &lt;fct&gt;</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   dat_id sim_id        mu val coef_(Intercept)  coef_aucss coef_sexMale</span></span>
+<span><span class="co">#&gt; 1      1      1 0.8940486   1        -2.092199 0.006010499    0.1793657</span></span>
+<span><span class="co">#&gt; 2      2      1 0.9999996   1        -2.092199 0.006010499    0.1793657</span></span>
+<span><span class="co">#&gt; 3      3      1 0.1098574   0        -2.092199 0.006010499    0.1793657</span></span>
+<span><span class="co">#&gt; 4      4      1 0.9928562   1        -2.092199 0.006010499    0.1793657</span></span>
+<span><span class="co">#&gt; 5      5      1 0.5877947   1        -2.092199 0.006010499    0.1793657</span></span>
+<span><span class="co">#&gt; 6      6      1 0.4684692   1        -2.092199 0.006010499    0.1793657</span></span>
+<span><span class="co">#&gt;      aucss    sex</span></span>
+<span><span class="co">#&gt; 1  673.091   Male</span></span>
+<span><span class="co">#&gt; 2 2806.115 Female</span></span>
+<span><span class="co">#&gt; 3    0.000 Female</span></span>
+<span><span class="co">#&gt; 4 1169.045 Female</span></span>
+<span><span class="co">#&gt; 5  377.288   Male</span></span>
+<span><span class="co">#&gt; 6  327.079 Female</span></span></code></pre></div>
 <p>To visualise the simulations against the observed data (e.g. as a VPC-style plot) see erplots’ <code>er_vpc()</code> mini-grammar – specifically <code><a href="https://erplots.djnavarro.net/reference/er_vpc_add_simulated.html" class="external-link">erplots::er_vpc_add_simulated()</a></code>, which can build its own simulated replicates directly from a fitted <code>erglm_model</code> (<code>er_vpc_add_simulated(model = mod)</code>).</p>
 </div>
 </div>
