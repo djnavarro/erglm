@@ -2,6 +2,14 @@
 
 ## erglm (development version)
 
+- [`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
+  gain a `criterion` argument, supporting `"aic"`/`"bic"`-based term
+  selection in addition to the existing `"p-value"` default. The SCM
+  history
+  ([`erglm_scm_history()`](https://erglm.djnavarro.net/reference/erglm_scm.md))
+  gains a `criterion` column recording which selection rule was applied
+  in each forward/backward step
+  ([\#7](https://github.com/djnavarro/erglm/issues/7)).
 - The bundled `erglm_data` dataset’s continuous columns (`aucss`,
   `cmaxss`, `biomarker_change`, `ae_duration`) are now rounded to two
   decimal places, a more realistic degree of precision; underlying
@@ -21,14 +29,6 @@
   dropped from `Suggests` entirely, since the vignettes now build their
   example data with plain
   [`data.frame()`](https://rdrr.io/r/base/data.frame.html) calls too.
-- [`erglm_scm_forward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)/[`erglm_scm_backward()`](https://erglm.djnavarro.net/reference/erglm_scm.md)
-  gain a `criterion` argument, supporting `"aic"`/`"bic"`-based term
-  selection in addition to the existing `"p-value"` default. The SCM
-  history
-  ([`erglm_scm_history()`](https://erglm.djnavarro.net/reference/erglm_scm.md))
-  gains a `criterion` column recording which selection rule was applied
-  in each forward/backward step
-  ([\#7](https://github.com/djnavarro/erglm/issues/7)).
 - Fixed several documentation gaps across help pages, vignettes, and the
   README: missing descriptions, undocumented argument defaults, and
   broken cross-references, including several references to erplots’
