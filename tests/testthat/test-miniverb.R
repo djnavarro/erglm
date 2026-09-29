@@ -105,6 +105,21 @@ test_that(".verb_mutate() with `.by` evaluates per group", {
   expect_equal(out$centered, c(-0.5, 0.5, -0.5, 0.5))
 })
 
+test_that(".verb_mutate() with `.by` computes ifelse() correctly when a group's condition is not uniform (mixes TRUE/FALSE within the same group)", {
+  # Contrast with `.make_erglm_data()`'s `weight` column (grouped `.by = "sex"`),
+  # where the condition IS uniform within each group -- the exact pattern that
+  # trips up base ifelse()'s short-circuit evaluation of its branches (see
+  # AGENTS.md/HISTORY.md). Here the condition mixes TRUE/FALSE within every
+  # group, so this exercises `.verb_mutate()`'s own per-group recycling/
+  # assignment logic without that separate ifelse() hazard confounding it.
+  gdf <- data.frame(g = rep(c("a", "b", "c"), each = 4), x = 1:12)
+  out <- .verb_mutate(gdf, y = ifelse(x > mean(x), "hi", "lo"), .by = "g")
+  expect_equal(
+    out$y,
+    rep(c("lo", "lo", "hi", "hi"), times = 3)
+  )
+})
+
 test_that(".verb_mutate() requires named arguments", {
   expect_error(.verb_mutate(sdf, a + b), "must be named")
 })
