@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/djnavarro/erglm/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/djnavarro/erglm/blob/v0.2.0/DESCRIPTION)
 
 Navarro D (2026). *erglm: Exposure-Response Tools for GLM-Based Models*.
 R package version 0.2.0, <https://github.com/djnavarro/erglm>.

@@ -45,7 +45,7 @@ returning a new fitted model object."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Add or remove a covariate term from an exposure-response model</h1>
-      <small class="dont-index">Source: <a href="https://github.com/djnavarro/erglm/blob/main/R/erglm-scm.R" class="external-link"><code>R/erglm-scm.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/djnavarro/erglm/blob/v0.2.0/R/erglm-scm.R" class="external-link"><code>R/erglm-scm.R</code></a></small>
       <div class="d-none name"><code>erglm_term.Rd</code></div>
     </div>
 
@@ -90,7 +90,7 @@ the model, respectively). Defaults to <code>FALSE</code>.</p></dd>
     <p>These functions are not typically called directly; they
 underpin <code><a href="erglm_scm.html">erglm_scm_forward()</a></code> and <code><a href="erglm_scm.html">erglm_scm_backward()</a></code>. Named and
 shaped to match the companion <code>emaxnls</code> package's
-<code><a href="https://rdrr.io/pkg/emaxnls/man/emax_update.html" class="external-link">emaxnls::emax_add_term()</a></code>/<code><a href="https://rdrr.io/pkg/emaxnls/man/emax_update.html" class="external-link">emaxnls::emax_remove_term()</a></code>, which serve the same purpose
+<code><a href="https://emaxnls.djnavarro.net/reference/emax_update.html" class="external-link">emaxnls::emax_add_term()</a></code>/<code><a href="https://emaxnls.djnavarro.net/reference/emax_update.html" class="external-link">emaxnls::emax_remove_term()</a></code>, which serve the same purpose
 for <code>emaxnls</code>/<code>emaxlogistic</code> models – with one structural
 difference: <code>emaxnls</code>'s terms are two-sided formulas naming a
 structural parameter (e.g. <code>E0 ~ AGE</code>), since covariates there attach

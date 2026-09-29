@@ -47,7 +47,7 @@ or data (e.g., for VPCs or other counterfactual simulation scenarios)."></head><
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Prediction function for an exposure-response model</h1>
-      <small class="dont-index">Source: <a href="https://github.com/djnavarro/erglm/blob/main/R/erglm-core.R" class="external-link"><code>R/erglm-core.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/djnavarro/erglm/blob/v0.2.0/R/erglm-core.R" class="external-link"><code>R/erglm-core.R</code></a></small>
       <div class="d-none name"><code>erglm_fun.Rd</code></div>
     </div>
 
@@ -85,7 +85,7 @@ of prediction to generate (defaults to <code>"response"</code>)</p></li>
 <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> family, not just binomial/logistic models; tested for
 binomial, poisson, gaussian, and gamma families. Named <code>erglm_fun()</code>
 for consistency with the companion <code>emaxnls</code> package's
-<code><a href="https://rdrr.io/pkg/emaxnls/man/emax_fun.html" class="external-link">emaxnls::emax_fun()</a></code>, which serves the same purpose for
+<code><a href="https://emaxnls.djnavarro.net/reference/emax_fun.html" class="external-link">emaxnls::emax_fun()</a></code>, which serves the same purpose for
 <code>emaxnls</code>/<code>emaxlogistic</code> models. The returned function checks that
 <code>param</code> is numeric and has one entry per column of the model matrix
 implied by <code>data</code>, erroring informatively rather than failing with a
