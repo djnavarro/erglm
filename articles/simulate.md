@@ -1,12 +1,5 @@
 # Simulation
 
-``` r
-
-library(erglm)
-library(ggplot2)
-theme_set(theme_bw())
-```
-
 Once a model has been fitted, it’s often useful to generate *new* data
 from it: for predictive checks, for simulation-based intervals, or as
 the input to some downstream analysis. The package offers two tools for
@@ -29,6 +22,9 @@ gaussian model, then shows that they generalise unchanged to the other
 
 ``` r
 
+library(erglm)
+library(ggplot2)
+theme_set(theme_bw())
 mod <- erglm_model(biomarker_change ~ aucss, erglm_data, family = gaussian())
 ```
 

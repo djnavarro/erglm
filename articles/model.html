@@ -78,8 +78,6 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span></code></pre></div>
 <p>Fitting a model and turning it into predictions are the two most
 basic tasks in erglm – every other tool in the package (stepwise
 covariate selection, simulation) builds on <code><a href="../reference/erglm_model.html">erglm_model()</a></code>
@@ -94,8 +92,9 @@ default), but any <code><a href="https://rdrr.io/r/stats/glm.html" class="extern
 <code>binomial</code>, <code>poisson</code>, and <code>Gamma</code> are
 also tested and supported. The package comes with a synthetic data set
 called <code>erglm_data</code> that we can use:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">erglm_data</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/djnavarro/erglm" class="external-link">erglm</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">erglm_data</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   id    sex age weight dose treatment   aucss cmaxss ae1 ae2 ae_count</span></span>
 <span><span class="co">#&gt; 1  1   Male  35     79  200      Drug  673.09  97.33   0   1        1</span></span>
 <span><span class="co">#&gt; 2  2 Female  22     58  200      Drug 2806.12 300.62   1   1        6</span></span>
@@ -114,7 +113,7 @@ called <code>erglm_data</code> that we can use:</p>
 <h2 id="fitting-models">Fitting models<a class="anchor" aria-label="anchor" href="#fitting-models"></a>
 </h2>
 <p>Creating a model:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">ae1</span> <span class="op">~</span> <span class="va">aucss</span>, data <span class="op">=</span> <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mod</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -133,7 +132,7 @@ called <code>erglm_data</code> that we can use:</p>
 </h2>
 <p>The <code><a href="../reference/erglm_predict.html">erglm_predict()</a></code> function produces model
 predictions:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="va">mod</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>    aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="fl">1500</span>, by <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
@@ -162,14 +161,14 @@ move between these two scales yourself – e.g. to transform a raw
 response-scale value onto the link scale – <code><a href="../reference/erglm_link.html">erglm_link()</a></code> and
 <code><a href="../reference/erglm_link.html">erglm_invlink()</a></code> extract the relevant functions straight
 from the model’s <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> family:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/erglm_link.html">erglm_link</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>    <span class="co"># response scale -&gt; link scale</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="fu"><a href="../reference/erglm_link.html">erglm_invlink</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>   <span class="co"># link scale -&gt; response scale</span></span>
 <span><span class="co">#&gt; [1] 0.5</span></span></code></pre></div>
 <p>The confidence level can be adjusted using the
 <code>conf_level</code> argument</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="va">mod</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span></span>
 <span>    newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="fl">1500</span>, by <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>, </span>
@@ -207,7 +206,7 @@ covered in its own article, “Stepwise covariate modelling”.</p>
 response (<code>ae_duration</code>), for demonstrating
 <code>poisson</code>, <code>gaussian</code>, and <code>Gamma</code>
 models respectively:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/erglm_model.html">erglm_model</a></span><span class="op">(</span><span class="va">ae_count</span> <span class="op">~</span> <span class="va">aucss</span> <span class="op">+</span> <span class="va">sex</span>, <span class="va">erglm_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mod_pois</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -223,7 +222,7 @@ models respectively:</p>
 <p><code><a href="../reference/erglm_predict.html">erglm_predict()</a></code> and <code><a href="../reference/erglm_fun.html">erglm_fun()</a></code> work
 unchanged, since both operate on the link scale generically via
 <code>stats::family(object)$linkinv</code>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod_pois</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/erglm_predict.html">erglm_predict</a></span><span class="op">(</span>newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>aucss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3000</span>, by <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, sex <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   aucss    sex   fit_link    se_link  fit_resp  ci_lower   ci_upper</span></span>

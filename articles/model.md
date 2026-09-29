@@ -1,10 +1,5 @@
 # Modelling
 
-``` r
-
-library(erglm)
-```
-
 Fitting a model and turning it into predictions are the two most basic
 tasks in erglm – every other tool in the package (stepwise covariate
 selection, simulation) builds on
@@ -28,6 +23,7 @@ supported. The package comes with a synthetic data set called
 
 ``` r
 
+library(erglm)
 head(erglm_data)
 #>   id    sex age weight dose treatment   aucss cmaxss ae1 ae2 ae_count
 #> 1  1   Male  35     79  200      Drug  673.09  97.33   0   1        1

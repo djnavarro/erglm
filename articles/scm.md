@@ -1,10 +1,5 @@
 # Stepwise covariate modelling
 
-``` r
-
-library(erglm)
-```
-
 Once you can fit a single exposure-response model, the next practical
 question is usually *which covariates belong in the model*. When there
 are several candidates, testing every combination by hand is tedious and
@@ -17,6 +12,11 @@ forward-addition step that greedily adds the most helpful covariates, a
 backward-elimination step that prunes terms that no longer earn their
 place, and a complete history of every model considered along the way
 that serves as an audit log for the procedure.
+
+``` r
+
+library(erglm)
+```
 
 ## The building blocks
 
@@ -202,7 +202,7 @@ where the $`p`$-value search above found none:
 aic_mod <- erglm_scm_forward(base_mod, candidates, criterion = "aic", seed = 3425)
 aic_mod$formula
 #> ae1 ~ aucss + weight + age
-#> <environment: 0x56181c27a020>
+#> <environment: 0x555daa54d178>
 ```
 
 ``` r

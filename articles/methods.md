@@ -1,10 +1,5 @@
 # Using base R model methods
 
-``` r
-
-library(erglm)
-```
-
 An object returned by
 [`erglm_model()`](https://erglm.djnavarro.net/reference/erglm_model.md)
 is a genuine `glm` object – it has class
@@ -18,6 +13,7 @@ exposure-response models.
 
 ``` r
 
+library(erglm)
 mod <- erglm_model(ae1 ~ aucss + dose + sex, erglm_data, family = binomial())
 ```
 
